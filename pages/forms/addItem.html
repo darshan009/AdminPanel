@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>OrderCMS</title>
+    <!-- Tell the browser to be responsive to screen width -->
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+    <!-- Bootstrap 3.3.5 -->
+    <link rel="stylesheet" href="../../bootstrap/css/bootstrap.min.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+    <!-- Ionicons -->
+    <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+    <!-- DataTables -->
+    <link rel="stylesheet" href="../../plugins/datatables/dataTables.bootstrap.css">
+    <!-- Theme style -->
+    <link rel="stylesheet" href="../../dist/css/AdminLTE.min.css">
+    <!-- AdminLTE Skins. Choose a skin from the css/skins
+         folder instead of downloading all of them to reduce the load. -->
+    <link rel="stylesheet" href="../../dist/css/skins/_all-skins.min.css">
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+        <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  </head>
+  <body class="hold-transition skin-blue sidebar-mini">
+    <div class="wrapper">
+
+      <header class="main-header">
+        <!-- Logo -->
+        <a href="../../index2.html" class="logo">
+          <!-- mini logo for sidebar mini 50x50 pixels -->
+          <span class="logo-mini"><b>A</b>LT</span>
+          <!-- logo for regular state and mobile devices -->
+          <span class="logo-lg"><b>Order</b>CMS</span>
+        </a>
+        <!-- Header Navbar: style can be found in header.less -->
+        <nav class="navbar navbar-static-top" role="navigation">
+          <div class="navbar-custom-menu">
+            <ul class="nav navbar-nav">
+              <li class="dropdown user user-menu">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                  <img src="../../dist/img/user2-160x160.jpg" class="user-image" alt="User Image">
+                  <span class="hidden-xs">Darshan Sapaliga</span>
+                </a>
+                <ul class="dropdown-menu">
+                  <!-- User image -->
+                  <li class="user-header">
+                    <img src="../../dist/img/user2-160x160.jpg" class="img-circle" alt="User Image">
+                    <p>
+                      Darshan Sapaliga - Web Developer
+                      <small>Admin User</small>
+                    </p>
+                  </li>
+                  <!-- Menu Footer-->
+                  <li class="user-footer">
+                    <div class="pull-left">
+                      <a href="#" class="btn btn-default btn-flat">Profile</a>
+                    </div>
+                    <div class="pull-right">
+                      <a href="#" class="btn btn-default btn-flat">Sign out</a>
+                    </div>
+                  </li>
+                </ul>
+              </li>
+            </ul>
+          </div>
+        </nav>
+      </header>
+      <!-- Left side column. contains the logo and sidebar -->
+      <aside class="main-sidebar">
+        <!-- sidebar: style can be found in sidebar.less -->
+        <section class="sidebar">
+          <!-- Sidebar user panel -->
+          <div class="user-panel">
+            <div class="pull-left image">
+              <img src="../../dist/img/user2-160x160.jpg" class="img-circle" alt="User Image">
+            </div>
+            <div class="pull-left info">
+              <p>Darshan Sapaliga</p>
+            </div>
+          </div>
+          <!-- search form -->
+          <form action="#" method="get" class="sidebar-form">
+            <div class="input-group">
+              <input type="text" name="q" class="form-control" placeholder="Search...">
+              <span class="input-group-btn">
+                <button type="submit" name="search" id="search-btn" class="btn btn-flat"><i class="fa fa-search"></i></button>
+              </span>
+            </div>
+          </form>
+          <!-- /.search form -->
+          <!-- sidebar menu: : style can be found in sidebar.less -->
+          <ul class="sidebar-menu">
+            <li class="header">MAIN NAVIGATION</li>
+            <li>
+              <a href="user.html">
+                <i class="fa fa-table"></i> <span>User</span> <i class="fa fa-angle-left pull-right"></i>
+              </a>
+              <ul class="treeview-menu">
+                <li><a href="userList.html"><i class="fa fa-circle-o"></i> List of Users</a></li>
+                <li><a href="addUser.html"><i class="fa fa-circle-o"></i> Add a User</a></li>
+              </ul>
+            </li>
+            <li class="active">
+              <a href="item.html">
+                <i class="fa fa-calendar"></i> <span>Item</span> <i class="fa fa-angle-left pull-right"></i>
+              </a>
+              <ul class="treeview-menu">
+                <li><a href="itemList.html"><i class="fa fa-circle-o"></i> List of Items</a></li>
+                <li class="active"><a href="addItem.html"><i class="fa fa-circle-o"></i> Add an Item</a></li>
+              </ul>
+            </li>
+            <li>
+              <a href="itemcategory.html">
+                <i class="fa fa-envelope"></i> <span>ItemCategory</span> <i class="fa fa-angle-left pull-right"></i>
+              </a>
+              <ul class="treeview-menu">
+                <li class="active"><a href="categoryList.html"><i class="fa fa-circle-o"></i> List of Categories</a></li>
+                <li><a href="addCategory.html"><i class="fa fa-circle-o"></i> Add a category</a></li>
+              </ul>
+            </li>
+            <li class="treeview">
+              <a href="menu.html">
+                <i class="fa fa-folder"></i> <span>Menu</span> <i class="fa fa-angle-left pull-right"></i>
+              </a>
+              <ul class="treeview-menu">
+                <li><a href="menuList.html"><i class="fa fa-circle-o"></i> List of Menu</a></li>
+                <li><a href="addMenu.html"><i class="fa fa-circle-o"></i> Add an Item</a></li>
+              </ul>
+            </li>
+            <li class="treeview">
+              <a href="order.html">
+                <i class="fa fa-share"></i> <span>Order</span>  <i class="fa fa-angle-left pull-right"></i>
+              </a>
+              <ul class="treeview-menu">
+                <li><a href="orderList.html"><i class="fa fa-circle-o"></i> List of Orders</a></li>
+                <li><a href="addOrder.html"><i class="fa fa-circle-o"></i> Place an Order</a></li>
+              </ul>
+            </li>
+          </ul>
+        </section>
+        <!-- /.sidebar -->
+      </aside>
+
+      <!-- Content Wrapper. Contains page content -->
+      <div class="content-wrapper">
+        <!-- Main content -->
+        <section class="content">
+          <div class="row">
+            <div class="box box-info">
+              <div class="box-header with-border">
+                <h3 class="box-title">Items</h3>
+              </div><!-- /.box-header -->
+              <!-- form start -->
+              <form class="form-horizontal">
+                  <!-- select -->
+                  <div class="form-group">
+                    <label class="col-sm-2 control-label">State</label>
+                    <div class="col-sm-10">
+                      <select class="form-control">
+                        <option>Draft</option>
+                        <option>Published</option>
+                        <option>Archieved</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label class="col-sm-2 control-label">Chef</label>
+                    <div class="col-sm-10">
+                      <select class="form-control">
+                        <option>Select</option>
+                        <option>Suur Daas</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label for="exampleInputFile" class="col-sm-2 control-label">Image</label>
+                    <div class="col-sm-10">
+                      <input type="file" id="exampleInputFile">
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label class="col-sm-2 control-label">Description</label>
+                    <div class="col-sm-10">
+                      <textarea class="form-control" rows="3" placeholder="Give a description ..."></textarea>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label class="col-sm-2 control-label">Type</label>
+                    <div class="col-sm-10">
+                      <select class="form-control">
+                        <option>Veg</option>
+                        <option>Non-veg</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label class="col-sm-2 control-label">Category</label>
+                    <div class="col-sm-10">
+                      <select class="form-control">
+                        <option>Select</option>
+                        <option>Indian</option>
+                        <option>Sandwhich</option>
+                        <option>Burger</option>
+                      </select>
+                    </div>
+                  </div>
+                <div Class="form-group">
+                  <label class="col-sm-2 control-label">Attributes</label>
+                  <div class="col-sm-10">
+                    <table id="hi" class="table table-bordered table-hover">
+                      <thead>
+                        <tr>
+                          <th>VALUE</th>
+                          <th>PRICE</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td><input type=text></td>
+                          <td><input type=Number></td>
+                        </tr>
+                      </tbody>
+                    </table>
+                    <button onclick="addTableRow()" type="button" class="btn btn-info pull-right">Add a row</button>
+                  </div>
+                </div>
+            <div class="box-footer">
+              <button type="submit" class="btn btn-info pull-right">Save</button>
+            </div><!-- /.box-footer -->
+              </form>
+            </div><!-- /.box -->
+          </div>   <!-- /.row -->
+        </section><!-- /.content -->
+      </div><!-- /.content-wrapper -->
+      <footer class="main-footer">
+        <div class="pull-right hidden-xs">
+          <b>Version</b> 2.3.0
+        </div>
+        <strong>OrderCMS WAS Powered by <a href="http://keystonejs.com/">KeystoneJS</a>.</strong> version 0.3.16.
+      </footer>
+    </div><!-- ./wrapper -->
+
+    <!-- jQuery 2.1.4 -->
+    <script src="../../plugins/jQuery/jQuery-2.1.4.min.js"></script>
+    <!-- Bootstrap 3.3.5 -->
+    <script src="../../bootstrap/js/bootstrap.min.js"></script>
+    <!-- FastClick -->
+    <script src="../../plugins/fastclick/fastclick.min.js"></script>
+    <!-- DataTables -->
+    <script src="../../plugins/datatables/jquery.dataTables.min.js"></script>
+    <script src="../../plugins/datatables/dataTables.bootstrap.min.js"></script>
+    <!-- AdminLTE App -->
+    <script src="../../dist/js/app.min.js"></script>
+    <!-- page script -->
+    <script>
+      function addTableRow() {
+        var table = document.getElementById("hi");
+        var row = table.insertRow(1);
+        var cell1 = row.insertCell(0);
+        var cell2 = row.insertCell(1);
+        var cell1Data = document.createElement("input");
+        var cell2Data = document.createElement("input");
+        cell1.type = "text";
+        cell2.type = "Number";
+        cell1.appendChild(cell1Data);
+        cell2.appendChild(cell2Data);
+      }
+    </script>
+    <script>
+      $(function () {
+        $("#example1").DataTable();
+        $('#example2').DataTable({
+          "paging": true,
+          "lengthChange": false,
+          "searching": false,
+          "ordering": true,
+          "info": true,
+          "autoWidth": false
+        });
+      });
+    </script>
+  </body>
+</html>
