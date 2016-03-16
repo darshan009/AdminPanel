@@ -8,7 +8,7 @@ var MongoStore = require('connect-mongo')(session);
 var app = express();
 
 //mongoose connection
-mongoose.connect("mongodb://localhost:27017/adminpanel");
+mongoose.connect("mongodb://darshan009:admin123@ds015859.mlab.com:15859/adminpanel");
 mongoose.connection.on('error', function(){
   console.log("Mongoose connection error");
 });
@@ -25,7 +25,7 @@ app.use(session({
   saveUninitialized: true,
   secret: "2hjkeydwjfhusdifsb",
   store: new MongoStore({
-    url: "mongodb://localhost:27017/adminpanel",
+    url: "mongodb://darshan009:admin123@ds015859.mlab.com:15859/adminpanel",
     autoReconnect: true
   })
 }));
