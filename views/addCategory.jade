@@ -1,0 +1,211 @@
+doctype html
+html
+  head
+    meta(charset='utf-8')
+    meta(http-equiv='X-UA-Compatible', content='IE=edge')
+    title OrderCMS
+    // Tell the browser to be responsive to screen width
+    meta(content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no', name='viewport')
+    // Bootstrap 3.3.5
+    link(rel='stylesheet', href='../public/bootstrap/css/bootstrap.min.css')
+    // Font Awesome
+    link(rel='stylesheet', href='https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css')
+    // Ionicons
+    link(rel='stylesheet', href='https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css')
+    // DataTables
+    link(rel='stylesheet', href='../public/plugins/datatables/dataTables.bootstrap.css')
+    // Theme style
+    link(rel='stylesheet', href='../public/dist/css/AdminLTE.min.css')
+    //
+      AdminLTE Skins. Choose a skin from the css/skins
+      folder instead of downloading all of them to reduce the load.
+    link(rel='stylesheet', href='../public/dist/css/skins/_all-skins.min.css')
+    // HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries
+    // WARNING: Respond.js doesn't work if you view the page via file://
+    //if lt IE 9
+      script(src='https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js')
+      script(src='https://oss.maxcdn.com/respond/1.4.2/respond.min.js')
+  body.hold-transition.skin-blue.sidebar-mini
+    .wrapper
+      header.main-header
+        // Logo
+        a.logo(href='/itemList')
+          // mini logo for sidebar mini 50x50 pixels
+          span.logo-mini
+            b A
+            | LT
+          // logo for regular state and mobile devices
+          span.logo-lg
+            b Order
+            | CMS
+        // Header Navbar: style can be found in header.less
+        nav.navbar.navbar-static-top(role='navigation')
+          .navbar-custom-menu
+            ul.nav.navbar-nav
+              li.dropdown.user.user-menu
+                a.dropdown-toggle(href='#', data-toggle='dropdown')
+                  img.user-image(src='../public/dist/img/user2-160x160.jpg', alt='User Image')
+                  span.hidden-xs Darshan Sapaliga
+                ul.dropdown-menu
+                  // User image
+                  li.user-header
+                    img.img-circle(src='../public/dist/img/user2-160x160.jpg', alt='User Image')
+                    p
+                      | Darshan Sapaliga - Web Developer
+                      small Admin User
+                  // Menu Footer
+                  li.user-footer
+                    .pull-left
+                      a.btn.btn-default.btn-flat(href='#') Profile
+                    .pull-right
+                      a.btn.btn-default.btn-flat(href='#') Sign out
+      // Left side column. contains the logo and sidebar
+      aside.main-sidebar
+        // sidebar: style can be found in sidebar.less
+        section.sidebar
+          // Sidebar user panel
+          .user-panel
+            .pull-left.image
+              img.img-circle(src='../public/dist/img/user2-160x160.jpg', alt='User Image')
+            .pull-left.info
+              p Darshan Sapaliga
+          // search form
+          form.sidebar-form(action='#', method='get')
+            .input-group
+              input.form-control(type='text', name='q', placeholder='Search...')
+              span.input-group-btn
+                button#search-btn.btn.btn-flat(type='submit', name='search')
+                  i.fa.fa-search
+          // /.search form
+          // sidebar menu: : style can be found in sidebar.less
+          ul.sidebar-menu
+            li.header MAIN NAVIGATION
+            li
+              a(href='#')
+                i.fa.fa-table
+                span User
+                i.fa.fa-angle-left.pull-right
+              ul.treeview-menu
+                li
+                  a(href='/userList')
+                    i.fa.fa-circle-o
+                    |  List of Users
+                li
+                  a(href='/addUser')
+                    i.fa.fa-circle-o
+                    |  Add a User
+            li
+              a(href='#')
+                i.fa.fa-calendar
+                span Item
+                i.fa.fa-angle-left.pull-right
+              ul.treeview-menu
+                li
+                  a(href='/itemList')
+                    i.fa.fa-circle-o
+                    |  List of Items
+                li
+                  a(href='/addItem')
+                    i.fa.fa-circle-o
+                    |  Add an Item
+            li.active
+              a(href='#')
+                i.fa.fa-envelope
+                span ItemCategory
+                i.fa.fa-angle-left.pull-right
+              ul.treeview-menu
+                li
+                  a(href='/categoryList')
+                    i.fa.fa-circle-o
+                    |  List of Categories
+                li.active
+                  a(href='/addCategory')
+                    i.fa.fa-circle-o
+                    |  Add a category
+            li.treeview
+              a(href='/menu')
+                i.fa.fa-folder
+                span Menu
+                i.fa.fa-angle-left.pull-right
+              ul.treeview-menu
+                li
+                  a(href='/menuList')
+                    i.fa.fa-circle-o
+                    |  List of Menu
+                li
+                  a(href='/addMenu')
+                    i.fa.fa-circle-o
+                    |  Add a Menu
+            li.treeview
+              a(href='/order')
+                i.fa.fa-share
+                span Order
+                i.fa.fa-angle-left.pull-right
+              ul.treeview-menu
+                li
+                  a(href='/orderList')
+                    i.fa.fa-circle-o
+                    |  List of Orders
+                li
+                  a(href='/addOrder')
+                    i.fa.fa-circle-o
+                    |  Place an Order
+        // /.sidebar
+      // Content Wrapper. Contains page content
+      .content-wrapper
+        // Main content
+        section.content
+          .row
+            .box.box-info
+              .box-header.with-border
+                h3.box-title User
+              // /.box-header
+              // form start
+              form.form-horizontal
+                .box-body
+                  .form-group
+                    label.col-sm-2.control-label Name
+                    .col-sm-10
+                      input.form-control(type='email', id='', placeholder='Name')
+                  // /.box-body
+                  .box-footer
+                    button.btn.btn-info.pull-right(type='submit') Save
+                  // /.box-footer
+            // /.box
+          // /.row
+        // /.content
+      // /.content-wrapper
+      footer.main-footer
+        .pull-right.hidden-xs
+          b Version
+          |  2.3.0
+        strong
+          | OrderCMS WAS Powered by
+          a(href='http://keystonejs.com/') KeystoneJS
+          | .
+        |  version 0.3.16.
+    // ./wrapper
+    // jQuery 2.1.4
+    script(src='../public/plugins/jQuery/jQuery-2.1.4.min.js')
+    // Bootstrap 3.3.5
+    script(src='../public/bootstrap/js/bootstrap.min.js')
+    // FastClick
+    script(src='../public/plugins/fastclick/fastclick.min.js')
+    // DataTables
+    script(src='../public/plugins/datatables/jquery.dataTables.min.js')
+    script(src='../public/plugins/datatables/dataTables.bootstrap.min.js')
+    // AdminLTE App
+    script(src='../public/dist/js/app.min.js')
+    // page script
+    script.
+      $(function () {
+      $("#example1").DataTable();
+      $('#example2').DataTable({
+      "paging": true,
+      "lengthChange": false,
+      "searching": false,
+      "ordering": true,
+      "info": true,
+      "autoWidth": false
+      });
+      });

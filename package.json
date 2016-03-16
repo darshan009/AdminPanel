@@ -24,7 +24,13 @@
     "crypto": "0.0.3",
     "express": "^4.13.3",
     "express-session": "^1.12.1",
+    "gulp": "^3.9.1",
+    "gulp-html2jade": "^1.1.1",
+    "gulp-jade": "^1.1.0",
+    "jade": "^1.11.0",
     "mongoose": "^4.2.8",
+    "passport": "^0.3.2",
+    "passport-local": "^1.0.0",
     "path": "^0.4.9"
   }
 }
