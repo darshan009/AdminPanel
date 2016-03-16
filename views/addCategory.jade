@@ -161,14 +161,16 @@ html
                 h3.box-title User
               // /.box-header
               // form start
-              form.form-horizontal
+              form.form-horizontal(method='POST')
                 .box-body
                   .form-group
                     label.col-sm-2.control-label Name
                     .col-sm-10
-                      input.form-control(type='email', id='', placeholder='Name')
-                  // /.box-body
+                      input.form-control(type='name', id='', name='name' required='true' placeholder='Name' value=(itemCategory?(itemCategory.name?itemCategory.name:''):''))
                   .box-footer
+                    if(itemCategory)
+                      a(href='/addCategory/delete/#{itemCategory._id}')
+                        button.btn.btn-info.pull-left(type='button') Delete
                     button.btn.btn-info.pull-right(type='submit') Save
                   // /.box-footer
             // /.box

@@ -166,7 +166,7 @@ html
                   .form-group
                     label.col-sm-2.control-label First Name
                     .col-sm-10
-                      input.form-control(type='text', id='', name='firstName' placeholder='First Name' value=(user?(user.firstName?user.firstName:''):''))
+                      input.form-control(type='text', id='', name='firstName' required='true' placeholder='First Name' value=(user?(user.firstName?user.firstName:''):''))
                   .form-group
                     label.col-sm-2.control-label Last Name
                     .col-sm-10
@@ -174,14 +174,21 @@ html
                   .form-group
                     label.col-sm-2.control-label Email
                     .col-sm-10
-                      input.form-control(type='email', id='', name='email', placeholder='Enter email' value=(user?(user.email?user.email:''):''))
+                      input.form-control(type='email', id='', name='email', required='true' placeholder='Enter email' value=(user?(user.email?user.email:''):''))
+                  .form-group
+                    label.col-sm-2.control-label Type
+                    .col-sm-10
+                      select.form-control(name='userType')
+                        option Select
+                        option Admin
+                        option General
                   .form-group
                     label.col-sm-2.control-label Password
                     .col-sm-10
                       if user
                         button.btn.btn-default(type='submit') Change Password
                       else
-                        input.form-control(type='password', id='', name='password', placeholder='Password')
+                        input.form-control(type='password', id='', required='true' name='password', placeholder='Password')
                   .form-group
                     if user && user.amount
                         label.col-sm-2.control-label Recharge

@@ -1,18 +1,23 @@
 var passport = require('passport');
 var User = require('../models/User');
 
-//check if user is logged in
+//check if user is admin
 exports.isAdmin = function(req, res, next){
-  if(req.user && req.user.type == "admin")
-    next();
+  if(req.user){
+    if(req.user.type == "admin" || req.user.type == "Admin")
+      next();
+  }
   else
     res.redirect('/');
 };
 //login logout signup
 exports.getLogin = function(req, res, next){
-  if(req.user)
-    if (user.type == "admin")
+  if(req.user){
+    if(req.user.type == "Admin" || req.user.type == "admin")
       res.render('/userList');
+    else
+      res.render('adminLogin');
+  }
   res.render('adminLogin');
 };
 exports.postLogin = function(req, res, next){
@@ -53,6 +58,7 @@ exports.postAddUser = function(req, res, next){
         user.firstName = req.body.firstName;
         user.lastName = req.body.lastName;
         user.email = req.body.email;
+        user.type = req.body.userType;
         user.amount = req.body.amount;
         user.save(function (err) {
             if (err) return err
@@ -65,9 +71,12 @@ exports.postAddUser = function(req, res, next){
       lastName: req.body.lastName,
       email: req.body.email,
       password: req.body.password,
+      type: req.body.userType,
       amount: req.body.amount
     });
-    user.save();
+    user.save(function (err) {
+        if (err) return err
+    });
     res.redirect('/userList');
   }
 };

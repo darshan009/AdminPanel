@@ -166,8 +166,12 @@ html
                     tr
                       th Name
                   tbody
-                    tr
-                      td Burger
+                    if itemCategories
+                      each itemCategory in itemCategories
+                        tr
+                          td
+                            a(href='/addCategory/#{itemCategory._id}')
+                              | #{itemCategory.name}
               // /.box-body
             // /.box
         // /.content

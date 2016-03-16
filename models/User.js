@@ -7,7 +7,7 @@ var userSchema = new mongoose.Schema({
   lastName: String,
   email: {type: String, unique: true},
   password: String,
-  type: { type: String, options: ['admin','general'], default: 'general'},
+  type: { type: String, options: ['Admin','admin', 'General'], default: 'General'},
   amount: String
 });
 

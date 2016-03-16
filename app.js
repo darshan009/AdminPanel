@@ -41,10 +41,12 @@ app.use(function(req, res, next){
 
 //controllers
 var userController = require('./controllers/user');
+var itemController = require('./controllers/item');
 
 //routes
 app.get('/', userController.getLogin);
 app.post('/', userController.postLogin);
+//user OR Admin
 app.get('/userList', userController.isAdmin, userController.getUsers);
 app.post('/addUser', userController.isAdmin, userController.postAddUser);
 app.post('/addUser/:id', userController.isAdmin, userController.postAddUser);
@@ -57,12 +59,14 @@ app.get('/itemList', function(req, res){
 app.get('/addItem', function(req, res){
     res.render('addItem');
 });
-app.get('/categoryList', function(req, res){
-    res.render('categoryList');
-});
-app.get('/addCategory', function(req, res){
-    res.render('addCategory');
-});
+//item category
+app.get('/categoryList', userController.isAdmin, itemController.getItemCategories);
+app.get('/addCategory', userController.isAdmin, itemController.getAddItemCategory);
+app.post('/addCategory', userController.isAdmin, itemController.postAddItemCategory);
+app.get('/addCategory/:id', userController.isAdmin, itemController.getAddItemCategory);
+app.post('/addCategory/:id', userController.isAdmin, itemController.postAddItemCategory);
+app.get('/addCategory/delete/:id', userController.isAdmin, itemController.deleteItemCategory);
+
 app.get('/menuList', function(req, res){
     res.render('menuList');
 });
