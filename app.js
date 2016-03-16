@@ -4,11 +4,14 @@ var cookieParser = require('cookie-parser');
 var mongoose = require('mongoose');
 var session = require('express-session');
 var MongoStore = require('connect-mongo')(session);
+var passport = require('passport');
+var passportConf = require('./config/passport');
+var secrets = require('./config/secrets');
 
 var app = express();
 
 //mongoose connection
-mongoose.connect("mongodb://darshan009:admin123@ds015859.mlab.com:15859/adminpanel");
+mongoose.connect(secrets.mongodburl);
 mongoose.connection.on('error', function(){
   console.log("Mongoose connection error");
 });
@@ -25,10 +28,12 @@ app.use(session({
   saveUninitialized: true,
   secret: "2hjkeydwjfhusdifsb",
   store: new MongoStore({
-    url: "mongodb://darshan009:admin123@ds015859.mlab.com:15859/adminpanel",
+    url: secrets.mongodburl,
     autoReconnect: true
   })
 }));
+app.use(passport.initialize());
+app.use(passport.session());
 app.use(function(req, res, next){
   res.locals.currentUser= req.user;
   next();
@@ -39,7 +44,7 @@ var userController = require('./controllers/user');
 
 //routes
 app.get('/', function(req, res){
-    res.render('adminLogin');
+    res.render('userList');
 });
 app.get('/userList', userController.getUsers);
 app.post('/addUser', userController.postAddUser);
