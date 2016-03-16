@@ -7,18 +7,18 @@
     <!-- Tell the browser to be responsive to screen width -->
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
     <!-- Bootstrap 3.3.5 -->
-    <link rel="stylesheet" href="../../bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../public/bootstrap/css/bootstrap.min.css">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
     <!-- Ionicons -->
     <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
     <!-- DataTables -->
-    <link rel="stylesheet" href="../../plugins/datatables/dataTables.bootstrap.css">
+    <link rel="stylesheet" href="../public/plugins/datatables/dataTables.bootstrap.css">
     <!-- Theme style -->
-    <link rel="stylesheet" href="../../dist/css/AdminLTE.min.css">
+    <link rel="stylesheet" href="../public/dist/css/AdminLTE.min.css">
     <!-- AdminLTE Skins. Choose a skin from the css/skins
          folder instead of downloading all of them to reduce the load. -->
-    <link rel="stylesheet" href="../../dist/css/skins/_all-skins.min.css">
+    <link rel="stylesheet" href="../public/dist/css/skins/_all-skins.min.css">
 
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -32,7 +32,7 @@
 
       <header class="main-header">
         <!-- Logo -->
-        <a href="../../index2.html" class="logo">
+        <a href="itemList.html" class="logo">
           <!-- mini logo for sidebar mini 50x50 pixels -->
           <span class="logo-mini"><b>A</b>LT</span>
           <!-- logo for regular state and mobile devices -->
@@ -44,13 +44,13 @@
             <ul class="nav navbar-nav">
               <li class="dropdown user user-menu">
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                  <img src="../../dist/img/user2-160x160.jpg" class="user-image" alt="User Image">
+                  <img src="../public/dist/img/user2-160x160.jpg" class="user-image" alt="User Image">
                   <span class="hidden-xs">Darshan Sapaliga</span>
                 </a>
                 <ul class="dropdown-menu">
                   <!-- User image -->
                   <li class="user-header">
-                    <img src="../../dist/img/user2-160x160.jpg" class="img-circle" alt="User Image">
+                    <img src="../public/dist/img/user2-160x160.jpg" class="img-circle" alt="User Image">
                     <p>
                       Darshan Sapaliga - Web Developer
                       <small>Admin User</small>
@@ -78,7 +78,7 @@
           <!-- Sidebar user panel -->
           <div class="user-panel">
             <div class="pull-left image">
-              <img src="../../dist/img/user2-160x160.jpg" class="img-circle" alt="User Image">
+              <img src="../public/dist/img/user2-160x160.jpg" class="img-circle" alt="User Image">
             </div>
             <div class="pull-left info">
               <p>Darshan Sapaliga</p>
@@ -97,21 +97,21 @@
           <!-- sidebar menu: : style can be found in sidebar.less -->
           <ul class="sidebar-menu">
             <li class="header">MAIN NAVIGATION</li>
-            <li class="active">
+            <li>
               <a href="user.html">
                 <i class="fa fa-table"></i> <span>User</span> <i class="fa fa-angle-left pull-right"></i>
               </a>
               <ul class="treeview-menu">
-                <li class="active"><a href="userList.html"><i class="fa fa-circle-o"></i> List of Users</a></li>
+                <li><a href="userList.html"><i class="fa fa-circle-o"></i> List of Users</a></li>
                 <li><a href="addUser.html"><i class="fa fa-circle-o"></i> Add a User</a></li>
               </ul>
             </li>
-            <li>
+            <li class="active">
               <a href="item.html">
                 <i class="fa fa-calendar"></i> <span>Item</span> <i class="fa fa-angle-left pull-right"></i>
               </a>
               <ul class="treeview-menu">
-                <li><a href="itemList.html"><i class="fa fa-circle-o"></i> List of Items</a></li>
+                <li class="active"><a href="itemList.html"><i class="fa fa-circle-o"></i> List of Items</a></li>
                 <li><a href="addItem.html"><i class="fa fa-circle-o"></i> Add an Item</a></li>
               </ul>
             </li>
@@ -120,7 +120,7 @@
                 <i class="fa fa-envelope"></i> <span>ItemCategory</span> <i class="fa fa-angle-left pull-right"></i>
               </a>
               <ul class="treeview-menu">
-                <li><a href="categoryList.html"><i class="fa fa-circle-o"></i> List of Categories</a></li>
+                <li class="active"><a href="categoryList.html"><i class="fa fa-circle-o"></i> List of Categories</a></li>
                 <li><a href="addCategory.html"><i class="fa fa-circle-o"></i> Add a category</a></li>
               </ul>
             </li>
@@ -160,16 +160,16 @@
                 <table id="example2" class="table table-bordered table-hover">
                   <thead>
                     <tr>
-                      <th>Name</th>
-                      <th>Email</th>
-                      <th>Permissions/th>
+                      <th>TITLE</th>
+                      <th>STATE</th>
+                      <th>CHEF</th>
                     </tr>
                   </thead>
                   <tbody>
                     <tr>
-                      <td>Sobin</td>
-                      <td>sobingt@gmail.com</td>
-                      <td></td>
+                      <td>Egg-Centric</td>
+                      <td>Published</td>
+                      <td>Surr Daas</td>
                     </tr>
                   </tbody>
                 </table>
@@ -187,16 +187,16 @@
     </div><!-- ./wrapper -->
 
     <!-- jQuery 2.1.4 -->
-    <script src="../../plugins/jQuery/jQuery-2.1.4.min.js"></script>
+    <script src="../public/plugins/jQuery/jQuery-2.1.4.min.js"></script>
     <!-- Bootstrap 3.3.5 -->
-    <script src="../../bootstrap/js/bootstrap.min.js"></script>
+    <script src="../public/bootstrap/js/bootstrap.min.js"></script>
     <!-- FastClick -->
-    <script src="../../plugins/fastclick/fastclick.min.js"></script>
+    <script src="../public/plugins/fastclick/fastclick.min.js"></script>
     <!-- DataTables -->
-    <script src="../../plugins/datatables/jquery.dataTables.min.js"></script>
-    <script src="../../plugins/datatables/dataTables.bootstrap.min.js"></script>
+    <script src="../public/plugins/datatables/jquery.dataTables.min.js"></script>
+    <script src="../public/plugins/datatables/dataTables.bootstrap.min.js"></script>
     <!-- AdminLTE App -->
-    <script src="../../dist/js/app.min.js"></script>
+    <script src="../public/dist/js/app.min.js"></script>
     <!-- page script -->
     <script>
       $(function () {

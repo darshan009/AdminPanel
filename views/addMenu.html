@@ -7,18 +7,18 @@
     <!-- Tell the browser to be responsive to screen width -->
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
     <!-- Bootstrap 3.3.5 -->
-    <link rel="stylesheet" href="../../bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../public/bootstrap/css/bootstrap.min.css">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
     <!-- Ionicons -->
     <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
     <!-- DataTables -->
-    <link rel="stylesheet" href="../../plugins/datatables/dataTables.bootstrap.css">
+    <link rel="stylesheet" href="../public/plugins/datatables/dataTables.bootstrap.css">
     <!-- Theme style -->
-    <link rel="stylesheet" href="../../dist/css/AdminLTE.min.css">
+    <link rel="stylesheet" href="../public/dist/css/AdminLTE.min.css">
     <!-- AdminLTE Skins. Choose a skin from the css/skins
          folder instead of downloading all of them to reduce the load. -->
-    <link rel="stylesheet" href="../../dist/css/skins/_all-skins.min.css">
+    <link rel="stylesheet" href="../public/dist/css/skins/_all-skins.min.css">
 
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -32,7 +32,7 @@
 
       <header class="main-header">
         <!-- Logo -->
-        <a href="../../index2.html" class="logo">
+        <a href="itemList.html" class="logo">
           <!-- mini logo for sidebar mini 50x50 pixels -->
           <span class="logo-mini"><b>A</b>LT</span>
           <!-- logo for regular state and mobile devices -->
@@ -44,13 +44,13 @@
             <ul class="nav navbar-nav">
               <li class="dropdown user user-menu">
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                  <img src="../../dist/img/user2-160x160.jpg" class="user-image" alt="User Image">
+                  <img src="../public/dist/img/user2-160x160.jpg" class="user-image" alt="User Image">
                   <span class="hidden-xs">Darshan Sapaliga</span>
                 </a>
                 <ul class="dropdown-menu">
                   <!-- User image -->
                   <li class="user-header">
-                    <img src="../../dist/img/user2-160x160.jpg" class="img-circle" alt="User Image">
+                    <img src="../public/dist/img/user2-160x160.jpg" class="img-circle" alt="User Image">
                     <p>
                       Darshan Sapaliga - Web Developer
                       <small>Admin User</small>
@@ -78,7 +78,7 @@
           <!-- Sidebar user panel -->
           <div class="user-panel">
             <div class="pull-left image">
-              <img src="../../dist/img/user2-160x160.jpg" class="img-circle" alt="User Image">
+              <img src="../public/dist/img/user2-160x160.jpg" class="img-circle" alt="User Image">
             </div>
             <div class="pull-left info">
               <p>Darshan Sapaliga</p>
@@ -106,13 +106,13 @@
                 <li><a href="addUser.html"><i class="fa fa-circle-o"></i> Add a User</a></li>
               </ul>
             </li>
-            <li class="active">
+            <li>
               <a href="item.html">
                 <i class="fa fa-calendar"></i> <span>Item</span> <i class="fa fa-angle-left pull-right"></i>
               </a>
               <ul class="treeview-menu">
                 <li><a href="itemList.html"><i class="fa fa-circle-o"></i> List of Items</a></li>
-                <li class="active"><a href="addItem.html"><i class="fa fa-circle-o"></i> Add an Item</a></li>
+                <li><a href="addItem.html"><i class="fa fa-circle-o"></i> Add an Item</a></li>
               </ul>
             </li>
             <li>
@@ -120,22 +120,22 @@
                 <i class="fa fa-envelope"></i> <span>ItemCategory</span> <i class="fa fa-angle-left pull-right"></i>
               </a>
               <ul class="treeview-menu">
-                <li class="active"><a href="categoryList.html"><i class="fa fa-circle-o"></i> List of Categories</a></li>
+                <li><a href="categoryList.html"><i class="fa fa-circle-o"></i> List of Categories</a></li>
                 <li><a href="addCategory.html"><i class="fa fa-circle-o"></i> Add a category</a></li>
               </ul>
             </li>
-            <li class="treeview">
+            <li class="active">
               <a href="menu.html">
                 <i class="fa fa-folder"></i> <span>Menu</span> <i class="fa fa-angle-left pull-right"></i>
               </a>
               <ul class="treeview-menu">
                 <li><a href="menuList.html"><i class="fa fa-circle-o"></i> List of Menu</a></li>
-                <li><a href="addMenu.html"><i class="fa fa-circle-o"></i> Add an Item</a></li>
+                <li class="active"><a href="addMenu.html"><i class="fa fa-circle-o"></i> Add a Menu</a></li>
               </ul>
             </li>
-            <li class="treeview">
+            <li>
               <a href="order.html">
-                <i class="fa fa-share"></i> <span>Order</span>  <i class="fa fa-angle-left pull-right"></i>
+                <i class="fa fa-share"></i> <span>Order</span> <i class="fa fa-angle-left pull-right"></i>
               </a>
               <ul class="treeview-menu">
                 <li><a href="orderList.html"><i class="fa fa-circle-o"></i> List of Orders</a></li>
@@ -154,85 +154,34 @@
           <div class="row">
             <div class="box box-info">
               <div class="box-header with-border">
-                <h3 class="box-title">Items</h3>
+                <h3 class="box-title">User</h3>
               </div><!-- /.box-header -->
               <!-- form start -->
               <form class="form-horizontal">
-                  <!-- select -->
+                <div class="box-body">
                   <div class="form-group">
-                    <label class="col-sm-2 control-label">State</label>
-                    <div class="col-sm-10">
-                      <select class="form-control">
-                        <option>Draft</option>
-                        <option>Published</option>
-                        <option>Archieved</option>
-                      </select>
-                    </div>
-                  </div>
-                  <div class="form-group">
-                    <label class="col-sm-2 control-label">Chef</label>
+                    <label class="col-sm-2 control-label">Select Item</label>
                     <div class="col-sm-10">
                       <select class="form-control">
                         <option>Select</option>
-                        <option>Suur Daas</option>
+                        <option>Egg-centric</option>
+                        <option>club sandwhich</option>
+                        <option>hakka noodles</option>
                       </select>
                     </div>
                   </div>
+                  <!-- Date mm/dd/yyyy -->
                   <div class="form-group">
-                    <label for="exampleInputFile" class="col-sm-2 control-label">Image</label>
+                    <label class="col-sm-2 control-label">Pick a date</label>
                     <div class="col-sm-10">
-                      <input type="file" id="exampleInputFile">
+                      <input type="text" class="form-control" data-inputmask="'alias': 'mm/dd/yyyy'" data-mask>
                     </div>
-                  </div>
-                  <div class="form-group">
-                    <label class="col-sm-2 control-label">Description</label>
-                    <div class="col-sm-10">
-                      <textarea class="form-control" rows="3" placeholder="Give a description ..."></textarea>
-                    </div>
-                  </div>
-                  <div class="form-group">
-                    <label class="col-sm-2 control-label">Type</label>
-                    <div class="col-sm-10">
-                      <select class="form-control">
-                        <option>Veg</option>
-                        <option>Non-veg</option>
-                      </select>
-                    </div>
-                  </div>
-                  <div class="form-group">
-                    <label class="col-sm-2 control-label">Category</label>
-                    <div class="col-sm-10">
-                      <select class="form-control">
-                        <option>Select</option>
-                        <option>Indian</option>
-                        <option>Sandwhich</option>
-                        <option>Burger</option>
-                      </select>
-                    </div>
-                  </div>
-                <div Class="form-group">
-                  <label class="col-sm-2 control-label">Attributes</label>
-                  <div class="col-sm-10">
-                    <table id="hi" class="table table-bordered table-hover">
-                      <thead>
-                        <tr>
-                          <th>VALUE</th>
-                          <th>PRICE</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr>
-                          <td><input type=text></td>
-                          <td><input type=Number></td>
-                        </tr>
-                      </tbody>
-                    </table>
-                    <button onclick="addTableRow()" type="button" class="btn btn-info pull-right">Add a row</button>
-                  </div>
-                </div>
-            <div class="box-footer">
-              <button type="submit" class="btn btn-info pull-right">Save</button>
-            </div><!-- /.box-footer -->
+                  </div><!-- /.form group -->
+
+                </div><!-- /.box-body -->
+                <div class="box-footer">
+                  <button type="submit" class="btn btn-info pull-right">Save</button>
+                </div><!-- /.box-footer -->
               </form>
             </div><!-- /.box -->
           </div>   <!-- /.row -->
@@ -247,34 +196,27 @@
     </div><!-- ./wrapper -->
 
     <!-- jQuery 2.1.4 -->
-    <script src="../../plugins/jQuery/jQuery-2.1.4.min.js"></script>
+    <script src="../public/plugins/jQuery/jQuery-2.1.4.min.js"></script>
     <!-- Bootstrap 3.3.5 -->
-    <script src="../../bootstrap/js/bootstrap.min.js"></script>
+    <script src="../public/bootstrap/js/bootstrap.min.js"></script>
     <!-- FastClick -->
-    <script src="../../plugins/fastclick/fastclick.min.js"></script>
+    <script src="../public/plugins/fastclick/fastclick.min.js"></script>
     <!-- DataTables -->
-    <script src="../../plugins/datatables/jquery.dataTables.min.js"></script>
-    <script src="../../plugins/datatables/dataTables.bootstrap.min.js"></script>
+    <script src="../public/plugins/datatables/jquery.dataTables.min.js"></script>
+    <script src="../public/plugins/datatables/dataTables.bootstrap.min.js"></script>
     <!-- AdminLTE App -->
-    <script src="../../dist/js/app.min.js"></script>
+    <script src="../public/dist/js/app.min.js"></script>
+    <!-- InputMask -->
+    <script src="../public/plugins/input-mask/jquery.inputmask.js"></script>
+    <script src="../public/plugins/input-mask/jquery.inputmask.date.extensions.js"></script>
+    <script src="../public/plugins/input-mask/jquery.inputmask.extensions.js"></script>
     <!-- page script -->
-    <script>
-      function addTableRow() {
-        var table = document.getElementById("hi");
-        var row = table.insertRow(1);
-        var cell1 = row.insertCell(0);
-        var cell2 = row.insertCell(1);
-        var cell1Data = document.createElement("input");
-        var cell2Data = document.createElement("input");
-        cell1.type = "text";
-        cell2.type = "Number";
-        cell1.appendChild(cell1Data);
-        cell2.appendChild(cell2Data);
-      }
-    </script>
     <script>
       $(function () {
         $("#example1").DataTable();
+        //Money Euro
+        $("[data-mask]").inputmask();
+
         $('#example2').DataTable({
           "paging": true,
           "lengthChange": false,
@@ -283,6 +225,8 @@
           "info": true,
           "autoWidth": false
         });
+        //Datemask2 mm/dd/yyyy
+        $("#datemask2").inputmask("mm/dd/yyyy", {"placeholder": "mm/dd/yyyy"});
       });
     </script>
   </body>
