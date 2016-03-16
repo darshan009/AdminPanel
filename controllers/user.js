@@ -17,8 +17,7 @@ exports.getLogin = function(req, res, next){
       res.render('/userList');
     else
       res.render('adminLogin');
-  }
-  res.render('adminLogin');
+  }else res.render('adminLogin');
 };
 exports.postLogin = function(req, res, next){
     passport.authenticate('local', function(err, user, info){

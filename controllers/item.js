@@ -25,14 +25,15 @@ exports.postAddItemCategory = function(req, res, next){
       });
       res.redirect('/categoryList');
     });
-  }else{
+  }
+  else {
     var itemCategory = new ItemCategory({
       name: req.body.name
     });
     itemCategory.save(function (err) {
-        if (err) return err
-    res.redirect('/categoryList');
+      if (err) return err
     })
+    res.redirect('/categoryList');
   }
 };
 
