@@ -50,6 +50,7 @@ app.post('/addUser', userController.isAdmin, userController.postAddUser);
 app.post('/addUser/:id', userController.isAdmin, userController.postAddUser);
 app.get('/addUser', userController.isAdmin, userController.getAddUser);
 app.get('/addUser/:id', userController.isAdmin, userController.getAddUser);
+app.get('/logout', userController.getLogout);
 app.get('/itemList', function(req, res){
     res.render('itemList');
 });
