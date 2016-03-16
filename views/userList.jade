@@ -166,13 +166,17 @@ html
                     tr
                       th Name
                       th Email
-                      th
-                        | Permissions/th>
+                      th Type
+                      th Amount
                   tbody
-                    tr
-                      td Sobin
-                      td sobingt@gmail.com
-                      td
+                    each user in users
+                      tr
+                        td
+                          a(href='/addUser/#{user._id}')
+                            | #{user.firstName}
+                        td #{user.lastName}
+                        td #{user.type}
+                        td #{user.amount}
               // /.box-body
             // /.box
           // /.row

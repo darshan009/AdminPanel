@@ -8,7 +8,7 @@ var MongoStore = require('connect-mongo')(session);
 var app = express();
 
 //mongoose connection
-mongoose.connect("mongodb://test:test123@ds059165.mongolab.com:59165/adminpanel");
+mongoose.connect("mongodb://localhost:27017/adminpanel");
 mongoose.connection.on('error', function(){
   console.log("Mongoose connection error");
 });
@@ -25,7 +25,7 @@ app.use(session({
   saveUninitialized: true,
   secret: "2hjkeydwjfhusdifsb",
   store: new MongoStore({
-    url: "mongodb://test:test123@ds059165.mongolab.com:59165/interviewer",
+    url: "mongodb://localhost:27017/adminpanel",
     autoReconnect: true
   })
 }));
@@ -34,18 +34,18 @@ app.use(function(req, res, next){
   next();
 });
 
+//controllers
+var userController = require('./controllers/user');
 
 //routes
 app.get('/', function(req, res){
-    res.render('userList');
+    res.render('adminLogin');
 });
-//routes
-app.get('/userList', function(req, res){
-    res.render('userList');
-});
-app.get('/addUser', function(req, res){
-    res.render('addUser');
-});
+app.get('/userList', userController.getUsers);
+app.post('/addUser', userController.postAddUser);
+app.post('/addUser/:id', userController.postAddUser);
+app.get('/addUser', userController.getAddUser);
+app.get('/addUser/:id', userController.getAddUser);
 app.get('/itemList', function(req, res){
     res.render('itemList');
 });

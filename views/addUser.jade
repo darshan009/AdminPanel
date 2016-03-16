@@ -161,20 +161,27 @@ html
                 h3.box-title User
               // /.box-header
               // form start
-              form.form-horizontal
+              form.form-horizontal(method='POST')
                 .box-body
                   .form-group
                     label.col-sm-2.control-label First Name
                     .col-sm-10
-                      input.form-control(type='email', id='', placeholder='First Name')
+                      input.form-control(type='text', id='', name='firstName' placeholder='First Name' value=(user?(user.firstName?user.firstName:''):''))
                   .form-group
                     label.col-sm-2.control-label Last Name
                     .col-sm-10
-                      input.form-control(type='email', id='', placeholder='Last Name')
+                      input.form-control(type='text', id='', name='lastName', placeholder='Last Name' value=(user?(user.lastName?user.lastName:''):''))
                   .form-group
                     label.col-sm-2.control-label Password
                     .col-sm-10
                       button.btn.btn-default(type='submit') Change Password
+                  .form-group
+                    if user && user.amount
+                        label.col-sm-2.control-label Recharge
+                    else
+                      label.col-sm-2.control-label Add amount
+                    .col-sm-10
+                      input.form-control(type='Numebr', id='', name='amount' placeholder='Enter recharge amount' value=(user?(user.amount?user.amount:''):''))
                   .form-group
                     h4.col-sm-2.control-label
                       b Permissions

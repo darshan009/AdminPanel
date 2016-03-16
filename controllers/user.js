@@ -34,18 +34,48 @@ exports.postLogin = function(req, res, next){
     })(req, res, next);
 };
 
-exports.getSignUp = function(req, res, next){
-  res.render('signup');
+
+//get all users
+exports.getUsers = function(req, res, next){
+  User.find().exec(function(err, users){
+    if(err) return next(err);
+    res.render('userList', {users: users});
+  });
 };
-exports.postSignUp = function(req, res, next){
+exports.getAddUser = function(req, res, next){
+  if(req.params.id){
+    User.findById(req.params.id).exec(function(err, user){
+      if(err) return next(err);
+      var locals = req.body;
+      locals.data = user;
+      res.render('addUser', {user: user});
+    });
+  }else res.render('addUser');
+};
+
+exports.postAddUser = function(req, res, next){
+  if(req.params.id){
+    User.findById(req.params.id).exec(function(err, user){
+        user.firstName = req.body.firstName;
+        user.lastName = req.body.lastName;
+        user.email = req.body.email;
+        user.amount = req.body.amount;
+        user.save(function (err) {
+            if (err) return err
+        });
+        res.redirect('/userList');
+    });
+  }else{
     var user = new User({
-      name: req.body.name,
+      firstName: req.body.firstName,
+      lastName: req.body.lastName,
       email: req.body.email,
       password: req.body.password,
-      siteAdmin: req.body.admin
+      amount: req.body.amount
     });
-  user.save();
-  res.redirect('/');
+    user.save();
+    res.redirect('/userList');
+  }
 };
 
 exports.getLogout = function(req, res, next){
