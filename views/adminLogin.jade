@@ -1,0 +1,76 @@
+doctype html
+html
+  head
+    meta(charset='utf-8')
+    meta(http-equiv='X-UA-Compatible', content='IE=edge')
+    title OrderCMS
+    // Tell the browser to be responsive to screen width
+    meta(content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no', name='viewport')
+    // Bootstrap 3.3.5
+    link(rel='stylesheet', href='../public/bootstrap/css/bootstrap.min.css')
+    // Font Awesome
+    link(rel='stylesheet', href='https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css')
+    // Ionicons
+    link(rel='stylesheet', href='https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css')
+    // DataTables
+    link(rel='stylesheet', href='../public/plugins/datatables/dataTables.bootstrap.css')
+    // Theme style
+    link(rel='stylesheet', href='../public/dist/css/AdminLTE.min.css')
+    //
+      AdminLTE Skins. Choose a skin from the css/skins
+      folder instead of downloading all of them to reduce the load.
+    link(rel='stylesheet', href='../public/dist/css/skins/_all-skins.min.css')
+    // HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries
+    // WARNING: Respond.js doesn't work if you view the page via file://
+    //if lt IE 9
+      script(src='https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js')
+      script(src='https://oss.maxcdn.com/respond/1.4.2/respond.min.js')
+  body.hold-transition.skin-blue.sidebar-mini
+    .wrapper
+      header.main-header
+        // Logo
+        a.logo(href='/itemList')
+          // mini logo for sidebar mini 50x50 pixels
+          span.logo-mini
+            b A
+            | LT
+          // logo for regular state and mobile devices
+          span.logo-lg
+            b Order
+            | CMS
+        // Header Navbar: style can be found in header.less
+        nav.navbar.navbar-static-top(role='navigation')
+          .navbar-custom-menu
+            ul.nav.navbar-nav
+              li.dropdown.user.user-menu
+                a.dropdown-toggle(href='/login', data-toggle='dropdown')
+                  img.user-image(src='../public/dist/img/user2-160x160.jpg', alt='User Image')
+                  span.hidden-xs Log in
+    .container
+      // Main content
+      section.content
+        .row
+          br
+          br
+          h2 Admin login with admin@orderCMS.com  &&  123            
+          br
+          br
+          br
+          .box.box-info
+            .box-header.with-border
+              h3.box-title Login
+            // /.box-header
+            // form start
+            form.form-horizontal(method='POST')
+              .box-body
+                .form-group
+                  label.col-sm-2.control-label email
+                  .col-sm-10
+                    input.form-control(type='text', id='', name='email' placeholder='email' value=(user?(user.firstName?user.firstName:''):''))
+                .form-group
+                  label.col-sm-2.control-label Password
+                  .col-sm-10
+                    input.form-control(type='password', id='', name='password', placeholder='Password')
+              // /.box-body
+              .box-footer
+                button.btn.btn-info.pull-right(type='submit') Login

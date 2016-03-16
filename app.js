@@ -43,14 +43,13 @@ app.use(function(req, res, next){
 var userController = require('./controllers/user');
 
 //routes
-app.get('/', function(req, res){
-    res.render('userList');
-});
-app.get('/userList', userController.getUsers);
-app.post('/addUser', userController.postAddUser);
-app.post('/addUser/:id', userController.postAddUser);
-app.get('/addUser', userController.getAddUser);
-app.get('/addUser/:id', userController.getAddUser);
+app.get('/', userController.getLogin);
+app.post('/', userController.postLogin);
+app.get('/userList', userController.isAdmin, userController.getUsers);
+app.post('/addUser', userController.isAdmin, userController.postAddUser);
+app.post('/addUser/:id', userController.isAdmin, userController.postAddUser);
+app.get('/addUser', userController.isAdmin, userController.getAddUser);
+app.get('/addUser/:id', userController.isAdmin, userController.getAddUser);
 app.get('/itemList', function(req, res){
     res.render('itemList');
 });

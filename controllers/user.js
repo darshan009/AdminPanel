@@ -2,38 +2,32 @@ var passport = require('passport');
 var User = require('../models/User');
 
 //check if user is logged in
-exports.isLogged = function(req, res, next){
-  var user = 1;
-  if(user)
-  {
+exports.isAdmin = function(req, res, next){
+  if(req.user && req.user.type == "admin")
     next();
-  }
   else
-    res.render('login');
+    res.redirect('/');
 };
 //login logout signup
 exports.getLogin = function(req, res, next){
-  res.render('user');
+  if(req.user)
+    if (user.type == "admin")
+      res.render('/userList');
+  res.render('adminLogin');
 };
 exports.postLogin = function(req, res, next){
     passport.authenticate('local', function(err, user, info){
       if (err)
         return next(err);
-      console.log(user);
       if(!user)
-      {
-        console.log("user to login");
-        res.redirect('/login',{message: info.message});
-      }
+        res.redirect('/');
       req.logIn(user,function(err){
         if(err)
           return next(err);
-        console.log("Login Sucessful")
-        res.redirect('/');
+        res.redirect('/userList');
       });
     })(req, res, next);
 };
-
 
 //get all users
 exports.getUsers = function(req, res, next){

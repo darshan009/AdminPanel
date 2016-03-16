@@ -45,13 +45,13 @@ html
               li.dropdown.user.user-menu
                 a.dropdown-toggle(href='#', data-toggle='dropdown')
                   img.user-image(src='../public/dist/img/user2-160x160.jpg', alt='User Image')
-                  span.hidden-xs Darshan Sapaliga
+                  span.hidden-xs Admin
                 ul.dropdown-menu
                   // User image
                   li.user-header
                     img.img-circle(src='../public/dist/img/user2-160x160.jpg', alt='User Image')
                     p
-                      | Darshan Sapaliga - Web Developer
+                      | Admin - Web Developer
                       small Admin User
                   // Menu Footer
                   li.user-footer
@@ -68,7 +68,7 @@ html
             .pull-left.image
               img.img-circle(src='../public/dist/img/user2-160x160.jpg', alt='User Image')
             .pull-left.info
-              p Darshan Sapaliga
+              p Admin
           // search form
           form.sidebar-form(action='#', method='get')
             .input-group
@@ -169,14 +169,15 @@ html
                       th Type
                       th Amount
                   tbody
-                    each user in users
-                      tr
-                        td
-                          a(href='/addUser/#{user._id}')
-                            | #{user.firstName}
-                        td #{user.lastName}
-                        td #{user.type}
-                        td #{user.amount}
+                    if users
+                      each user in users
+                        tr
+                          td
+                            a(href='/addUser/#{user._id}')
+                              | #{user.firstName}
+                          td #{user.lastName}
+                          td #{user.type}
+                          td #{user.amount}
               // /.box-body
             // /.box
           // /.row

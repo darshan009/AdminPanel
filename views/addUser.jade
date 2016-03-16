@@ -172,6 +172,10 @@ html
                     .col-sm-10
                       input.form-control(type='text', id='', name='lastName', placeholder='Last Name' value=(user?(user.lastName?user.lastName:''):''))
                   .form-group
+                    label.col-sm-2.control-label Email
+                    .col-sm-10
+                      input.form-control(type='email', id='', name='email', placeholder='Enter email' value=(user?(user.email?user.email:''):''))
+                  .form-group
                     label.col-sm-2.control-label Password
                     .col-sm-10
                       if user
@@ -184,7 +188,7 @@ html
                     else
                       label.col-sm-2.control-label Add amount
                     .col-sm-10
-                      input.form-control(type='Numebr', id='', name='amount' placeholder='Enter recharge amount' value=(user?(user.amount?user.amount:''):''))
+                      input.form-control(type='Numebr', id='', name='amount' placeholder='Enter your amount' value=(user?(user.amount?user.amount:''):''))
                   .form-group
                     h4.col-sm-2.control-label
                       b Permissions
