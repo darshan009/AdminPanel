@@ -44,6 +44,7 @@ app.use(function(req, res, next){
 //controllers
 var userController = require('./controllers/user');
 var itemController = require('./controllers/item');
+var menuController = require('./controllers/menu');
 
 //routes
 app.get('/', userController.getLogin);
@@ -67,13 +68,15 @@ app.get('/itemList', userController.isAdmin, itemController.getItemList);
 app.get('/addItem', userController.isAdmin, itemController.getAddItem);
 app.get('/addItem/:id', userController.isAdmin, itemController.getAddItem);
 app.post('/addItem', userController.isAdmin, itemController.postAddItem);
-
-app.get('/menuList', function(req, res){
-    res.render('menuList');
-});
-app.get('/addMenu', function(req, res){
-    res.render('addMenu');
-});
+//menu
+app.get('/menuList', userController.isAdmin, menuController.getMenuList);
+app.get('/addMenu', userController.isAdmin, menuController.getAddMenu);
+app.get('/addMenu/:id', userController.isAdmin, menuController.getAddMenu);
+app.post('/addMenu', userController.isAdmin, menuController.postAddMenu);
+//ajax populate
+app.get('/getItemsFromCategory', menuController.getItemsFromCategory);
+app.get('/addMenu/delete/:id', userController.isAdmin, menuController.deleteMenu);
+//order
 app.get('/orderList', function(req, res){
     res.render('orderList');
 });

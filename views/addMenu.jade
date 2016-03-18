@@ -162,24 +162,49 @@ html
                 h3.box-title User
               // /.box-header
               // form start
-              form.form-horizontal
+              form.form-horizontal(method='POST')
                 .box-body
-                  .form-group
-                    label.col-sm-2.control-label Select Item
-                    .col-sm-10
-                      select.form-control
-                        option Select
-                        option Egg-centric
-                        option club sandwhich
-                        option hakka noodles
                   // Date mm/dd/yyyy
                   .form-group
                     label.col-sm-2.control-label Pick a date
                     .col-sm-10
-                      input.form-control(type='text', data-inputmask="'alias': 'mm/dd/yyyy'", data-mask='')
+                      input.form-control(type='text', name='date' data-inputmask="'alias': 'mm/dd/yyyy'", data-mask='' value=(menu?(menu.date?menu.date:''):''))
+                  .form-group
+                    label.col-sm-2.control-label Meal type
+                    .col-sm-10
+                      select.form-control(name = 'meal')
+                        option(selected='selected')
+                          | #{menu?(menu.meal?menu.meal:''):''}
+                        option Lunch
+                        option Dinner
+                  .form-group
+                    label.col-sm-2.control-label Category
+                    .col-sm-10
+                      select.form-control(name = 'category' id = 'categorySelected')
+                        option(selected='selected')
+                          | #{menu?(menu.category?menu.category:''):''}
+                        each itemCategory in itemCategories
+                          option #{itemCategory.name}
+                  .form-group
+                    label.col-sm-2.control-label User
+                    .col-sm-10
+                      select.form-control(name = 'user')
+                        option(selected='selected')
+                          | #{menu?(menu.user?menu.user:''):''}
+                        each user in users
+                          option #{user.email}
+                  .form-group
+                    label.col-sm-2.control-label Select Item
+                    .col-sm-10
+                      select.form-control(name = 'itemSelected' id = 'itemList')
+                        option(selected='selected')
+                          | #{item?(item.title?item.title:''):''}
                   // /.form group
                 // /.box-body
                 .box-footer
+                  if(menu)
+                    a(href='/addMenu/delete/#{menu._id}')
+                      button.btn.btn-info.pull-left(type='submit') Delete
                   button.btn.btn-info.pull-right(type='submit') Save
                 // /.box-footer
             // /.box
@@ -228,3 +253,15 @@ html
       //Datemask2 mm/dd/yyyy
       $("#datemask2").inputmask("mm/dd/yyyy", {"placeholder": "mm/dd/yyyy"});
       });
+      //populate
+      $(function(){
+        $("select#categorySelected").change(function(){
+          $.getJSON("/getItemsFromCategory",{q: $(this).val(), ajax: 'true'}, function(j){
+            var options = '';
+            for (var i = 0; i < j.length; i++) {
+              options += '<option value="'+ j[i].id +'">' + j[i].title + '</option>';
+            }
+            $("select#itemList").html(options);
+          })
+        })
+      })

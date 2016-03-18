@@ -166,10 +166,16 @@ html
                     tr
                       th Item
                       th Date
+                      th User
                   tbody
-                    tr
-                      td Egg-centric
-                      td 03-15-2016
+                    if menu
+                      each menus in menu
+                        tr
+                          td
+                            a(href='/addMenu/#{menus.id}')
+                              | #{menus.item}
+                          td #{menus.date}
+                          td #{menus.user}
               // /.box-body
             // /.box
           // /.row
