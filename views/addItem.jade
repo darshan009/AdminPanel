@@ -161,59 +161,86 @@ html
                 h3.box-title Items
               // /.box-header
               // form start
-              form.form-horizontal
+              form.form-horizontal(method='POST')
                 // select
+                .form-group
+                  label.col-sm-2.control-label Title
+                  .col-sm-10
+                    input.form-control(type='text' name='title' required='true' placeholder='Title' value=(item?(item.title?item.title:''):''))
                 .form-group
                   label.col-sm-2.control-label State
                   .col-sm-10
-                    select.form-control
+                    select.form-control(name='state')
+                      option(selected='selected')
+                        | #{item?(item.state?item.state:''):''}
                       option Draft
                       option Published
                       option Archieved
                 .form-group
                   label.col-sm-2.control-label Chef
                   .col-sm-10
-                    select.form-control
-                      option Select
-                      option Suur Daas
+                    select.form-control(name='chefEmail')
+                      option(selected='selected')
+                        | #{paramsUserChef?(paramsUserChef.email?paramsUserChef.email:''):''}
+                      each userChefs in userChef
+                        option #{userChefs.email}
                 .form-group
                   label.col-sm-2.control-label(for='exampleInputFile') Image
                   .col-sm-10
-                    input#exampleInputFile(type='file')
+                    input#exampleInputFile(type='file' name='image')
                 .form-group
                   label.col-sm-2.control-label Description
                   .col-sm-10
-                    textarea.form-control(rows='3', placeholder='Give a description ...')
+                    textarea.form-control(rows='3', name='description' placeholder='Give a description ...')
+                      | #{item?(item.description?item.description:''):''}
                 .form-group
                   label.col-sm-2.control-label Type
                   .col-sm-10
-                    select.form-control
+                    select.form-control(nam='type')
+                      option(selected='selected')
+                        | #{item?(item.type?item.type:''):''}
                       option Veg
                       option Non-veg
                 .form-group
                   label.col-sm-2.control-label Category
                   .col-sm-10
-                    select.form-control
-                      option Select
-                      option Indian
-                      option Sandwhich
-                      option Burger
+                    select.form-control(name='category' value=(item?(item.category?item.category:''):''))
+                      option(selected='selected')
+                        | #{itemCategory?(itemCategory.name?itemCategory.name:''):''}
+                      each itemCategory in itemCategories
+                        option #{itemCategory.name}
                 .form-group
                   label.col-sm-2.control-label Attributes
                   .col-sm-10
                     table#hi.table.table-bordered.table-hover
                       thead
                         tr
-                          th VALUE
-                          th PRICE
+                          th Name
+                          th Cost
+                          th Quantity
                       tbody
-                        tr
-                          td
-                            input(type='text')
-                          td
-                            input(type='Number')
+                        if item
+                          each items in item.attributes
+                            tr
+                              td
+                                input(type='text' name='name[]' placeholder='Item name' value=(items?(items.name?items.name:''):''))
+                              td
+                                input(type='Number' name='cost[]' placeholder='Cost' value=(items?(items.cost?items.cost:''):''))
+                              td
+                                input(type='Number' name='quantity[]' placeholder='Quantity' value=(items?(items.quantity?items.quantity:''):''))
+                        else
+                          tr
+                            td
+                              input(type='text' name='name[]' placeholder='Item name')
+                            td
+                              input(type='Number' name='cost[]' placeholder='Cost')
+                            td
+                              input(type='Number' name='quantity[]' placeholder='Quantity')
                     button.btn.btn-info.pull-right(onclick='addTableRow()', type='button') Add a row
                 .box-footer
+                  if(item)
+                    a(href='/addItem/delete/#{item._id}')
+                      button.btn.btn-info.pull-left(type='submit') Delete
                   button.btn.btn-info.pull-right(type='submit') Save
                 // /.box-footer
             // /.box
@@ -244,26 +271,38 @@ html
     // page script
     script.
       function addTableRow() {
-      var table = document.getElementById("hi");
-      var row = table.insertRow(1);
-      var cell1 = row.insertCell(0);
-      var cell2 = row.insertCell(1);
-      var cell1Data = document.createElement("input");
-      var cell2Data = document.createElement("input");
-      cell1.type = "text";
-      cell2.type = "Number";
-      cell1.appendChild(cell1Data);
-      cell2.appendChild(cell2Data);
+        var table = document.getElementById("hi");
+        var row = table.insertRow(1);
+        var cell1 = row.insertCell(0);
+        var cell1Data = document.createElement("input");
+        cell1Data.type = "text";
+        cell1Data.name = "name[]";
+        cell1Data.placeholder = "Item Name";
+        cell1.appendChild(cell1Data);
+
+        var cell2 = row.insertCell(1);
+        var cell2Data = document.createElement("input");
+        cell2Data.type = "Number";
+        cell2Data.name = "cost[]";
+        cell2Data.placeholder = "Cost"
+        cell2.appendChild(cell2Data);
+
+        var cell3 = row.insertCell(2);
+        var cell3Data = document.createElement("input");
+        cell3Data.type = "Number";
+        cell3Data.name = "quantity[]";
+        cell3Data.placeholder = "Quantity";
+        cell3.appendChild(cell3Data);
       }
     script.
       $(function () {
-      $("#example1").DataTable();
-      $('#example2').DataTable({
-      "paging": true,
-      "lengthChange": false,
-      "searching": false,
-      "ordering": true,
-      "info": true,
-      "autoWidth": false
-      });
+        $("#example1").DataTable();
+        $('#example2').DataTable({
+          "paging": true,
+          "lengthChange": false,
+          "searching": false,
+          "ordering": true,
+          "info": true,
+          "autoWidth": false
+        });
       });

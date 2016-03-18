@@ -11,7 +11,9 @@ var secrets = require('./config/secrets');
 var app = express();
 
 //mongoose connection
-mongoose.connect(secrets.mongodburl);
+mongoose.connect(secrets.mongodburl, function(){
+  console.log("Mongoose connected to mongolab");
+});
 mongoose.connection.on('error', function(){
   console.log("Mongoose connection error");
 });
@@ -53,12 +55,6 @@ app.post('/addUser/:id', userController.isAdmin, userController.postAddUser);
 app.get('/addUser', userController.isAdmin, userController.getAddUser);
 app.get('/addUser/:id', userController.isAdmin, userController.getAddUser);
 app.get('/logout', userController.getLogout);
-app.get('/itemList', function(req, res){
-    res.render('itemList');
-});
-app.get('/addItem', function(req, res){
-    res.render('addItem');
-});
 //item category
 app.get('/categoryList', userController.isAdmin, itemController.getItemCategories);
 app.get('/addCategory', userController.isAdmin, itemController.getAddItemCategory);
@@ -66,6 +62,11 @@ app.post('/addCategory', userController.isAdmin, itemController.postAddItemCateg
 app.get('/addCategory/:id', userController.isAdmin, itemController.getAddItemCategory);
 app.post('/addCategory/:id', userController.isAdmin, itemController.postAddItemCategory);
 app.get('/addCategory/delete/:id', userController.isAdmin, itemController.deleteItemCategory);
+//items
+app.get('/itemList', userController.isAdmin, itemController.getItemList);
+app.get('/addItem', userController.isAdmin, itemController.getAddItem);
+app.get('/addItem/:id', userController.isAdmin, itemController.getAddItem);
+app.post('/addItem', userController.isAdmin, itemController.postAddItem);
 
 app.get('/menuList', function(req, res){
     res.render('menuList');

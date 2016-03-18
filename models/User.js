@@ -7,9 +7,10 @@ var userSchema = new mongoose.Schema({
   lastName: String,
   email: {type: String, unique: true},
   password: String,
-  type: { type: String, options: ['Admin','admin', 'General'], default: 'General'},
-  amount: String
-});
+  type: { type: String, enum: ['Admin', 'Customer', 'Chef'], default: 'Customer'},
+  amount: String,
+  image: String
+}, {strict: true});
 
 //hashing
 userSchema.pre('save', function(next){

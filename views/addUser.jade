@@ -179,9 +179,13 @@ html
                     label.col-sm-2.control-label Type
                     .col-sm-10
                       select.form-control(name='userType')
-                        option Select
+                        option Customer                      
                         option Admin
-                        option General
+                        option Chef
+                  .form-group
+                    label.col-sm-2.control-label(for='exampleInputFile') Image
+                    .col-sm-10
+                      input#exampleInputFile(type='file' name='image')
                   .form-group
                     label.col-sm-2.control-label Password
                     .col-sm-10
@@ -195,15 +199,7 @@ html
                     else
                       label.col-sm-2.control-label Add amount
                     .col-sm-10
-                      input.form-control(type='Numebr', id='', name='amount' placeholder='Enter your amount' value=(user?(user.amount?user.amount:''):''))
-                  .form-group
-                    h4.col-sm-2.control-label
-                      b Permissions
-                    .col-sm-offset-2.col-sm-10
-                      .checkbox
-                        label
-                          input(type='checkbox')
-                          |  Can access admin panel
+                      input.form-control(type='Numebr', id='', name='amount' placeholder='Enter your recharge amount')
                 // /.box-body
                 .box-footer
                   button.btn.btn-info.pull-right(type='submit') Save
