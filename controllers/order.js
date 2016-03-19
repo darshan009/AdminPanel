@@ -102,23 +102,25 @@ exports.deleteOrder = function(req,res){
 
 //ajax populate getMenuList select box
 exports.getMenusFromOptions = function(req, res){
-  Menu.find({
-    category: req.query.category,
-    meal: req.query.meal
-  }).exec(function(err, menusList){
-    var getMenusItem = [];
-    if(menusList)
-      for(var i=0; i<menusList.length; i++)
-        getMenusItem.push(menusList[i].item);
-    Item.find({_id: {$in: getMenusItem}}).exec(function(err, items){
+  var menuOptions = {}
+  if(req.query.category)
+   menuOptions.category = req.query.category
+  if(req.query.date)
+    menuOptions.date = req.query.date
+  if(req.query.meal)
+    menuOptions.meal = req.query.meal
+  Menu.find(menuOptions)
+  .populate('item', 'title')
+  .exec(function(err, menusList){
       var menusListJson = []
+      console.log( menuOptions )
+      console.log(menusList);
       for(var i=0; i<menusList.length; i++){
         menusListJson[i] = {
           id: menusList[i]._id,
-          item: items[i].title
+          item: menusList[i].item.title
         }
       }
       res.send(menusListJson);
-    });
-  })
+  });
 };

@@ -115,7 +115,6 @@ exports.deleteItemCategory = function(req,res){
            item.category= itemCategory._id;
            item.totalCost = 0;
            item.totalCost += totalCost;
-           console.log(item.totalCost)
            item.attributes = attributes;
            item.save(function (err, items) {
                if (err) return err
@@ -151,7 +150,6 @@ exports.deleteItemCategory = function(req,res){
          });
          item.totalCost = 0;
          item.totalCost += totalCost;
-         console.log(item.totalCost)
          item.attributes = attributes;
          item.save(function (err, items) {
              if (err) return err

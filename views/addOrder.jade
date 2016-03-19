@@ -184,12 +184,6 @@ html
                         each itemCategory in itemCategories
                           option #{itemCategory.name}
                   .form-group
-                    label.col-sm-2.control-label Select Menu
-                    .col-sm-10
-                      select.form-control(id='getMenuList' name='menuSelected')
-                        option(selected='selected' value=(menus?(menus._id?menus._id:''):''))
-                          | #{menuName?(menuName.title?menuName.title:''):''}
-                  .form-group
                     label.col-sm-2.control-label User
                     .col-sm-10
                       select.form-control(name = 'user')
@@ -197,6 +191,12 @@ html
                           | #{order?(order.user?order.user:''):''}
                         each user in users
                           option #{user.email}
+                  .form-group
+                    label.col-sm-2.control-label Select Menu
+                    .col-sm-10
+                      select.form-control(id='getMenuList' name='menuSelected')
+                        option(selected='selected' value=(menus?(menus._id?menus._id:''):''))
+                          | #{menuName?(menuName.title?menuName.title:''):''}
                 // /.box-body
                 .box-footer
                   if(order)
@@ -251,25 +251,78 @@ html
       });
       //populate
       $(function(){
-      //  $("select#dateSelected").change(function(){
-      //    $date = $(this).val();
-          $("select#mealSelected").change(function(){
-            $meal = $(this).val();
-            $("select#categorySelected").change(function(){
-              $category = $(this).val();
-              $.getJSON("/getMenusFromOptions",{
-                //date: $date,
-                meal: $meal,
-                category: $category,
-                ajax: 'true'
-              }, function(j){
-                var options = '';
-                for (var i = 0; i < j.length; i++) {
-                  options += '<option value="'+ j[i].id +'">' + j[i].item + '</option>';
-                }
-                $("select#getMenuList").html(options);
-              })
-            })
+        $("input#dateSelected").focusout(function(){
+          $date = $(this).val();
+          $meal = $("#mealSelected").val();
+          $category = $("#categorySelected").val();
+          $.getJSON("/getMenusFromOptions",{
+            date: $date,
+            meal: $meal,
+            category: $category,
+            ajax: 'true'
+          }, function(j){
+            if( j.length == 0 ){
+              var options = '';
+              options += '<option>'+ "No Menus available" +'</option>'
+              $("select#getMenuList").html(options);
+            }
+            else{
+              var options = '';
+              for (var i = 0; i < j.length; i++) {
+                options += '<option value="'+ j[i].id +'">' + j[i].item + '</option>';
+              }
+              $("select#getMenuList").html(options);
+            }
           })
-        //})
+        })
+        //mealSelected
+        $("select#mealSelected").change(function(){
+          $date = $("#dateSelected").val();
+          $meal = $(this).val();
+          $category = $("#categorySelected").val();
+          $.getJSON("/getMenusFromOptions",{
+            date: $date,
+            meal: $meal,
+            category: $category,
+            ajax: 'true'
+          }, function(j){
+            if( j.length == 0 ){
+              var options = '';
+              options += '<option>'+ "No Menus available" +'</option>'
+              $("select#getMenuList").html(options);
+            }
+            else{
+              var options = '';
+              for (var i = 0; i < j.length; i++) {
+                options += '<option value="'+ j[i].id +'">' + j[i].item + '</option>';
+              }
+              $("select#getMenuList").html(options);
+            }
+          })
+        })
+        //categorySelected
+        $("select#categorySelected").change(function(){
+          $date = $("#dateSelected").val();
+          $meal = $("#mealSelected").val();
+          $category = $(this).val();
+          $.getJSON("/getMenusFromOptions",{
+            date: $date,
+            meal: $meal,
+            category: $category,
+            ajax: 'true'
+          }, function(j){
+            if( j.length == 0 ){
+              var options = '';
+              options += '<option>'+ "No Menus available" +'</option>'
+              $("select#getMenuList").html(options);
+            }
+            else{
+              var options = '';
+              for (var i = 0; i < j.length; i++) {
+                options += '<option value="'+ j[i].id +'">' + j[i].item + '</option>';
+              }
+              $("select#getMenuList").html(options);
+            }
+          })
+        })
       })

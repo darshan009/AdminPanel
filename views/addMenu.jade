@@ -189,7 +189,7 @@ html
                     label.col-sm-2.control-label Select Item
                     .col-sm-10
                       select.form-control(name = 'itemSelected' id = 'itemList')
-                        option(selected='selected')
+                        option(selected='selected' value = (item?(item._id?item._id:''):''))
                           | #{item?(item.title?item.title:''):''}
                   // /.form group
                 // /.box-body
@@ -233,6 +233,8 @@ html
       $(function () {
       $("#example1").DataTable();
       //Money Euro
+      //Datemask dd/mm/yyyy
+      $("#datemask2").inputmask("mm/dd/yyyy", {"placeholder": "mm/dd/yyyy"});
       $("[data-mask]").inputmask();
       $('#example2').DataTable({
       "paging": true,
@@ -242,8 +244,6 @@ html
       "info": true,
       "autoWidth": false
       });
-      //Datemask2 mm/dd/yyyy
-      $("#datemask2").inputmask("mm/dd/yyyy", {"placeholder": "mm/dd/yyyy"});
       });
       //populate
       $(function(){
