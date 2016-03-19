@@ -49,6 +49,7 @@ exports.postAddOrder = function(req, res){
           order.category= req.body.category;
           order.menu= menu._id;
           order.user= req.body.user;
+          order.address = req.body.address;
           var newAmount = Number(userAmount.amount);
           userAmount.amount = 0;
           newAmount -= Number(menu.item.totalCost);
@@ -74,8 +75,10 @@ exports.postAddOrder = function(req, res){
           meal: req.body.meal,
           category: req.body.category,
           menu: menu._id,
-          user: req.body.user
+          user: req.body.user,
+          address: req.body.address
         })
+
         var newAmount = Number(userAmount.amount);
         userAmount.amount = 0;
         newAmount -= Number(menu.item.totalCost);
@@ -123,4 +126,19 @@ exports.getMenusFromOptions = function(req, res){
       }
       res.send(menusListJson);
   });
+};
+
+//ajax get user addresses
+exports.getUserAddress = function(req, res){
+  if(req.query.userEmail) var userEmail = req.query.userEmail
+  User.findOne({email: userEmail}).exec(function(err, user){
+    var userAddressJson = [];
+    for(var i=0; i<user.address.length; i++){
+      userAddressJson[i] = {
+        address : user.address[i]
+      }
+    }
+    console.log(userAddressJson)
+    res.send(userAddressJson);
+  })
 };

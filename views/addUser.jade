@@ -202,6 +202,18 @@ html
                       label.col-sm-2.control-label Add amount
                     .col-sm-10
                       input.form-control(type='Numebr', id='', name='amount' placeholder='Enter your recharge amount')
+                  .form-group
+                    label.col-sm-2.control-label Address
+                    .col-sm-10
+                      if(addressList)
+                        each addressLists in addressList
+                          textarea.form-control(rows='3', name='address[]' id = 'textAreaField' placeholder='Add an address ...')
+                            | #{addressLists}
+                      else
+                        textarea.form-control(rows='3', name='address[]' id = 'textAreaField' placeholder='Add an address ...')
+                          | #{user?(user.address?user.address:''):''}
+                    #wrapper
+                  button.btn.btn-info.pull-right(onclick='addAddress()', type='button') Add one more address
                 // /.box-body
                 .box-footer
                   button.btn.btn-info.pull-right(type='submit') Save
@@ -244,3 +256,8 @@ html
       "autoWidth": false
       });
       });
+      function addAddress() {
+        var newTextArea = $(document.createElement('div'))
+        newTextArea.after().html('<label class="col-sm-2 control-label">Address</label><div class="col-sm-10"><textarea rows="3" name="address[]" id="" placeholder="Add an address ..." class="form-control"></textarea></div>');
+        newTextArea.appendTo('#wrapper');
+      }

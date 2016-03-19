@@ -5,7 +5,8 @@ var orderSchema = new mongoose.Schema({
   date: Date,
   meal: { type: String, enum: ['Lunch', 'Dinner'], default: 'Lunch'},
   category: { type: String},
-  menu: { type: mongoose.Schema.Types.ObjectId, ref: 'Menu' }
+  menu: { type: mongoose.Schema.Types.ObjectId, ref: 'Menu' },
+  address: String
 });
 
 module.exports = mongoose.model('Order', orderSchema);

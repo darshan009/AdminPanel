@@ -9,7 +9,8 @@ var userSchema = new mongoose.Schema({
   password: String,
   type: { type: String, enum: ['Admin', 'Customer', 'Chef'], default: 'Customer'},
   amount: Number,
-  image: String
+  image: String,
+  address: Array
 })
 
 //hashing

@@ -166,7 +166,7 @@ html
                   .form-group
                     label.col-sm-2.control-label Pick a date
                     .col-sm-10
-                      input.form-control(type='text', id='dateSelected' name='date' data-inputmask="'alias': 'mm/dd/yyyy'", data-mask='' value=(menu?(menu.date?menu.date:''):''))
+                      input.form-control(type='text', id='dateSelected' name='date' data-inputmask="'alias': 'mm/dd/yyyy'", data-mask='' value=(order?(order.date?order.date:''):''))
                   .form-group
                     label.col-sm-2.control-label Meal type
                     .col-sm-10
@@ -184,19 +184,25 @@ html
                         each itemCategory in itemCategories
                           option #{itemCategory.name}
                   .form-group
-                    label.col-sm-2.control-label User
-                    .col-sm-10
-                      select.form-control(name = 'user')
-                        option(selected='selected')
-                          | #{order?(order.user?order.user:''):''}
-                        each user in users
-                          option #{user.email}
-                  .form-group
                     label.col-sm-2.control-label Select Menu
                     .col-sm-10
                       select.form-control(id='getMenuList' name='menuSelected')
                         option(selected='selected' value=(menus?(menus._id?menus._id:''):''))
                           | #{menuName?(menuName.title?menuName.title:''):''}
+                  .form-group
+                    label.col-sm-2.control-label User
+                    .col-sm-10
+                      select.form-control(name = 'user' id = 'userSelectedEmail')
+                        option(selected='selected')
+                          | #{order?(order.user?order.user:''):''}
+                        each user in users
+                          option #{user.email}
+                  .form-group
+                    label.col-sm-2.control-label Select User Address
+                    .col-sm-10
+                      select.form-control(name = 'address' id = 'getUserAddress')
+                        option(selected='selected')
+                          | #{order?(order.address?order.address:''):''}
                 // /.box-body
                 .box-footer
                   if(order)
@@ -325,4 +331,16 @@ html
             }
           })
         })
-      })
+        //userSelectedEmail
+        $("select#userSelectedEmail").change(function(){
+          $userEmail = $(this).val();
+          $.getJSON("/getUserAddress",{
+            userEmail: $userEmail
+          }, function(j){
+            var options = '';
+            for (var i = 0; i < j.length; i++)
+              options += '<option>' + j[i].address + '</option>';
+            $("select#getUserAddress").html(options);
+          })
+        })
+        })

@@ -45,7 +45,10 @@ exports.getAddUser = function(req, res, next){
   if(req.params.id){
     User.findById(req.params.id).exec(function(err, user){
       if(err) return next(err);
-      res.render('addUser', {user: user});
+      var addressList = []
+      for (var i=0; i<user.address.length; i++)
+        addressList.push(user.address[i]);
+      res.render('addUser', {user : user, addressList : addressList});
     });
   }else res.render('addUser');
 };
@@ -62,6 +65,9 @@ exports.postAddUser = function(req, res, next){
         user.image = req.body.image;
         var newAmount = Number(user.amount) + Number(req.body.amount);
         user.amount = newAmount;
+        user.address = [];console.log(req.body.address)
+        for (var i=0; i<req.body.address.length; i++)
+          user.address.push(req.body.address[i]);
         user.save(function (err) {
             if (err) return err
         });
@@ -76,6 +82,9 @@ exports.postAddUser = function(req, res, next){
       type: req.body.userType,
       amount: req.body.amount
     });
+    user.address = [];
+    for (var i=0; i<req.body.address.length; i++)
+      user.address.push(req.body.address[i]);
     user.save(function (err) {
         if (err) return err
     });
