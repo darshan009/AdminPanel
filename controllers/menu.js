@@ -2,26 +2,13 @@ var ItemCategory = require('../models/ItemCategory');
 var Item = require('../models/Item');
 var User = require('../models/User');
 var Menu = require('../models/Menu')
+
 //controllers
 exports.getMenuList = function(req, res){
-  Menu.find().exec(function(err, menus){
-    var menusItem = [];
-    for(var i=0; i<menus.length; i++)
-      menusItem.push(menus[i].item);
-    Item.find({_id: {$in: menusItem}}).exec(function(err, items){
-      if(menus) {
-        var menuAndItem = [];
-        for(var i=0; i<menus.length; i++) {
-          menuAndItem[i] = {
-            id : menus[i]._id,
-            user : menus[i].user,
-            date : menus[i].date,
-            item : items[i].title
-          }
-        }
-        res.render('menuList', {menu : menuAndItem});
-      }
-    })
+  Menu.find()
+  .populate('item')
+  .exec(function(err, menu) {
+    res.render('menuList', {menu : menu});
   });
 };
 
@@ -29,8 +16,14 @@ exports.getAddMenu = function(req, res){
   Menu.findById(req.params.id).exec(function(err, menu){
     ItemCategory.find().exec(function(err, itemCategories){
       User.find().exec(function(err, users){
-        Item.findById(menu.item).exec(function(err, item){
-          res.render('addMenu', {menu: menu, itemCategories: itemCategories, users: users, item: item});
+        if(req.params.id) var menuItem = menu.item;
+        Item.findById(menuItem).exec(function(err, item){
+          res.render('addMenu', {
+            menu: menu,
+            itemCategories: itemCategories,
+            users: users,
+            item: item
+          });
         })
       })
     })
@@ -40,11 +33,16 @@ exports.getAddMenu = function(req, res){
 exports.postAddMenu = function(req, res){
   if(req.params.id){
     Menu.findById(req.params.id).exec(function(err, menu){
-      itemCategory.name = req.body.name;
-      itemCategory.save(function (err) {
-          if (err) return err
+      Item.findById(req.body.itemSelected).exec(function(err, item){
+        menu.date= req.body.date;
+        menu.meal= req.body.meal;
+        menu.category= req.body.category;
+        menu.item= item._id;
+        menu.save(function (err) {
+            if (err) return err
+        });
+        res.redirect('/menuList');
       });
-      res.redirect('/menuList');
     });
   }
   else {
@@ -53,8 +51,7 @@ exports.postAddMenu = function(req, res){
         date: req.body.date,
         meal: req.body.meal,
         category: req.body.category,
-        item: item._id,
-        user: req.body.user
+        item: item._id
       })
       menu.save(function (err) {
         if (err) return err;

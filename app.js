@@ -45,6 +45,7 @@ app.use(function(req, res, next){
 var userController = require('./controllers/user');
 var itemController = require('./controllers/item');
 var menuController = require('./controllers/menu');
+var orderController = require('./controllers/order');
 
 //routes
 app.get('/', userController.getLogin);
@@ -68,22 +69,25 @@ app.get('/itemList', userController.isAdmin, itemController.getItemList);
 app.get('/addItem', userController.isAdmin, itemController.getAddItem);
 app.get('/addItem/:id', userController.isAdmin, itemController.getAddItem);
 app.post('/addItem', userController.isAdmin, itemController.postAddItem);
+app.post('/addItem/:id', userController.isAdmin, itemController.postAddItem);
 //menu
 app.get('/menuList', userController.isAdmin, menuController.getMenuList);
 app.get('/addMenu', userController.isAdmin, menuController.getAddMenu);
 app.get('/addMenu/:id', userController.isAdmin, menuController.getAddMenu);
 app.post('/addMenu', userController.isAdmin, menuController.postAddMenu);
+app.post('/addMenu/:id', userController.isAdmin, menuController.postAddMenu);
 //ajax populate
 app.get('/getItemsFromCategory', menuController.getItemsFromCategory);
 app.get('/addMenu/delete/:id', userController.isAdmin, menuController.deleteMenu);
 //order
-app.get('/orderList', function(req, res){
-    res.render('orderList');
-});
-app.get('/addOrder', function(req, res){
-    res.render('addOrder');
-});
-
+app.get('/orderList', userController.isAdmin, orderController.getOrderList);
+app.get('/addOrder', userController.isAdmin, orderController.getAddOrder);
+app.get('/addOrder/:id', userController.isAdmin, orderController.getAddOrder);
+app.post('/addOrder', userController.isAdmin, orderController.postAddOrder);
+app.post('/addOrder/:id', userController.isAdmin, orderController.postAddOrder);
+app.get('/addMenu/delete/:id', userController.isAdmin, orderController.deleteOrder);
+//populate menu in add order
+app.get('/getMenusFromOptions', orderController.getMenusFromOptions);
 
 //listen
 var port = Number(process.env.PORT || 3000);

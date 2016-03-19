@@ -57,25 +57,12 @@ exports.deleteItemCategory = function(req,res){
  *
  */
  exports.getItemList = function(req, res, next){
-   Item.find().exec(function(err, items){
-     var findAllCategories = []
-     for(var i=0; i<items.length; i++)
-        findAllCategories.push(items[i].category);
-     ItemCategory.find({_id: {$in: findAllCategories}}).exec(function(err, itemCategory){
-       var completeItemList = [];
-       for(var i=0; i<items.length; i++){
-         completeItemList[i] = {
-           _id: items[i]._id,
-           title: items[i].title,
-           state: items[i].state,
-           chef: items[i].chef,
-           type: items[i].type,
-           category: itemCategory[i].name
-         }
-       }
-      res.render('itemList', {completeItemList: completeItemList});
+   Item.find()
+   .populate('category')
+   .populate('chef')
+   .exec(function(err, items){
+      res.render('itemList' , {items: items } );
     })
-  });
  };
 
  exports.getAddItem = function(req, res, next){
@@ -104,12 +91,38 @@ exports.deleteItemCategory = function(req,res){
  exports.postAddItem = function(req, res, next){
    if(req.params.id){
      Item.findById(req.params.id).exec(function(err, item){
-         if (err)
-           return next(err);
-         item.save(function (err) {
-             if (err) return err
-         });
-         res.redirect('/userList');
+       ItemCategory.findOne({name: req.body.category}).exec(function(err, itemCategory){
+         User.findOne({email: req.body.chefEmail}).exec(function(err, userChef){
+           if (err) return err;
+           if(!itemCategory) res.end("The enetered category is not valid");
+           if(!userChef) res.end("Chef does not exist");
+           var locals = req.body;
+           var attributes = [];
+           var totalCost = 0;
+           for(var i=0; i<locals.name.length; i++){
+             attributes[i] = {
+               name : locals.name[i],
+               cost : locals.cost[i],
+               quantity : locals.quantity[i]
+             }
+             totalCost += Number(attributes[i].cost);
+           }
+           item.title= req.body.title;
+           item.state = req.body.state;
+           item.chef= userChef._id;
+           item.description= req.body.description;
+           item.type= req.body.type;
+           item.category= itemCategory._id;
+           item.totalCost = 0;
+           item.totalCost += totalCost;
+           console.log(item.totalCost)
+           item.attributes = attributes;
+           item.save(function (err, items) {
+               if (err) return err
+           });
+          res.redirect('/itemList');
+        })
+       })
      });
    }else{
      ItemCategory.findOne({name: req.body.category}).exec(function(err, itemCategory){
@@ -119,12 +132,14 @@ exports.deleteItemCategory = function(req,res){
          if(!userChef) res.end("Chef does not exist");
          var locals = req.body;
          var attributes = [];
+         var totalCost = 0;
          for(var i=0; i<locals.name.length; i++){
            attributes[i] = {
              name : locals.name[i],
              cost : locals.cost[i],
              quantity : locals.quantity[i]
            }
+           totalCost += attributes[i].cost;
          }
          var item = new Item({
            title: req.body.title,
@@ -134,6 +149,9 @@ exports.deleteItemCategory = function(req,res){
            type: req.body.type,
            category: itemCategory._id
          });
+         item.totalCost = 0;
+         item.totalCost += totalCost;
+         console.log(item.totalCost)
          item.attributes = attributes;
          item.save(function (err, items) {
              if (err) return err

@@ -159,7 +159,7 @@ html
           .row
             .box.box-info
               .box-header.with-border
-                h3.box-title User
+                h3.box-title Add a Menu
               // /.box-header
               // form start
               form.form-horizontal(method='POST')
@@ -185,14 +185,6 @@ html
                           | #{menu?(menu.category?menu.category:''):''}
                         each itemCategory in itemCategories
                           option #{itemCategory.name}
-                  .form-group
-                    label.col-sm-2.control-label User
-                    .col-sm-10
-                      select.form-control(name = 'user')
-                        option(selected='selected')
-                          | #{menu?(menu.user?menu.user:''):''}
-                        each user in users
-                          option #{user.email}
                   .form-group
                     label.col-sm-2.control-label Select Item
                     .col-sm-10

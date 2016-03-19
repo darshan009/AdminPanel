@@ -179,7 +179,9 @@ html
                     label.col-sm-2.control-label Type
                     .col-sm-10
                       select.form-control(name='userType')
-                        option Customer                      
+                        option(selected='selected')
+                          | #{user?(user.type?user.type:''):''}
+                        option Customer
                         option Admin
                         option Chef
                   .form-group

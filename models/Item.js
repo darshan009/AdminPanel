@@ -13,7 +13,8 @@ var itemSchema = new mongoose.Schema({
      "container": { type: Number , default: '1'}
   }],
   image: String,
-  chef: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
+  chef: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  totalCost : Number
 });
 
 module.exports = mongoose.model('Item', itemSchema);

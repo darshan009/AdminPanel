@@ -165,20 +165,17 @@ html
                   thead
                     tr
                       th Menu
+                      th Date
                       th User
                   tbody
-                    tr
-                      td Egg-centric
-                      td Darshan
-                    tr
-                      td club sandwhich
-                      td Sobin
-                    tr
-                      td veg burger
-                      td Darshan
-                    tr
-                      td veg pasta
-                      td Sobin
+                    if results
+                      each result in results
+                        tr
+                          td
+                            a(href='/addOrder/#{result.id}')
+                              | #{result.menu.item.title}
+                          td #{result.date}
+                          td #{result.user}
               // /.box-body
             // /.box
           // /.row

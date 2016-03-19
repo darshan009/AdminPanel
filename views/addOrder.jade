@@ -158,27 +158,50 @@ html
           .row
             .box.box-info
               .box-header.with-border
-                h3.box-title User
+                h3.box-title Place an order
               // /.box-header
               // form start
-              form.form-horizontal
+              form.form-horizontal(method='POST')
                 .box-body
+                  .form-group
+                    label.col-sm-2.control-label Pick a date
+                    .col-sm-10
+                      input.form-control(type='text', id='dateSelected' name='date' data-inputmask="'alias': 'mm/dd/yyyy'", data-mask='' value=(menu?(menu.date?menu.date:''):''))
+                  .form-group
+                    label.col-sm-2.control-label Meal type
+                    .col-sm-10
+                      select.form-control(name = 'meal' id='mealSelected')
+                        option(selected='selected')
+                          | #{order?(order.meal?order.meal:''):''}
+                        option Lunch
+                        option Dinner
+                  .form-group
+                    label.col-sm-2.control-label Category
+                    .col-sm-10
+                      select.form-control(name = 'category' id = 'categorySelected')
+                        option(selected='selected')
+                          | #{order?(order.category?order.category:''):''}
+                        each itemCategory in itemCategories
+                          option #{itemCategory.name}
                   .form-group
                     label.col-sm-2.control-label Select Menu
                     .col-sm-10
-                      select.form-control
-                        option Select
-                        option Egg-centric
-                        option club sandwhich
+                      select.form-control(id='getMenuList' name='menuSelected')
+                        option(selected='selected' value=(menus?(menus._id?menus._id:''):''))
+                          | #{menuName?(menuName.title?menuName.title:''):''}
                   .form-group
                     label.col-sm-2.control-label User
                     .col-sm-10
-                      select.form-control
-                        option Select
-                        option Darshan
-                        option Sobin
+                      select.form-control(name = 'user')
+                        option(selected='selected')
+                          | #{order?(order.user?order.user:''):''}
+                        each user in users
+                          option #{user.email}
                 // /.box-body
                 .box-footer
+                  if(order)
+                    a(href='/addOrder/delete/#{order._id}')
+                      button.btn.btn-info.pull-left(type='submit') Delete
                   button.btn.btn-info.pull-right(type='submit') Add
                 // /.box-footer
             // /.box
@@ -206,10 +229,15 @@ html
     script(src='../public/plugins/datatables/dataTables.bootstrap.min.js')
     // AdminLTE App
     script(src='../public/dist/js/app.min.js')
+    // InputMask
+    script(src='../public/plugins/input-mask/jquery.inputmask.js')
+    script(src='../public/plugins/input-mask/jquery.inputmask.date.extensions.js')
+    script(src='../public/plugins/input-mask/jquery.inputmask.extensions.js')
     // page script
     script.
       $(function () {
       $("#example1").DataTable();
+      $("[data-mask]").inputmask();
       $('#example2').DataTable({
       "paging": true,
       "lengthChange": false,
@@ -218,4 +246,30 @@ html
       "info": true,
       "autoWidth": false
       });
+      //Datemask2 mm/dd/yyyy
+      $("#datemask2").inputmask("mm/dd/yyyy", {"placeholder": "mm/dd/yyyy"});
       });
+      //populate
+      $(function(){
+      //  $("select#dateSelected").change(function(){
+      //    $date = $(this).val();
+          $("select#mealSelected").change(function(){
+            $meal = $(this).val();
+            $("select#categorySelected").change(function(){
+              $category = $(this).val();
+              $.getJSON("/getMenusFromOptions",{
+                //date: $date,
+                meal: $meal,
+                category: $category,
+                ajax: 'true'
+              }, function(j){
+                var options = '';
+                for (var i = 0; i < j.length; i++) {
+                  options += '<option value="'+ j[i].id +'">' + j[i].item + '</option>';
+                }
+                $("select#getMenuList").html(options);
+              })
+            })
+          })
+        //})
+      })

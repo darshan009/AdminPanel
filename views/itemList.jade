@@ -170,15 +170,15 @@ html
                       th TYPE
                       th CATEGORY
                   tbody
-                    each completeItemLists in completeItemList
+                    each item in items
                       tr
                         td
-                          a(href='/addItem/#{completeItemLists._id}')
-                            | #{completeItemLists.title}
-                        td #{completeItemLists.state}
-                        td #{completeItemLists.chef}
-                        td #{completeItemLists.type}
-                        td #{completeItemLists.category}
+                          a(href='/addItem/#{item._id}')
+                            | #{item.title}
+                        td #{item.state}
+                        td #{item.chef.email}
+                        td #{item.type}
+                        td #{item.category.name}
               // /.box-body
             // /.box
           // /.row

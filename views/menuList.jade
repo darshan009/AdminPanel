@@ -166,16 +166,16 @@ html
                     tr
                       th Item
                       th Date
-                      th User
+                      th Meal
                   tbody
                     if menu
                       each menus in menu
                         tr
                           td
                             a(href='/addMenu/#{menus.id}')
-                              | #{menus.item}
+                              | #{menus.item.title}
                           td #{menus.date}
-                          td #{menus.user}
+                          td #{menus.meal}
               // /.box-body
             // /.box
           // /.row
