@@ -96,8 +96,9 @@ exports.postAddOrder = function(req, res){
 };
 
 exports.deleteOrder = function(req,res){
-  order.findById(req.params.id).exec(function(err, order){
+  Order.findById(req.params.id).exec(function(err, order){
     if(err) return err;
+    console.log(order)
     order.remove();
     res.redirect('/orderList');
   });
@@ -135,7 +136,7 @@ exports.getUserAddress = function(req, res){
     var userAddressJson = [];
     for(var i=0; i<user.address.length; i++){
       userAddressJson[i] = {
-        address : user.address[i]
+        address : user.address[i].tag
       }
     }
     console.log(userAddressJson)

@@ -46,8 +46,7 @@ exports.getAddUser = function(req, res, next){
     User.findById(req.params.id).exec(function(err, user){
       if(err) return next(err);
       var addressList = []
-      for (var i=0; i<user.address.length; i++)
-        addressList.push(user.address[i]);
+      addressList = (user.address);
       res.render('addUser', {user : user, addressList : addressList});
     });
   }else res.render('addUser');
@@ -65,9 +64,19 @@ exports.postAddUser = function(req, res, next){
         user.image = req.body.image;
         var newAmount = Number(user.amount) + Number(req.body.amount);
         user.amount = newAmount;
-        user.address = [];console.log(req.body.address)
-        for (var i=0; i<req.body.address.length; i++)
-          user.address.push(req.body.address[i]);
+        user.address = [];
+        var fullAddress = [];
+        for (var i=0; i<req.body.streetAddress.length; i++)
+          fullAddress[i] = {
+            tag : req.body.tag[i],
+            flatNo : req.body.flatNo[i],
+            streetAddress : req.body.streetAddress[i],
+            landmark : req.body.landmark[i],
+            pincode : req.body.pincode[i]
+          }
+        console.log(fullAddress);
+        user.address = fullAddress;
+        console.log(user.address);
         user.save(function (err) {
             if (err) return err
         });
@@ -80,11 +89,22 @@ exports.postAddUser = function(req, res, next){
       email: req.body.email,
       password: req.body.password,
       type: req.body.userType,
-      amount: req.body.amount
+      amount: req.body.amount,
+      contactNo : req.body.contactNo
     });
     user.address = [];
-    for (var i=0; i<req.body.address.length; i++)
-      user.address.push(req.body.address[i]);
+    var fullAddress = [];
+    for (var i=0; i<req.body.streetAddress.length; i++)
+      fullAddress[i] = {
+        tag : req.body.tag[i],
+        flatNo : req.body.flatNo[i],
+        streetAddress : req.body.streetAddress[i],
+        landmark : req.body.landmark[i],
+        pincode : req.body.pincode[i]
+      }
+    console.log(fullAddress);
+    user.address = fullAddress;
+    console.log(user.address);
     user.save(function (err) {
         if (err) return err
     });

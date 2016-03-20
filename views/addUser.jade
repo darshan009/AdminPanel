@@ -196,6 +196,10 @@ html
                       else
                         input.form-control(type='password', id='', required='true' name='password', placeholder='Password')
                   .form-group
+                    label.col-sm-2.control-label Contact Number
+                    .col-sm-10
+                      input.form-control(type='Number', id='', name='contactNo' required='true' placeholder='Add you Contact Number' value=(user?(user.contactNo?user.contactNo:''):''))
+                  .form-group
                     if user && user.amount
                         label.col-sm-2.control-label Recharge
                     else
@@ -207,11 +211,19 @@ html
                     .col-sm-10
                       if(addressList)
                         each addressLists in addressList
-                          textarea.form-control(rows='3', name='address[]' id = 'textAreaField' placeholder='Add an address ...')
-                            | #{addressLists}
+                          input.form-control(type='text', id='', name='tag[]' required='true' placeholder='Add a tag - Home, Office or custom' value=(user?(addressLists.tag?addressLists.tag:''):''))
+                          input.form-control(type='text', id='', name='flatNo[]' required='true' placeholder='Building Name and Flat Number')
+                          input.form-control(type='text', id='', name='streetAddress[]' required='true' placeholder='Enter your street Address...' value=(addressLists?(addressLists.streetAddress?addressLists.streetAddress:''):''))
+                          input.form-control(type='text', id='', name='landmark[]' required='true' placeholder='Landmark' value=(user?(addressLists.landmark?addressLists.landmark:''):''))
+                          input.form-control(type='Number', id='', name='pincode[]' required='true' placeholder='Pincode' value=(user?(addressLists.pincode?addressLists.pincode:''):''))
+                          br
                       else
-                        textarea.form-control(rows='3', name='address[]' id = 'textAreaField' placeholder='Add an address ...')
-                          | #{user?(user.address?user.address:''):''}
+                        input.form-control(type='text', id='', name='tag[]' required='true' placeholder='Add a tag - Home, Office or custom')
+                        input.form-control(type='text', id='', name='flatNo[]' required='true' placeholder='Building Name and Flat Number')
+                        input.form-control(type='text', id='', name='streetAddress[]' required='true' placeholder='Enter your street Address...')
+                        input.form-control(type='text', id='', name='landmark[]' required='true' placeholder='Landmark')
+                        input.form-control(type='Number', id='', name='pincode[]' required='true' placeholder='Pincode')
+                        br
                     #wrapper
                   button.btn.btn-info.pull-right(onclick='addAddress()', type='button') Add one more address
                 // /.box-body
@@ -258,6 +270,6 @@ html
       });
       function addAddress() {
         var newTextArea = $(document.createElement('div'))
-        newTextArea.after().html('<label class="col-sm-2 control-label">Address</label><div class="col-sm-10"><textarea rows="3" name="address[]" id="" placeholder="Add an address ..." class="form-control"></textarea></div>');
+        newTextArea.after().html('<label class="col-sm-2 control-label">Address</label><div class="col-sm-10"><input type="text" id="" name="tag[]" required="true" placeholder="Home or Office" value="" class="form-control"/><input type="text" id="" name="flatNo[]" required="true" placeholder="Building Name and Flat Number" value="" class="form-control"/><input type="text" id="" name="streetAddress[]" required="true" placeholder="Enter your street Address..." value="" class="form-control"/><input type="text" id="" name="landmark[]" required="true" placeholder="Landmark" value="" class="form-control"/><input type="Number" id="" name="pincode[]" required="true" placeholder="Pincode" value="" class="form-control"/></div>');
         newTextArea.appendTo('#wrapper');
       }

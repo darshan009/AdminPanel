@@ -85,7 +85,7 @@ app.get('/addOrder', userController.isAdmin, orderController.getAddOrder);
 app.get('/addOrder/:id', userController.isAdmin, orderController.getAddOrder);
 app.post('/addOrder', userController.isAdmin, orderController.postAddOrder);
 app.post('/addOrder/:id', userController.isAdmin, orderController.postAddOrder);
-app.get('/addMenu/delete/:id', userController.isAdmin, orderController.deleteOrder);
+app.get('/addOrder/delete/:id', userController.isAdmin, orderController.deleteOrder);
 //populate menu in add order
 app.get('/getMenusFromOptions', orderController.getMenusFromOptions);
 app.get('/getUserAddress', orderController.getUserAddress);

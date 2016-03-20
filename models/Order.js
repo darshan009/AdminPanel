@@ -6,7 +6,14 @@ var orderSchema = new mongoose.Schema({
   meal: { type: String, enum: ['Lunch', 'Dinner'], default: 'Lunch'},
   category: { type: String},
   menu: { type: mongoose.Schema.Types.ObjectId, ref: 'Menu' },
-  address: String
+  address: {
+      tag : String,
+      flatNo : String,
+      streetAddress : String,
+      landmark : String,
+      pincode : Number,
+      contactNo : Number
+    }
 });
 
 module.exports = mongoose.model('Order', orderSchema);
