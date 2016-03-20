@@ -43,20 +43,33 @@ exports.postAddOrder = function(req, res){
       Menu.findById(req.body.menuSelected)
       .populate('item', 'totalCost')
       .exec(function(err, menu){
-        User.findOne({email: req.body.user}).exec(function(err, userAmount){
+        User.findOne({email: req.body.user}).exec(function(err, user){
           order.date= req.body.date;
           order.meal= req.body.meal;
           order.category= req.body.category;
           order.menu= menu._id;
           order.user= req.body.user;
           order.address = req.body.address;
-          var newAmount = Number(userAmount.amount);
-          userAmount.amount = 0;
+          var newAmount = Number(user.amount);
+          user.amount = 0;
           newAmount -= Number(menu.item.totalCost);
-          userAmount.amount = newAmount;
-          userAmount.save(function (err) {
+          user.amount = newAmount;
+          user.save(function (err) {
             if (err) return err;
           });
+          var fullUserAddress = {};
+          for (var i=0; i<user.address.length; i++)
+            if (user.address[i].tag == req.body.address) {
+              fullUserAddress = {
+                tag : user.address[i].tag,
+                flatNo : user.address[i].flatNo,
+                streetAddress : user.address[i].streetAddress,
+                landmark : user.address[i].landmark,
+                pincode : user.address[i].pincode
+              }
+            }
+          order.address = {};
+          order.address = fullUserAddress;
           order.save(function (err) {
               if (err) return err
           })
@@ -69,23 +82,35 @@ exports.postAddOrder = function(req, res){
     Menu.findById(req.body.menuSelected)
     .populate('item', 'totalCost')
     .exec(function(err, menu){
-      User.findOne({email: req.body.user}).exec(function(err, userAmount){
+      User.findOne({email: req.body.user}).exec(function(err, user){
         var order = new Order({
           date: req.body.date,
           meal: req.body.meal,
           category: req.body.category,
           menu: menu._id,
           user: req.body.user,
-          address: req.body.address
         })
 
-        var newAmount = Number(userAmount.amount);
-        userAmount.amount = 0;
+        var newAmount = Number(user.amount);
+        user.amount = 0;
         newAmount -= Number(menu.item.totalCost);
-        userAmount.amount = newAmount;
-        userAmount.save(function (err) {
+        user.amount = newAmount;
+        user.save(function (err) {
           if (err) return err;
         })
+        var fullUserAddress = {};
+        for (var i=0; i<user.address.length; i++)
+          if (user.address[i].tag == req.body.address) {
+            fullUserAddress = {
+              tag : user.address[i].tag,
+              flatNo : user.address[i].flatNo,
+              streetAddress : user.address[i].streetAddress,
+              landmark : user.address[i].landmark,
+              pincode : user.address[i].pincode
+            }
+          }
+        order.address = {};
+        order.address = fullUserAddress;
         order.save(function (err) {
           if (err) return err;
         });

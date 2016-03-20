@@ -202,7 +202,16 @@ html
                     .col-sm-10
                       select.form-control(name = 'address' id = 'getUserAddress')
                         option(selected='selected')
-                          | #{order?(order.address?order.address:''):''}
+                          | #{order?(order.address.tag?order.address.tag:''):''}
+                  if (order)
+                  .form-group
+                    label.col-sm-2.control-label Address
+                    .col-sm-10
+                      input.form-control(type='text', id='', name='tag[]' placeholder='Add a tag - Home, Office or custom' disabled value=(order?(order.address.tag?order.address.tag:''):''))
+                      input.form-control(type='text', id='', name='flatNo[]' placeholder='Building Name and Flat Number' disabled)
+                      input.form-control(type='text', id='', name='streetAddress[]' disabled placeholder='Enter your street Address...' value=(order?(order.address.streetAddress?order.address.streetAddress:''):''))
+                      input.form-control(type='text', id='', name='landmark[]' disabled placeholder='Landmark' value=(order?(order.address.landmark?order.address.landmark:''):''))
+                      input.form-control(type='Number', id='', name='pincode[]' disabled placeholder='Pincode' value=(order?(order.address.pincode?order.address.pincode:''):''))
                 // /.box-body
                 .box-footer
                   if(order)
