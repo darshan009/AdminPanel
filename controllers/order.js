@@ -56,7 +56,7 @@ exports.getEditOrder = function(req, res){
               user : result.user,
               address : result.address.tag
             }
-          console.log(fullResult);
+          console.log(result);
           res.render('addOrder', {
             itemCategories: itemCategories,
             users: users,
@@ -74,9 +74,10 @@ exports.postAddOrder = function(req, res){
     Order.findById(req.params.id).exec(function(err, order){
       var allMenus = [];
       for (var i=0; i<req.body.allMenus.length; i++){
-        if(req.body.allMenus[i] != '' || req.body.allMenus[i] != 'undefined')
+        if(req.body.allMenus[i] != '')
           allMenus.push(req.body.allMenus[i]);
       }
+      console.log(allMenus)
       Menu.find({_id : {$in : allMenus}})
       .populate('item', 'totalCost')
       .exec(function(err, menus){
@@ -103,10 +104,9 @@ exports.postAddOrder = function(req, res){
           });
           var orderMenu = [];
           order.menu = [];
-          for (var i=0; i<req.body.allMenus.length; i++)
+          for (var i=0; i<allMenus.length; i++)
             orderMenu[i] = {
-              _id : req.body.allMenus[i],
-              meal: req.body.meal
+              _id : allMenus[i]
             }
           console.log(req.body.allMenus)
           order.menu = orderMenu;
@@ -150,24 +150,24 @@ exports.postAddOrder = function(req, res){
         console.log(menus)
         var orderMenu = [];
         order.menu = [];
-        for (var i=0; i<req.body.allMenus.length; i++)
+        for (var i=0; i<allMenus.length; i++)
           orderMenu[i] = {
-            _id : req.body.allMenus[i],
-            meal: req.body.meal
+            _id : allMenus[i]
           }
         order.menu = orderMenu;
         var fullUserAddress = {};
-        for (var i=0; i<user.address.length; i++)
-          if (user.address[i].tag == req.body.address) {
-            fullUserAddress = {
-              tag : user.address[i].tag,
-              flatNo : user.address[i].flatNo,
-              streetAddress : user.address[i].streetAddress,
-              landmark : user.address[i].landmark,
-              pincode : user.address[i].pincode,
-              contactNo : user.contactNo
+        if(user.address)
+          for (var i=0; i<user.address.length; i++)
+            if (user.address[i].tag == req.body.address) {
+              fullUserAddress = {
+                tag : user.address[i].tag,
+                flatNo : user.address[i].flatNo,
+                streetAddress : user.address[i].streetAddress,
+                landmark : user.address[i].landmark,
+                pincode : user.address[i].pincode,
+                contactNo : user.contactNo
+              }
             }
-          }
         order.address = {};
         order.address = fullUserAddress;
         order.save(function (err) {

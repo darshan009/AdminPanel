@@ -190,13 +190,14 @@ html
                         option
                       br
                       if(fullResult)
-                        each fullResults in fullResult
-                          select.form-control(id='' name='allMenus[]')
-                            option(selected='selected' value='#{fullResults.id}')
-                              | #{fullResults.title}
-                          .btn-tools.pull-right
-                            button#count.btn.btn-box-tool(type='button')
-                              i.fa.fa-times
+                        each fullResults, index in fullResult
+                          div(data-removePreId=index)
+                            select.form-control(id='' name='allMenus[]')
+                              option(selected='selected' value='#{fullResults.id}')
+                                | #{fullResults.title}
+                            .btn-tools.pull-right
+                              button#count.btn.btn-box-tool(type='button' data-count='index' onclick='deletePreSelectBox(#{index})')
+                                i.fa.fa-times
                     #selectedMenu
                       br
                   .form-group
@@ -367,15 +368,20 @@ html
         $("select#getMenuList").change(function(){
           var newTextField = $(document.createElement('div'))
           var menuData = $(this).find(':selected').attr('data-menuName');
-          newTextField.after().html('<label class="col-sm-2 control-label">Selected Menu</label><div class="col-sm-10"><select data-removeId="count" id=""  name="allMenus[]" class="form-control"><option selected="selected" value="'+$(this).val()+'">'+ menuData +'</option></select><div class="btn-tools pull-right"><button class="btn btn-box-tool" type="button" id="count"><i class="fa fa-times"></i></button></div>');
+          newTextField.after().html('<div data-removeId="'+count+'"><label class="col-sm-2 control-label">Selected Menu</label><div class="col-sm-10"><select id=""  name="allMenus[]" class="form-control"><option selected="selected" value="'+$(this).val()+'">'+ menuData +'</option></select><div class="btn-tools pull-right"><button class="btn btn-box-tool" type="button" onclick="deleteSelectBox('+count+')"><i class="fa fa-times"></i></button></div></div>');
           var options = '';
           $("select#getMenuList").html(options);
           newTextField.appendTo('#selectedMenu');
           count++;
-          console.log(count);
         })
-        $('#1, #2, #3').click(function(){
-          var x = $('[data-removeId="2"]');
+        })
+        //deleting select
+        function deleteSelectBox(d){
+          var x = $('[data-removeId="'+d+'"]');
           x.remove();
-        })
-        })
+        }
+        //deleting select
+        function deletePreSelectBox(d){
+          var x = $('[data-removePreId="'+d+'"]');
+          x.remove();
+        }
