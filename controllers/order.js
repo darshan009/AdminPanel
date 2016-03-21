@@ -7,30 +7,62 @@ var Menu = require('../models/Menu');
 //controllers
 exports.getOrderList = function(req, res) {
   Order.find()
-  .populate('menu', 'item')
+  .populate('menu._id')
   .exec(function(err, orders) {
-    Item.populate(orders, 'menu.item', function(err, results){
-      res.render('orderList', {results : results});
+    Item.populate(orders, 'menu._id.item', function(err, results){
+      var fullResult = [];
+      var z = 0;
+      for (var i=0; i<results.length; i++){
+        for (var j=0; j<results[i].menu.length; j++){
+          fullResult[z] = {
+              id : orders[i]._id,
+              title : results[i].menu[j]._id.item.title,
+              date : results[i].menu[j]._id.date,
+              user : results[i].user
+          }
+          z++;
+        }
+      }
+      console.log(fullResult)
+      res.render('orderList', {fullResult : fullResult});
     })
   });
 };
 
 exports.getAddOrder = function(req, res){
-  Order.findById(req.params.id).exec(function(err, order){
-    ItemCategory.find().exec(function(err, itemCategories){
-      User.find().exec(function(err, users){
-        if(order) var orderMenu = order.menu
-        Menu.findById(orderMenu).exec(function(err, menus){
-          if(menus) var menuItem = menus.item
-          Item.findById(menuItem).exec(function(err, item){
-            res.render('addOrder', {
-              order: order,
-              itemCategories: itemCategories,
-              users: users,
-              menuName: item,
-              menus: menus
-            });
-          })
+  ItemCategory.find().exec(function(err, itemCategories) {
+    User.find().exec(function(err, users) {
+      res.render('addOrder', {
+        itemCategories: itemCategories,
+        users: users
+      });
+    })
+  });
+};
+
+exports.getEditOrder = function(req, res){
+  Order.findById(req.params.id)
+  .populate('menu._id')
+  .exec(function(err, order) {
+    Item.populate(order, 'menu._id.item', function(err, result) {
+      ItemCategory.find().exec(function(err, itemCategories) {
+        User.find().exec(function(err, users) {
+          if (!order) res.end("Order not found")
+          var fullResult = [];
+          for (var i=0; i<result.menu.length; i++)
+            fullResult[i] = {
+              id : result.menu[i]._id._id,
+              title : result.menu[i]._id.item.title,
+              user : result.user,
+              address : result.address.tag
+            }
+          console.log(fullResult);
+          res.render('addOrder', {
+            itemCategories: itemCategories,
+            users: users,
+            result : result,
+            fullResult : fullResult //result.menu._id.
+          });
         })
       })
     })
@@ -40,23 +72,45 @@ exports.getAddOrder = function(req, res){
 exports.postAddOrder = function(req, res){
   if(req.params.id){
     Order.findById(req.params.id).exec(function(err, order){
-      Menu.findById(req.body.menuSelected)
+      var allMenus = [];
+      for (var i=0; i<req.body.allMenus.length; i++){
+        if(req.body.allMenus[i] != '' || req.body.allMenus[i] != 'undefined')
+          allMenus.push(req.body.allMenus[i]);
+      }
+      Menu.find({_id : {$in : allMenus}})
       .populate('item', 'totalCost')
-      .exec(function(err, menu){
+      .exec(function(err, menus){
+        console.log(menus)
         User.findOne({email: req.body.user}).exec(function(err, user){
-          order.date= req.body.date;
-          order.meal= req.body.meal;
-          order.category= req.body.category;
-          order.menu= menu._id;
           order.user= req.body.user;
           order.address = req.body.address;
+          var totalCostToSub = 0;
+          for (var i=0; i<order.menu.length; i++) {
+            for (var j=0; j<menus.length; j++){
+              if ((menus[j]._id).toString() == (order.menu[i]._id).toString())
+                break;
+              else
+                totalCostToSub += menus[j].item.totalCost;
+            }
+          }
+          console.log(totalCostToSub);
           var newAmount = Number(user.amount);
           user.amount = 0;
-          newAmount -= Number(menu.item.totalCost);
+          newAmount -= totalCostToSub;
           user.amount = newAmount;
           user.save(function (err) {
             if (err) return err;
           });
+          var orderMenu = [];
+          order.menu = [];
+          for (var i=0; i<req.body.allMenus.length; i++)
+            orderMenu[i] = {
+              _id : req.body.allMenus[i],
+              meal: req.body.meal
+            }
+          console.log(req.body.allMenus)
+          order.menu = orderMenu;
+          console.log(order.menu);
           var fullUserAddress = {};
           for (var i=0; i<user.address.length; i++)
             if (user.address[i].tag == req.body.address) {
@@ -65,7 +119,8 @@ exports.postAddOrder = function(req, res){
                 flatNo : user.address[i].flatNo,
                 streetAddress : user.address[i].streetAddress,
                 landmark : user.address[i].landmark,
-                pincode : user.address[i].pincode
+                pincode : user.address[i].pincode,
+                contactNo : user.contactNo
               }
             }
           order.address = {};
@@ -79,25 +134,28 @@ exports.postAddOrder = function(req, res){
     });
   }
   else {
-    Menu.findById(req.body.menuSelected)
+    var allMenus = [];
+    for (var i=0; i<req.body.allMenus.length; i++){
+      if(req.body.allMenus[i] != '')
+        allMenus.push(req.body.allMenus[i]);
+    }
+    console.log(allMenus)
+    Menu.find({_id : {$in : allMenus}})
     .populate('item', 'totalCost')
-    .exec(function(err, menu){
+    .exec(function(err, menus){
       User.findOne({email: req.body.user}).exec(function(err, user){
         var order = new Order({
-          date: req.body.date,
-          meal: req.body.meal,
-          category: req.body.category,
-          menu: menu._id,
-          user: req.body.user,
+          user: req.body.user
         })
-
-        var newAmount = Number(user.amount);
-        user.amount = 0;
-        newAmount -= Number(menu.item.totalCost);
-        user.amount = newAmount;
-        user.save(function (err) {
-          if (err) return err;
-        })
+        console.log(menus)
+        var orderMenu = [];
+        order.menu = [];
+        for (var i=0; i<req.body.allMenus.length; i++)
+          orderMenu[i] = {
+            _id : req.body.allMenus[i],
+            meal: req.body.meal
+          }
+        order.menu = orderMenu;
         var fullUserAddress = {};
         for (var i=0; i<user.address.length; i++)
           if (user.address[i].tag == req.body.address) {
@@ -106,12 +164,24 @@ exports.postAddOrder = function(req, res){
               flatNo : user.address[i].flatNo,
               streetAddress : user.address[i].streetAddress,
               landmark : user.address[i].landmark,
-              pincode : user.address[i].pincode
+              pincode : user.address[i].pincode,
+              contactNo : user.contactNo
             }
           }
         order.address = {};
         order.address = fullUserAddress;
         order.save(function (err) {
+          if (err) return err;
+        });
+        var totalCostToSub = 0;
+        for (var i=0; i<menus.length; i++) {
+          totalCostToSub += menus[i].item.totalCost;
+        }
+        var newAmount = Number(user.amount);
+        user.amount = 0;
+        newAmount -= totalCostToSub;
+        user.amount = newAmount;
+        user.save(function (err) {
           if (err) return err;
         });
         res.redirect('/orderList');

@@ -186,15 +186,25 @@ html
                   .form-group
                     label.col-sm-2.control-label Select Menu
                     .col-sm-10
-                      select.form-control(id='getMenuList' name='menuSelected')
-                        option(selected='selected' value=(menus?(menus._id?menus._id:''):''))
-                          | #{menuName?(menuName.title?menuName.title:''):''}
+                      select.form-control(id='getMenuList' name='allMenus[]')
+                        option
+                      br
+                      if(fullResult)
+                        each fullResults in fullResult
+                          select.form-control(id='' name='allMenus[]')
+                            option(selected='selected' value='#{fullResults.id}')
+                              | #{fullResults.title}
+                          .btn-tools.pull-right
+                            button#count.btn.btn-box-tool(type='button')
+                              i.fa.fa-times
+                    #selectedMenu
+                      br
                   .form-group
                     label.col-sm-2.control-label User
                     .col-sm-10
                       select.form-control(name = 'user' id = 'userSelectedEmail')
                         option(selected='selected')
-                          | #{order?(order.user?order.user:''):''}
+                          | #{result?(result.user?result.user:''):''}
                         each user in users
                           option #{user.email}
                   .form-group
@@ -202,20 +212,21 @@ html
                     .col-sm-10
                       select.form-control(name = 'address' id = 'getUserAddress')
                         option(selected='selected')
-                          | #{order?(order.address.tag?order.address.tag:''):''}
-                  if (order)
-                  .form-group
-                    label.col-sm-2.control-label Address
-                    .col-sm-10
-                      input.form-control(type='text', id='', name='tag[]' placeholder='Add a tag - Home, Office or custom' disabled value=(order?(order.address.tag?order.address.tag:''):''))
-                      input.form-control(type='text', id='', name='flatNo[]' placeholder='Building Name and Flat Number' disabled)
-                      input.form-control(type='text', id='', name='streetAddress[]' disabled placeholder='Enter your street Address...' value=(order?(order.address.streetAddress?order.address.streetAddress:''):''))
-                      input.form-control(type='text', id='', name='landmark[]' disabled placeholder='Landmark' value=(order?(order.address.landmark?order.address.landmark:''):''))
-                      input.form-control(type='Number', id='', name='pincode[]' disabled placeholder='Pincode' value=(order?(order.address.pincode?order.address.pincode:''):''))
+                          | #{result?(result.address.tag?result.address.tag:''):''}
+                  if (fullResult)
+                    .form-group
+                      label.col-sm-2.control-label Address
+                      .col-sm-10
+                        input.form-control(type='text', id='', name='tag[]' placeholder='Add a tag - Home, Office or custom' disabled value=(result?(result.address.tag?result.address.tag:''):''))
+                        input.form-control(type='text', id='', name='flatNo[]' placeholder='Building Name and Flat Number' disabled)
+                        input.form-control(type='text', id='', name='streetAddress[]' disabled placeholder='Enter your street Address...' value=(result?(result.address.streetAddress?result.address.streetAddress:''):''))
+                        input.form-control(type='text', id='', name='landmark[]' disabled placeholder='Landmark' value=(result?(result.address.landmark?result.address.landmark:''):''))
+                        input.form-control(type='Number', id='', name='pincode[]' disabled placeholder='Pincode' value=(result?(result.address.pincode?result.address.pincode:''):''))
+                        input.form-control(type='Number', id='', name='pincode[]' disabled placeholder='Contact Number' value=(result?(result.address.contactNo?result.address.contactNo:''):''))
                 // /.box-body
                 .box-footer
-                  if(order)
-                    a(href='/addOrder/delete/#{order._id}')
+                  if(result)
+                    a(href='/addOrder/delete/#{result._id}')
                       button.btn.btn-info.pull-left(type='submit') Delete
                   button.btn.btn-info.pull-right(type='submit') Add
                 // /.box-footer
@@ -282,7 +293,7 @@ html
               $("select#getMenuList").html(options);
             }
             else{
-              var options = '';
+              var options = '<option> Select a menu </option>';
               for (var i = 0; i < j.length; i++) {
                 options += '<option value="'+ j[i].id +'">' + j[i].item + '</option>';
               }
@@ -307,7 +318,7 @@ html
               $("select#getMenuList").html(options);
             }
             else{
-              var options = '';
+              var options = '<option> Select a menu </option>';
               for (var i = 0; i < j.length; i++) {
                 options += '<option value="'+ j[i].id +'">' + j[i].item + '</option>';
               }
@@ -332,15 +343,15 @@ html
               $("select#getMenuList").html(options);
             }
             else{
-              var options = '';
+              var options = '<option> Select a menu </option>';
               for (var i = 0; i < j.length; i++) {
-                options += '<option value="'+ j[i].id +'">' + j[i].item + '</option>';
+                options += '<option value="'+ j[i].id +'" data-menuName="' + j[i].item + '">' + j[i].item + '</option>';
               }
               $("select#getMenuList").html(options);
             }
           })
         })
-        //userSelectedEmail
+        //getUserAddress
         $("select#userSelectedEmail").change(function(){
           $userEmail = $(this).val();
           $.getJSON("/getUserAddress",{
@@ -351,5 +362,20 @@ html
               options += '<option>' + j[i].address + '</option>';
             $("select#getUserAddress").html(options);
           })
+        })
+        var count = 0;
+        $("select#getMenuList").change(function(){
+          var newTextField = $(document.createElement('div'))
+          var menuData = $(this).find(':selected').attr('data-menuName');
+          newTextField.after().html('<label class="col-sm-2 control-label">Selected Menu</label><div class="col-sm-10"><select data-removeId="count" id=""  name="allMenus[]" class="form-control"><option selected="selected" value="'+$(this).val()+'">'+ menuData +'</option></select><div class="btn-tools pull-right"><button class="btn btn-box-tool" type="button" id="count"><i class="fa fa-times"></i></button></div>');
+          var options = '';
+          $("select#getMenuList").html(options);
+          newTextField.appendTo('#selectedMenu');
+          count++;
+          console.log(count);
+        })
+        $('#1, #2, #3').click(function(){
+          var x = $('[data-removeId="2"]');
+          x.remove();
         })
         })

@@ -168,14 +168,14 @@ html
                       th Date
                       th User
                   tbody
-                    if results
-                      each result in results
+                    if fullResult
+                      each fullResults in fullResult
                         tr
                           td
-                            a(href='/addOrder/#{result.id}')
-                              | #{result.menu.item.title}
-                          td #{result.date}
-                          td #{result.user}
+                            a(href='/addOrder/#{fullResults.id}')
+                              | #{fullResults.title}
+                          td #{fullResults.date}
+                          td #{fullResults.user}
               // /.box-body
             // /.box
           // /.row
