@@ -214,6 +214,9 @@ html
                       select.form-control(name = 'address' id = 'getUserAddress')
                         option(selected='selected')
                           | #{result?(result.address.tag?result.address.tag:''):''}
+                        if(addressTag)
+                          each addressTags in addressTag
+                            option #{addressTags}
                   if (fullResult)
                     .form-group
                       label.col-sm-2.control-label Address

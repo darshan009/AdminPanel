@@ -45,24 +45,31 @@ exports.getEditOrder = function(req, res){
   .populate('menu._id')
   .exec(function(err, order) {
     Item.populate(order, 'menu._id.item', function(err, result) {
+      if(!result) res.end("No order found")
       ItemCategory.find().exec(function(err, itemCategories) {
         User.find().exec(function(err, users) {
-          if (!order) res.end("Order not found")
-          var fullResult = [];
-          for (var i=0; i<result.menu.length; i++)
-            fullResult[i] = {
-              id : result.menu[i]._id._id,
-              title : result.menu[i]._id.item.title,
-              user : result.user,
-              address : result.address.tag
-            }
-          console.log(result);
-          res.render('addOrder', {
-            itemCategories: itemCategories,
-            users: users,
-            result : result,
-            fullResult : fullResult //result.menu._id.
-          });
+          User.findOne({email : order.user}).exec(function(err, userFound) {
+            if (!order) res.end("Order not found")
+            var fullResult = [];
+            for (var i=0; i<result.menu.length; i++)
+              fullResult[i] = {
+                id : result.menu[i]._id._id,
+                title : result.menu[i]._id.item.title
+              }
+            var addressTag = [];
+            for (var i=0; i<userFound.address.length; i++)
+              addressTag.push(userFound.address[i].tag);
+            console.log(result);
+            console.log(userFound);
+            console.log(addressTag)
+            res.render('addOrder', {
+              itemCategories: itemCategories,
+              users: users,
+              addressTag : addressTag,
+              result : result,
+              fullResult : fullResult //result.menu._id.
+            });
+          })
         })
       })
     })
@@ -77,11 +84,9 @@ exports.postAddOrder = function(req, res){
         if(req.body.allMenus[i] != '')
           allMenus.push(req.body.allMenus[i]);
       }
-      console.log(allMenus)
       Menu.find({_id : {$in : allMenus}})
       .populate('item', 'totalCost')
       .exec(function(err, menus){
-        console.log(menus)
         User.findOne({email: req.body.user}).exec(function(err, user){
           order.user= req.body.user;
           order.address = req.body.address;
@@ -104,29 +109,33 @@ exports.postAddOrder = function(req, res){
           });
           var orderMenu = [];
           order.menu = [];
+          console.log("---------empty order.menu-----------")
           for (var i=0; i<allMenus.length; i++)
             orderMenu[i] = {
               _id : allMenus[i]
             }
-          console.log(req.body.allMenus)
           order.menu = orderMenu;
+          console.log("---------filled order.menu-----------")
           console.log(order.menu);
           var fullUserAddress = {};
-          for (var i=0; i<user.address.length; i++)
-            if (user.address[i].tag == req.body.address) {
-              fullUserAddress = {
-                tag : user.address[i].tag,
-                flatNo : user.address[i].flatNo,
-                streetAddress : user.address[i].streetAddress,
-                landmark : user.address[i].landmark,
-                pincode : user.address[i].pincode,
-                contactNo : user.contactNo
+          if (user.address)
+            for (var i=0; i<user.address.length; i++)
+              if (user.address[i].tag == req.body.address) {
+                fullUserAddress = {
+                  tag : user.address[i].tag,
+                  flatNo : user.address[i].flatNo,
+                  streetAddress : user.address[i].streetAddress,
+                  landmark : user.address[i].landmark,
+                  pincode : user.address[i].pincode,
+                  contactNo : user.contactNo
+                }
               }
-            }
           order.address = {};
           order.address = fullUserAddress;
-          order.save(function (err) {
+          order.save(function (err, orders) {
               if (err) return err
+              console.log("---------final order-----------")
+              console.log(orders);
           })
           res.redirect('/orderList');
         });
@@ -229,11 +238,11 @@ exports.getUserAddress = function(req, res){
   if(req.query.userEmail) var userEmail = req.query.userEmail
   User.findOne({email: userEmail}).exec(function(err, user){
     var userAddressJson = [];
-    for(var i=0; i<user.address.length; i++){
-      userAddressJson[i] = {
-        address : user.address[i].tag
-      }
-    }
+    if (user.address)
+      for(var i=0; i<user.address.length; i++)
+        userAddressJson[i] = {
+          address : user.address[i].tag
+        }
     console.log(userAddressJson)
     res.send(userAddressJson);
   })
