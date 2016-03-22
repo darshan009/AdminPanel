@@ -97,15 +97,19 @@ exports.deleteItemCategory = function(req,res){
            if(!itemCategory) res.end("The enetered category is not valid");
            if(!userChef) res.end("Chef does not exist");
            var locals = req.body;
-           var attributes = [];
+           var subItems = [];
            var totalCost = 0;
+           item.subItems = [];
            for(var i=0; i<locals.name.length; i++){
-             attributes[i] = {
-               name : locals.name[i],
-               cost : locals.cost[i],
-               quantity : locals.quantity[i]
+             if (locals.cost[i] != ''){
+               item.subItems.push({
+                 name : locals.name[i],
+                 cost : locals.cost[i],
+                 quantity : locals.quantity[i],
+                 container : locals.container[i]
+               })
+               totalCost += Number(item.subItems[i].cost);
              }
-             totalCost += Number(attributes[i].cost);
            }
            item.title= req.body.title;
            item.state = req.body.state;
@@ -115,7 +119,14 @@ exports.deleteItemCategory = function(req,res){
            item.category= itemCategory._id;
            item.totalCost = 0;
            item.totalCost += totalCost;
-           item.attributes = attributes;
+           item.attributes = [];
+           for(var i=0; i<locals.nameAtt.length; i++){
+             if (locals.nameAtt[i] != '' && locals.costAtt[i] != '')
+               item.attributes.push({
+                 name : locals.nameAtt[i],
+                 cost : locals.costAtt[i]
+               })
+            }
            item.save(function (err, items) {
                if (err) return err
            });
@@ -130,16 +141,6 @@ exports.deleteItemCategory = function(req,res){
          if(!itemCategory) res.end("The enetered category is not valid");
          if(!userChef) res.end("Chef does not exist");
          var locals = req.body;
-         var attributes = [];
-         var totalCost = 0;
-         for(var i=0; i<locals.name.length; i++){
-           attributes[i] = {
-             name : locals.name[i],
-             cost : locals.cost[i],
-             quantity : locals.quantity[i]
-           }
-           totalCost += attributes[i].cost;
-         }
          var item = new Item({
            title: req.body.title,
            state : req.body.state,
@@ -148,9 +149,29 @@ exports.deleteItemCategory = function(req,res){
            type: req.body.type,
            category: itemCategory._id
          });
+         item.subItems = [];
+         var totalCost = 0;
+         for(var i=0; i<locals.name.length; i++){
+           if (locals.cost[i] != ''){
+             item.subItems.push({
+               name : locals.name[i],
+               cost : locals.cost[i],
+               quantity : locals.quantity[i],
+               container : locals.container[i]
+             })
+             totalCost += item.subItems[i].cost;
+           }
+         }
          item.totalCost = 0;
          item.totalCost += totalCost;
-         item.attributes = attributes;
+         item.attributes = [];
+         for(var i=0; i<locals.nameAtt.length; i++){
+           if (locals.nameAtt[i] != '' && locals.costAtt[i] != '')
+             item.attributes.push({
+               name : locals.nameAtt[i],
+               cost : locals.costAtt[i]
+             })
+          }
          item.save(function (err, items) {
              if (err) return err
          });

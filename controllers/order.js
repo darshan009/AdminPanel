@@ -23,7 +23,7 @@ exports.getOrderList = function(req, res) {
           z++;
         }
       }
-      console.log(fullResult)
+      //console.log(fullResult)
       res.render('orderList', {fullResult : fullResult});
     })
   });
@@ -60,8 +60,6 @@ exports.getEditOrder = function(req, res){
             for (var i=0; i<userFound.address.length; i++)
               addressTag.push(userFound.address[i].tag);
             console.log(result);
-            console.log(userFound);
-            console.log(addressTag)
             res.render('addOrder', {
               itemCategories: itemCategories,
               users: users,
@@ -90,33 +88,31 @@ exports.postAddOrder = function(req, res){
         User.findOne({email: req.body.user}).exec(function(err, user){
           order.user= req.body.user;
           order.address = req.body.address;
-          var totalCostToSub = 0;
-          for (var i=0; i<order.menu.length; i++) {
-            for (var j=0; j<menus.length; j++){
-              if ((menus[j]._id).toString() == (order.menu[i]._id).toString())
-                break;
-              else
-                totalCostToSub += menus[j].item.totalCost;
-            }
-          }
-          console.log(totalCostToSub);
-          var newAmount = Number(user.amount);
-          user.amount = 0;
-          newAmount -= totalCostToSub;
-          user.amount = newAmount;
-          user.save(function (err) {
-            if (err) return err;
-          });
-          var orderMenu = [];
+          // var totalCostToSub = 0;
+          // var orderMenuFound = [];
+          // for (var i=0; i<order.menu.length; i++) {
+          //   for (var j=0; j<menus.length; j++){
+          //     if ((menus[j]._id).toString() == (order.menu[i]._id).toString())
+          //       orderMenuFound.push(order.menu[i]._id)
+          //   }
+          // }
+          //
+          // for (var i=0; i<order.menu.length; i++) {
+          //
+          // }
+          //totalCostToSub += menus[j].item.totalCost;
+          // var newAmount = Number(user.amount);
+          // user.amount = 0;
+          // newAmount -= totalCostToSub;
+          // user.amount = newAmount;
+          // user.save(function (err) {
+          //   if (err) return err;
+          // });
           order.menu = [];
-          console.log("---------empty order.menu-----------")
           for (var i=0; i<allMenus.length; i++)
-            orderMenu[i] = {
+            order.menu.push({
               _id : allMenus[i]
-            }
-          order.menu = orderMenu;
-          console.log("---------filled order.menu-----------")
-          console.log(order.menu);
+            })
           var fullUserAddress = {};
           if (user.address)
             for (var i=0; i<user.address.length; i++)
@@ -132,10 +128,8 @@ exports.postAddOrder = function(req, res){
               }
           order.address = {};
           order.address = fullUserAddress;
-          order.save(function (err, orders) {
+          order.save(function (err) {
               if (err) return err
-              console.log("---------final order-----------")
-              console.log(orders);
           })
           res.redirect('/orderList');
         });
@@ -144,6 +138,7 @@ exports.postAddOrder = function(req, res){
   }
   else {
     var allMenus = [];
+    console.log(req.body.allMenus)
     for (var i=0; i<req.body.allMenus.length; i++){
       if(req.body.allMenus[i] != '')
         allMenus.push(req.body.allMenus[i]);
@@ -157,13 +152,11 @@ exports.postAddOrder = function(req, res){
           user: req.body.user
         })
         console.log(menus)
-        var orderMenu = [];
         order.menu = [];
         for (var i=0; i<allMenus.length; i++)
-          orderMenu[i] = {
+          order.menu.push({
             _id : allMenus[i]
-          }
-        order.menu = orderMenu;
+          })
         var fullUserAddress = {};
         if(user.address)
           for (var i=0; i<user.address.length; i++)
@@ -183,9 +176,10 @@ exports.postAddOrder = function(req, res){
           if (err) return err;
         });
         var totalCostToSub = 0;
-        for (var i=0; i<menus.length; i++) {
-          totalCostToSub += menus[i].item.totalCost;
-        }
+        if (menus)
+          for (var i=0; i<menus.length; i++) {
+            totalCostToSub += menus[i].item.totalCost;
+          }
         var newAmount = Number(user.amount);
         user.amount = 0;
         newAmount -= totalCostToSub;

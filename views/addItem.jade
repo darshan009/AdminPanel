@@ -210,7 +210,7 @@ html
                       each itemCategory in itemCategories
                         option #{itemCategory.name}
                 .form-group
-                  label.col-sm-2.control-label Attributes
+                  label.col-sm-2.control-label Add Sub-Items
                   .col-sm-10
                     table#hi.table.table-bordered.table-hover
                       thead
@@ -218,25 +218,50 @@ html
                           th Name
                           th Cost
                           th Quantity
+                          th Container
                       tbody
                         if item
-                          each items in item.attributes
+                          each items in item.subItems
                             tr
                               td
-                                input(type='text' name='name[]' placeholder='Item name' value=(items?(items.name?items.name:''):''))
+                                input(type='text' name='name[]' placeholder='Sub-Item name' value=(items?(items.name?items.name:''):''))
                               td
                                 input(type='Number' name='cost[]' placeholder='Cost' value=(items?(items.cost?items.cost:''):''))
                               td
                                 input(type='Number' name='quantity[]' placeholder='Quantity' value=(items?(items.quantity?items.quantity:''):''))
-                        else
+                              td
+                                input(type='Number' name='container[]' placeholder='Container Number' value=(items?(items.container?items.container:''):''))
                           tr
                             td
-                              input(type='text' name='name[]' placeholder='Item name')
+                              input(type='text' name='name[]' placeholder='Sub-Item name')
                             td
                               input(type='Number' name='cost[]' placeholder='Cost')
                             td
                               input(type='Number' name='quantity[]' placeholder='Quantity')
+                            td
+                              input(type='Number' name='container[]' placeholder='Container Number')
                     button.btn.btn-info.pull-right(onclick='addTableRow()', type='button') Add a row
+                .form-group
+                  label.col-sm-2.control-label Attributes
+                  .col-sm-10
+                    table#attributesTable.table.table-bordered.table-hover
+                      thead
+                        tr
+                          th Name
+                          th Cost
+                        tbody
+                          if(item)
+                            each items in item.attributes
+                              tr
+                                td
+                                  input(type='text' name='nameAtt[]' placeholder='Attribute name' value=(items?(items.name?items.name:''):''))
+                                td
+                                  input(type='Number' name='costAtt[]' placeholder='Cost' value=(items?(items.cost?items.cost:''):''))
+                            td
+                              input(type='text' name='nameAtt[]' placeholder='Attribute name')
+                            td
+                              input(type='Number' name='costAtt[]' placeholder='Cost')
+                    button.btn.btn-info.pull-right(onclick='addTableRowPartTwo()', type='button') Add a row
                 .box-footer
                   if(item)
                     a(href='/addItem/delete/#{item._id}')
@@ -293,6 +318,23 @@ html
         cell3Data.name = "quantity[]";
         cell3Data.placeholder = "Quantity";
         cell3.appendChild(cell3Data);
+      }
+      function addTableRowPartTwo() {
+        var table = document.getElementById("attributesTable");
+        var row = table.insertRow(1);
+        var cell1 = row.insertCell(0);
+        var cell1Data = document.createElement("input");
+        cell1Data.type = "text";
+        cell1Data.name = "nameAtt[]";
+        cell1Data.placeholder = "Item Name";
+        cell1.appendChild(cell1Data);
+
+        var cell2 = row.insertCell(1);
+        var cell2Data = document.createElement("input");
+        cell2Data.type = "Number";
+        cell2Data.name = "costAtt[]";
+        cell2Data.placeholder = "Cost"
+        cell2.appendChild(cell2Data);
       }
     script.
       $(function () {
