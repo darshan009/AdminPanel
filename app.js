@@ -89,6 +89,7 @@ app.get('/addOrder/delete/:id', userController.isAdmin, orderController.deleteOr
 //populate menu in add order
 app.get('/getMenusFromOptions', orderController.getMenusFromOptions);
 app.get('/getUserAddress', orderController.getUserAddress);
+app.get('/getCustomizedMenuToItem', orderController.getCustomizedMenuToItem);
 
 //listen
 var port = Number(process.env.PORT || 3000);

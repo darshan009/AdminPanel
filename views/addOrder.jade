@@ -349,7 +349,7 @@ html
             else{
               var options = '<option> Select a menu </option>';
               for (var i = 0; i < j.length; i++) {
-                options += '<option value="'+ j[i].id +'" data-menuName="' + j[i].item + '">' + j[i].item + '</option>';
+                options += '<option data-checked='+ j[i].checked +' value="'+ j[i].id +'" data-menuName="' + j[i].item + '">' + j[i].item + '</option>';
               }
               $("select#getMenuList").html(options);
             }
@@ -371,13 +371,30 @@ html
         $("select#getMenuList").change(function(){
           var newTextField = $(document.createElement('div'))
           var menuData = $(this).find(':selected').attr('data-menuName');
+          var check = $("option:selected", this).attr("data-checked");
           //newTextField.after().html('<div data-removeId="'+count+'"><label class="col-sm-2 control-label">Selected Menu</label><div class="col-sm-10"><p name="allMenus[]" value="'+$(this).val()+'">'+ menuData +'</p><div class="btn-tools"><button class="btn btn-box-tool" type="button" onclick="deleteSelectBox('+count+')"><i class="fa fa-times"></i></button></div></div>')
-          newTextField.after().html('<div data-removeId="'+count+'"><label class="col-sm-2 control-label">Selected Menu</label><div class="col-sm-10"><select id=""  name="allMenus[]" class="form-control"><option selected="selected" value="'+$(this).val()+'">'+ menuData +'</option></select><div class="btn-tools pull-right"><button class="btn btn-box-tool" type="button" onclick="deleteSelectBox('+count+')"><i class="fa fa-times"></i></button></div></div>');
-          //var options = '';
-          //$("select#getMenuList").html(options);
+          newTextField.after().html('<div data-removeId="'+count+'"><label class="col-sm-2 control-label">Selected Menu</label><div class="col-sm-10"><select data-customizeOrderId="'+count+'"  name="allMenus['+count+']" class="form-control"><option selected="selected" data-confirmChecked='+check+' value="'+$(this).val()+'">'+ menuData +'</option></select><div class="btn-tools"><div data-customizeDivTag="'+ count +'"></div><button class="btn btn-box-tool pull-left" type="button"  onclick="customizeMenu('+count+')">Customize</button><button class="btn btn-box-tool  pull-right" type="button" onclick="deleteSelectBox('+count+')"><i class="fa fa-times"></i></button></div></div>');
           newTextField.appendTo('#selectedMenu');
+          if (check == true)
+            customizeMenu(count);
           count++;
         })
+        // for :checkbox -----------use this later--------------
+        $("input:checkbox").on('click', function() {
+          // in the handler, 'this' refers to the box clicked on
+          var $box = $(this);
+          if ($box.is(":checked")) {
+            // the name of the box is retrieved using the .attr() method
+            // as it is assumed and expected to be immutable
+            var group = "input:checkbox[name='" + $box.attr("name") + "']";
+            // the checked state of the group/box on the other hand will change
+            // and the current value is retrieved using .prop() method
+            $(group).prop("checked", false);
+            $box.prop("checked", true);
+          } else {
+            $box.prop("checked", false);
+          }
+        });
         })
         //deleting select
         function deleteSelectBox(d){
@@ -388,4 +405,25 @@ html
         function deletePreSelectBox(d){
           var x = $('[data-removePreId="'+d+'"]');
           x.remove();
+        }
+        function customizeMenu(d) {
+          var x = $('[data-customizeOrderId = "'+d+'"]').val();
+          $.getJSON("/getCustomizedMenuToItem", {
+            id : x
+          }, function(j){
+            var newTextField = $(document.createElement('div'))
+            console.log(j[0].quantity);
+            var generatedTable = 'Position : <input name="getPosition[]" value="'+d+'"><table class="table table-bordered table-hover"><tbody>';
+            //var subItemsName = [];
+            for (var i = 0; i < j.length; i++){
+              if(j[i].quantity){
+                generatedTable += '<tr><td><input name = "subItemsName['+d+']" value='+ j[i].name +'></td><td><input type = "Number" name = "subItemsQuantity['+d+']" value = '+ j[i].quantity +'></td><td>'+ j[i].cost +'</td><td><input type = "Number" name = "subItemsContainer['+d+']" value = '+ j[i].container +'></td></tr>';
+              }
+              else{
+                generatedTable += '<tr><td><input type = "checkbox" name = "attributesName['+d+']" value='+ j[i].name +'>'+ j[i].name +'</td><td>'+ j[i].cost +'</td></tr>';
+              }
+            }
+            newTextField.after().html(generatedTable);
+            newTextField.appendTo('[data-customizeDivTag = "'+d+'"]');
+          })
         }

@@ -3,7 +3,15 @@ var mongoose = require('mongoose');
 var orderSchema = new mongoose.Schema({
   user: { type: String, ref: 'User' },
   menu: [{
-    _id : { type: mongoose.Schema.Types.ObjectId, ref: 'Menu' }
+    _id : { type: mongoose.Schema.Types.ObjectId, ref: 'Menu' },
+    subItems: [{
+       "name" : { type: String },
+       "quantity" : {type: Number, default: '1'},
+       "container": { type: Number , default: '1'}
+    }],
+    attributes : {
+      "name" : String
+    }
   }],
   address: {
     tag : String,
@@ -12,7 +20,8 @@ var orderSchema = new mongoose.Schema({
     landmark : String,
     pincode : Number,
     contactNo : Number
-  }
+  },
+  grandTotal : Number
 });
 
 module.exports = mongoose.model('Order', orderSchema);

@@ -302,7 +302,7 @@ html
         var cell1Data = document.createElement("input");
         cell1Data.type = "text";
         cell1Data.name = "name[]";
-        cell1Data.placeholder = "Item Name";
+        cell1Data.placeholder = "Sub-Item Name";
         cell1.appendChild(cell1Data);
 
         var cell2 = row.insertCell(1);
@@ -318,6 +318,13 @@ html
         cell3Data.name = "quantity[]";
         cell3Data.placeholder = "Quantity";
         cell3.appendChild(cell3Data);
+
+        var cell4 = row.insertCell(3);
+        var cell4Data = document.createElement("input");
+        cell4Data.type = "Number";
+        cell4Data.name = "container[]";
+        cell4Data.placeholder = "Container Number";
+        cell4.appendChild(cell4Data);
       }
       function addTableRowPartTwo() {
         var table = document.getElementById("attributesTable");

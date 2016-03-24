@@ -10,21 +10,43 @@ exports.getOrderList = function(req, res) {
   .populate('menu._id')
   .exec(function(err, orders) {
     Item.populate(orders, 'menu._id.item', function(err, results){
-      var fullResult = [];
+      console.log(results[0].menu[0]._id.item)
+      var customizedResult = [];
+      var nonCustomizedResult = [];
       var z = 0;
       for (var i=0; i<results.length; i++){
         for (var j=0; j<results[i].menu.length; j++){
-          fullResult[z] = {
-              id : orders[i]._id,
-              title : results[i].menu[j]._id.item.title,
-              date : results[i].menu[j]._id.date,
-              user : results[i].user
+          if (results[i].menu[j].subItems.length > 0)
+            customizedResult[z] = {
+                id : orders[i]._id,
+                title : results[i].menu[j]._id.item.title,
+                date : results[i].menu[j]._id.date,
+                user : results[i].user
+                //details : results[i].menu[j].subItems
+            }
+          else{
+            nonCustomizedResult[z] = {
+                id : orders[i]._id,
+                title : results[i].menu[j]._id.item.title,
+                date : results[i].menu[j]._id.date,
+                user : results[i].user
+            }
+            if (results[i].menu[j].attributes.name)
+              nonCustomizedResult.details = results[i].menu[j].attributes.name;
+            else{
+              //nonCustomizedResult.details = results[i].menu[j]._id.item
+            }
           }
           z++;
         }
       }
-      //console.log(fullResult)
-      res.render('orderList', {fullResult : fullResult});
+      console.log("-------end-------")
+      console.log(customizedResult)
+      console.log(nonCustomizedResult)
+      res.render('orderList', {
+        customizedResult : customizedResult,
+        nonCustomizedResult : nonCustomizedResult
+      });
     })
   });
 };
@@ -152,11 +174,52 @@ exports.postAddOrder = function(req, res){
           user: req.body.user
         })
         console.log(menus)
-        order.menu = [];
-        for (var i=0; i<allMenus.length; i++)
-          order.menu.push({
-            _id : allMenus[i]
-          })
+        //for customized orders
+        console.log("-------------get position started------------")
+        console.log(req.body.getPosition.length)
+        var subItems = [];
+        if(req.body.getPosition)
+          for (var i=0; i<req.body.getPosition.length; i++){
+            if(req.body.subItemsName){
+              order.menu[i] = {
+                _id : allMenus[req.body.getPosition[i]],
+                subItems : [],
+              }
+              console.log(order.menu[i]);
+              for (var j=0; j<req.body.subItemsName[i].length; j++)
+                order.menu[i].subItems[j] = {
+                  name : req.body.subItemsName[i][j],
+                  quantity : Number(req.body.subItemsQuantity[i][j]),
+                  container : Number(req.body.subItemsContainer[i][j])
+                }
+              //order.menu[i].subItems = subItems;
+              console.log(order.menu[i].subItems)
+            }else{
+                order.menu.push({
+                  _id : allMenus[req.body.getPosition[i]],
+                  attributes : {
+                    name : req.body.attributesName[i],
+                    //quantity : req.body.attributesCost[i]
+                  }
+                })
+              }
+          }
+        //non - customized orders
+        var found = false;
+        for (var i=0; i<allMenus.length; i++){
+          for (var j=0; j<req.body.getPosition.length; j++)
+            if (i == req.body.getPosition[j]) {
+              found = true;
+              break;
+            }
+          if(!found)
+            order.menu.push({
+              _id : allMenus[i]
+            })
+          found = false;
+        }
+        console.log(order.menu)
+        console.log(order.menu.subItems)
         var fullUserAddress = {};
         if(user.address)
           for (var i=0; i<user.address.length; i++)
@@ -175,18 +238,18 @@ exports.postAddOrder = function(req, res){
         order.save(function (err) {
           if (err) return err;
         });
-        var totalCostToSub = 0;
-        if (menus)
-          for (var i=0; i<menus.length; i++) {
-            totalCostToSub += menus[i].item.totalCost;
-          }
-        var newAmount = Number(user.amount);
-        user.amount = 0;
-        newAmount -= totalCostToSub;
-        user.amount = newAmount;
-        user.save(function (err) {
-          if (err) return err;
-        });
+        // var totalCostToSub = 0;
+        // if (menus)
+        //   for (var i=0; i<menus.length; i++) {
+        //     totalCostToSub += menus[i].item.totalCost;
+        //   }
+        // var newAmount = Number(user.amount);
+        // user.amount = 0;
+        // newAmount -= totalCostToSub;
+        // user.amount = newAmount;
+        // user.save(function (err) {
+        //   if (err) return err;
+        // });
         res.redirect('/orderList');
       });
     });
@@ -212,16 +275,19 @@ exports.getMenusFromOptions = function(req, res){
   if(req.query.meal)
     menuOptions.meal = req.query.meal
   Menu.find(menuOptions)
-  .populate('item', 'title')
+  .populate('item')
   .exec(function(err, menusList){
       var menusListJson = []
-      console.log( menuOptions )
       console.log(menusList);
       for(var i=0; i<menusList.length; i++){
         menusListJson[i] = {
           id: menusList[i]._id,
           item: menusList[i].item.title
         }
+        if (menusList[i].item.subItems.length > 0)
+          menusListJson[i].checked = false;
+        else
+          menusListJson[i].checked = true;
       }
       res.send(menusListJson);
   });
@@ -240,4 +306,36 @@ exports.getUserAddress = function(req, res){
     console.log(userAddressJson)
     res.send(userAddressJson);
   })
+};
+
+//ajax get Customized Menu To Item
+exports.getCustomizedMenuToItem = function(req, res) {
+  console.log(req.query.id);
+  Menu.findById(req.query.id)
+  .populate('item')
+  .exec(function(err, menu){
+    console.log("--------getCustomizedMenuToItem----------")
+    console.log(menu);
+    var subItemsAttributes = [];
+    if(menu.item.subItems.length != 0){
+      console.log("subItems found");
+      for (var i=0; i<menu.item.subItems.length; i++)
+        subItemsAttributes[i] = {
+          name : menu.item.subItems[i].name,
+          quantity : menu.item.subItems[i].quantity,
+          cost : menu.item.subItems[i].cost,
+          container :menu.item.subItems[i].container
+        }
+    }
+    if(menu.item.attributes.length != 0){
+      console.log("attributes found")
+      for (var i=0; i<menu.item.attributes.length; i++)
+        subItemsAttributes[i] = {
+          name : menu.item.attributes[i].name,
+          cost : menu.item.attributes[i].cost
+        }
+    }
+
+    res.send(subItemsAttributes);
+  });
 };
