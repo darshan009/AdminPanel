@@ -173,7 +173,7 @@ html
                       each customizedResults in customizedResult
                         tr
                           td
-                            a(href='/addOrder/#{customizedResults.id}')
+                            a(href='/editOrder/#{customizedResults.id}')
                               | #{customizedResults.title}
                           td #{customizedResults.date}
                           td #{customizedResults.user}
@@ -196,7 +196,7 @@ html
                       each nonCustomizedResults in nonCustomizedResult
                         tr
                           td
-                            a(href='/addOrder/#{nonCustomizedResults.id}')
+                            a(href='/editOrder/#{nonCustomizedResults.id}')
                               | #{nonCustomizedResults.title}
                           td #{nonCustomizedResults.date}
                           td #{nonCustomizedResults.user}

@@ -266,7 +266,9 @@ html
                   if(item)
                     a(href='/addItem/delete/#{item._id}')
                       button.btn.btn-info.pull-left(type='submit') Delete
-                  button.btn.btn-info.pull-right(type='submit') Save
+                    button.btn.btn-info.pull-right(type='submit') Edit
+                  else
+                    button.btn.btn-info.pull-right(type='submit') Save
                 // /.box-footer
             // /.box
           // /.row

@@ -228,7 +228,10 @@ html
                   button.btn.btn-info.pull-right(onclick='addAddress()', type='button') Add one more address
                 // /.box-body
                 .box-footer
-                  button.btn.btn-info.pull-right(type='submit') Save
+                  if user
+                    button.btn.btn-info.pull-right(type='submit') Edit
+                  else
+                    button.btn.btn-info.pull-right(type='submit') Save
                 // /.box-footer
             // /.box
           // /.row

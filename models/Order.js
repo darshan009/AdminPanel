@@ -10,7 +10,8 @@ var orderSchema = new mongoose.Schema({
        "container": { type: Number , default: '1'}
     }],
     attributes : {
-      "name" : String
+      "name" : String,
+      "quantity" : Number
     }
   }],
   address: {

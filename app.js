@@ -53,38 +53,38 @@ app.post('/', userController.postLogin);
 //user OR Admin
 app.get('/userList', userController.isAdmin, userController.getUsers);
 app.post('/addUser', userController.isAdmin, userController.postAddUser);
-app.post('/addUser/:id', userController.isAdmin, userController.postAddUser);
+app.post('/editUser/:id', userController.isAdmin, userController.postAddUser);
 app.get('/addUser', userController.isAdmin, userController.getAddUser);
-app.get('/addUser/:id', userController.isAdmin, userController.getAddUser);
+app.get('/editUser/:id', userController.isAdmin, userController.getAddUser);
 app.get('/logout', userController.getLogout);
 //item category
 app.get('/categoryList', userController.isAdmin, itemController.getItemCategories);
 app.get('/addCategory', userController.isAdmin, itemController.getAddItemCategory);
 app.post('/addCategory', userController.isAdmin, itemController.postAddItemCategory);
-app.get('/addCategory/:id', userController.isAdmin, itemController.getAddItemCategory);
-app.post('/addCategory/:id', userController.isAdmin, itemController.postAddItemCategory);
+app.get('/editCategory/:id', userController.isAdmin, itemController.getAddItemCategory);
+app.post('/editCategory/:id', userController.isAdmin, itemController.postAddItemCategory);
 app.get('/addCategory/delete/:id', userController.isAdmin, itemController.deleteItemCategory);
 //items
 app.get('/itemList', userController.isAdmin, itemController.getItemList);
 app.get('/addItem', userController.isAdmin, itemController.getAddItem);
-app.get('/addItem/:id', userController.isAdmin, itemController.getAddItem);
+app.get('/editItem/:id', userController.isAdmin, itemController.getAddItem);
 app.post('/addItem', userController.isAdmin, itemController.postAddItem);
-app.post('/addItem/:id', userController.isAdmin, itemController.postAddItem);
+app.post('/editItem/:id', userController.isAdmin, itemController.postAddItem);
 //menu
 app.get('/menuList', userController.isAdmin, menuController.getMenuList);
 app.get('/addMenu', userController.isAdmin, menuController.getAddMenu);
-app.get('/addMenu/:id', userController.isAdmin, menuController.getAddMenu);
+app.get('/editMenu/:id', userController.isAdmin, menuController.getAddMenu);
 app.post('/addMenu', userController.isAdmin, menuController.postAddMenu);
-app.post('/addMenu/:id', userController.isAdmin, menuController.postAddMenu);
+app.post('/editMenu/:id', userController.isAdmin, menuController.postAddMenu);
 //ajax populate
 app.get('/getItemsFromCategory', menuController.getItemsFromCategory);
 app.get('/addMenu/delete/:id', userController.isAdmin, menuController.deleteMenu);
 //order
 app.get('/orderList', userController.isAdmin, orderController.getOrderList);
 app.get('/addOrder', userController.isAdmin, orderController.getAddOrder);
-app.get('/addOrder/:id', userController.isAdmin, orderController.getEditOrder);
+app.get('/editOrder/:id', userController.isAdmin, orderController.getEditOrder);
 app.post('/addOrder', userController.isAdmin, orderController.postAddOrder);
-app.post('/addOrder/:id', userController.isAdmin, orderController.postAddOrder);
+app.post('/editOrder/:id', userController.isAdmin, orderController.postAddOrder);
 app.get('/addOrder/delete/:id', userController.isAdmin, orderController.deleteOrder);
 //populate menu in add order
 app.get('/getMenusFromOptions', orderController.getMenusFromOptions);

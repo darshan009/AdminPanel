@@ -10,7 +10,7 @@ exports.getOrderList = function(req, res) {
   .populate('menu._id')
   .exec(function(err, orders) {
     Item.populate(orders, 'menu._id.item', function(err, results){
-      console.log(results[0].menu[0]._id.item)
+      console.log(results)
       var customizedResult = [];
       var nonCustomizedResult = [];
       var z = 0;
@@ -177,46 +177,47 @@ exports.postAddOrder = function(req, res){
         //for customized orders
         console.log("-------------get position started------------")
         console.log(req.body.getPosition.length)
-        var subItems = [];
-        if(req.body.getPosition)
-          for (var i=0; i<req.body.getPosition.length; i++){
-            if(req.body.subItemsName){
-              order.menu[i] = {
-                _id : allMenus[req.body.getPosition[i]],
-                subItems : [],
+        console.log(req.body.attributesName)
+        console.log(req.body.attributesQuantity)
+        // -------------- old adding of subItems--------------------
+        // var subItems = [];
+        // for (var i=0; i<req.body.getPosition.length; i++){
+        //   if(req.body.subItemsName){
+        //     order.menu[i] = {
+        //       _id : allMenus[req.body.getPosition[i]],
+        //       subItems : [],
+        //     }
+        //     console.log(order.menu[i]);
+        //     for (var j=0; j<req.body.subItemsName[i].length; j++)
+        //       order.menu[i].subItems[j] = {
+        //         name : req.body.subItemsName[i][j],
+        //         quantity : Number(req.body.subItemsQuantity[i][j]),
+        //         container : Number(req.body.subItemsContainer[i][j])
+        //       }
+        //     //order.menu[i].subItems = subItems;
+        //     console.log(order.menu[i].subItems)
+        //   }
+        // }
+        //-----------------new adding of customized part-------------
+        for (var i=0; i<req.body.getPosition.length; i++){
+          //customized
+          if (req.body.getPosition[i] == 'true'){
+            //yet to get a solution
+          }// this part has attributes - half, full
+          else if (req.body.getPosition[i] == 'hasAttributes') {
+            order.menu.push({
+              _id : allMenus[i],
+              attributes : {
+                name : req.body.attributesName[i],
+                quantity : req.body.attributesQuantity[i]
               }
-              console.log(order.menu[i]);
-              for (var j=0; j<req.body.subItemsName[i].length; j++)
-                order.menu[i].subItems[j] = {
-                  name : req.body.subItemsName[i][j],
-                  quantity : Number(req.body.subItemsQuantity[i][j]),
-                  container : Number(req.body.subItemsContainer[i][j])
-                }
-              //order.menu[i].subItems = subItems;
-              console.log(order.menu[i].subItems)
-            }else{
-                order.menu.push({
-                  _id : allMenus[req.body.getPosition[i]],
-                  attributes : {
-                    name : req.body.attributesName[i],
-                    //quantity : req.body.attributesCost[i]
-                  }
-                })
-              }
-          }
-        //non - customized orders
-        var found = false;
-        for (var i=0; i<allMenus.length; i++){
-          for (var j=0; j<req.body.getPosition.length; j++)
-            if (i == req.body.getPosition[j]) {
-              found = true;
-              break;
-            }
-          if(!found)
+            })
+          }//this is the non-customized part
+          else {
             order.menu.push({
               _id : allMenus[i]
             })
-          found = false;
+          }
         }
         console.log(order.menu)
         console.log(order.menu.subItems)
@@ -286,8 +287,10 @@ exports.getMenusFromOptions = function(req, res){
         }
         if (menusList[i].item.subItems.length > 0)
           menusListJson[i].checked = false;
+        else if (menusList[i].item.attributes)
+          menusListJson[i].checked = "hasAttributes";
         else
-          menusListJson[i].checked = true;
+          menusListJson[i].checked = "normal"
       }
       res.send(menusListJson);
   });
