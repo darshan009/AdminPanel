@@ -32,9 +32,9 @@ exports.getOrderList = function(req, res) {
                 user : results[i].user
             }
             if (results[i].menu[j].attributes.name)
-              nonCustomizedResult.details = results[i].menu[j].attributes.name;
+              nonCustomizedResult[z].details = results[i].menu[j].attributes.name;
             else{
-              //nonCustomizedResult.details = results[i].menu[j]._id.item
+              //nonCustomizedResult[z].details = results[i].menu[j]._id.item
             }
           }
           z++;
@@ -73,11 +73,19 @@ exports.getEditOrder = function(req, res){
           User.findOne({email : order.user}).exec(function(err, userFound) {
             if (!order) res.end("Order not found")
             var fullResult = [];
-            for (var i=0; i<result.menu.length; i++)
+            for (var i=0; i<result.menu.length; i++){
               fullResult[i] = {
                 id : result.menu[i]._id._id,
-                title : result.menu[i]._id.item.title
+                title : result.menu[i]._id.item.title,
+                attributes : result.menu[i].attributes
               }
+              if (result.menu[i].subItems.length > 0)
+                fullResult[i].getPosition = false;
+              else if (result.menu[i].attributes.name)
+                fullResult[i].getPosition = "hasAttributes";
+              else
+                fullResult[i].getPosition = "normal"
+            }
             var addressTag = [];
             for (var i=0; i<userFound.address.length; i++)
               addressTag.push(userFound.address[i].tag);
@@ -110,31 +118,69 @@ exports.postAddOrder = function(req, res){
         User.findOne({email: req.body.user}).exec(function(err, user){
           order.user= req.body.user;
           order.address = req.body.address;
-          // var totalCostToSub = 0;
-          // var orderMenuFound = [];
-          // for (var i=0; i<order.menu.length; i++) {
-          //   for (var j=0; j<menus.length; j++){
-          //     if ((menus[j]._id).toString() == (order.menu[i]._id).toString())
-          //       orderMenuFound.push(order.menu[i]._id)
-          //   }
-          // }
-          //
-          // for (var i=0; i<order.menu.length; i++) {
-          //
-          // }
-          //totalCostToSub += menus[j].item.totalCost;
-          // var newAmount = Number(user.amount);
-          // user.amount = 0;
-          // newAmount -= totalCostToSub;
-          // user.amount = newAmount;
-          // user.save(function (err) {
-          //   if (err) return err;
-          // });
+          /*-------------------adding in cost--------------
+          var totalCostToSub = 0;
+          var orderMenuFound = [];
+          for (var i=0; i<order.menu.length; i++) {
+            for (var j=0; j<menus.length; j++){
+              if ((menus[j]._id).toString() == (order.menu[i]._id).toString())
+                orderMenuFound.push(order.menu[i]._id)
+            }
+          }
+
+          for (var i=0; i<order.menu.length; i++) {
+
+          }
+          totalCostToSub += menus[j].item.totalCost;
+          var newAmount = Number(user.amount);
+          user.amount = 0;
+          newAmount -= totalCostToSub;
+          user.amount = newAmount;
+          user.save(function (err) {
+            if (err) return err;
+          });
+          * ------------adding cost-------------
+          */
+          console.log("------------adding new menu-------------")
+          console.log(order.menu);
+          console.log(req.body.attributesName)
+          console.log(req.body.preAttributesName)
           order.menu = [];
-          for (var i=0; i<allMenus.length; i++)
-            order.menu.push({
-              _id : allMenus[i]
-            })
+          var j = 0;
+          var k = 0;
+          for (var i=0; i<req.body.getPosition.length; i++) {
+            //customized
+            if (req.body.getPosition[i] == 'true') {
+              //yet to get a solution ---- subItems
+            }// this part has attributes - half, full
+            else if (req.body.getPosition[i] == 'hasAttributes') {
+              if (i > req.body.preAttributesName.length){
+                order.menu.push({
+                  _id : allMenus[i],
+                  attributes : {
+                    name : req.body.attributesName[j],
+                    quantity : req.body.attributesQuantity[j]
+                  }
+                })
+                j++;
+              }else {
+                order.menu.push({
+                  _id : allMenus[i],
+                  attributes : {
+                    name : req.body.preAttributesName[k],
+                    quantity : req.body.preAttributesQuantity[k]
+                  }
+                })
+                k++;
+              }
+            }//this is the non-customized part
+            else {
+              order.menu.push({
+                _id : allMenus[i]
+              })
+            }
+          }
+          console.log(order.menu)
           var fullUserAddress = {};
           if (user.address)
             for (var i=0; i<user.address.length; i++)
@@ -199,6 +245,10 @@ exports.postAddOrder = function(req, res){
         //   }
         // }
         //-----------------new adding of customized part-------------
+        console.log(order.menu);
+        console.log(req.body.getPosition);
+        console.log(allMenus);
+        var j = 0;
         for (var i=0; i<req.body.getPosition.length; i++){
           //customized
           if (req.body.getPosition[i] == 'true'){
@@ -208,10 +258,11 @@ exports.postAddOrder = function(req, res){
             order.menu.push({
               _id : allMenus[i],
               attributes : {
-                name : req.body.attributesName[i],
-                quantity : req.body.attributesQuantity[i]
+                name : req.body.attributesName[j],
+                quantity : req.body.attributesQuantity[j]
               }
             })
+            j++;
           }//this is the non-customized part
           else {
             order.menu.push({

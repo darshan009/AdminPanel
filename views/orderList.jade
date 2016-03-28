@@ -184,7 +184,7 @@ html
                 h3.box-title Non-Customized Order List
               // /.box-header
               .box-body
-                table#example2.table.table-bordered.table-hover
+                table#example3.table.table-bordered.table-hover
                   thead
                     tr
                       th Menu
@@ -232,6 +232,14 @@ html
       $(function () {
       $("#example1").DataTable();
       $('#example2').DataTable({
+      "paging": true,
+      "lengthChange": false,
+      "searching": false,
+      "ordering": true,
+      "info": true,
+      "autoWidth": false
+      });
+      $('#example3').DataTable({
       "paging": true,
       "lengthChange": false,
       "searching": false,

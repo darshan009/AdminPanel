@@ -190,14 +190,28 @@ html
                         option
                       br
                       if(fullResult)
-                        each fullResults, index in fullResult
-                          div(data-removePreId=index)
-                            select.form-control(id='')
-                              option(selected='selected' value='#{fullResults.id}')
+                        ol
+                          each fullResults, index in fullResult
+                            div(data-removePreId=index)
+                              li
+                                input(type='hidden', data-getposition=index, name='getPosition[]', value = '#{fullResults.getPosition}')
+                                input(type='hidden', data-customizeorderid=index, name="allMenus[]", value= '#{fullResults.id}')
                                 | #{fullResults.title}
-                            .btn-tools.pull-right
-                              button#count.btn.btn-box-tool(type='button' data-count='index' onclick='deletePreSelectBox(#{index})')
-                                i.fa.fa-times
+                                if (fullResults.attributes.name)
+                                  table.table.table-bordered.table-hover
+                                    tbody
+                                      tr
+                                        td
+                                          input(type='radio', checked, name="preAttributesName[#{index}]", value='#{fullResults.attributes.name}')
+                                          | #{fullResults.attributes.name}
+                                        td
+                                          input(type="hidden" name = "preAttributesQuantity[]" value = '#{fullResults.attributes.quantity}')
+                                          | #{fullResults.attributes.quantity}
+                              .btn-tools.pull-right
+                                button#index.btn.btn-box-tool(type='button' data-count=index onclick='deletePreSelectBox(#{index})')
+                                  i.fa.fa-times
+                            br
+                            br
                     #selectedMenu
                       br
                   .form-group
@@ -375,7 +389,7 @@ html
           var menuData = $(this).find(':selected').attr('data-menuName');
           var check = $("option:selected", this).attr("data-checked");
           //newTextField.after().html('<div data-removeId="'+count+'"><label class="col-sm-2 control-label">Selected Menu</label><div class="col-sm-10"><p name="allMenus[]" value="'+$(this).val()+'">'+ menuData +'</p><div class="btn-tools"><button class="btn btn-box-tool" type="button" onclick="deleteSelectBox('+count+')"><i class="fa fa-times"></i></button></div></div>')
-          newTextField.after().html('<div data-removeId="'+count+'"><label class="col-sm-2 control-label">Selected</label><div class="col-sm-10"><input type="hidden" data-getPosition='+count+' name="getPosition[]" value="'+check+'"><input type = "hidden" data-customizeOrderId="'+count+'"  name="allMenus['+count+']" value="'+$(this).val()+'">'+ menuData +'<div class="btn-tools"><div data-customizeDivTag="'+ count +'"></div><button class="btn btn-box-tool pull-left" data-removeBtn='+count+' type="button" onclick="customizeMenu('+count+','+check+')">Customize</button><button class="btn btn-box-tool  pull-right" type="button" onclick="deleteSelectBox('+count+')"><i class="fa fa-times"></i></button></div></div>');
+          newTextField.after().html('<div data-removeId="'+count+'"><label class="col-sm-2 control-label">Selected</label><div class="col-sm-10"><input type="hidden" data-getPosition='+count+' name="getPosition[]" value="'+check+'"><input type = "hidden" data-customizeOrderId="'+count+'"  name="allMenus[]" value="'+$(this).val()+'">'+ menuData +'<div class="btn-tools"><div data-customizeDivTag="'+ count +'"></div><button class="btn btn-box-tool pull-left" data-removeBtn='+count+' type="button" onclick="customizeMenu('+count+','+check+')">Customize</button><button class="btn btn-box-tool  pull-right" type="button" onclick="deleteSelectBox('+count+')"><i class="fa fa-times"></i></button></div></div>');
           newTextField.appendTo('#selectedMenu');
           console.log(check);
           if (check === 'hasAttributes'){
@@ -385,14 +399,6 @@ html
           }
           count++;
         })
-        //$("#submitButton").click(function () {
-        //    $('form[name="toSubmit"]').each(function () {
-        //        var $form = $(this);
-        //        $.post($form.attr("action"), $form.serialize(), function () {
-        //            alert('Form 2 submitted');
-        //        });
-        //    })
-        //});
         })
         //deleting select
         function deleteSelectBox(d){
@@ -423,7 +429,7 @@ html
                 generatedTable += '<tr><td><input name = "subItemsName[]" value='+ j[i].name +'></td><td><input type = "Number" name = "subItemsQuantity[]" value = '+ j[i].quantity +'></td><td>'+ j[i].cost +'</td><td><input type = "Number" name = "subItemsContainer[]" value = '+ j[i].container +'></td></tr>';
               }
               else{
-                generatedTable += '<tr><td><input type = "checkbox" name = "attributesName[]" value='+ j[i].name +'>&nbsp&nbsp'+ j[i].name +'</td><td>'+ j[i].cost +'</td>';
+                generatedTable += '<tr><td><input type = "radio" checked name = "attributesName['+d+']" value='+ j[i].name +'>&nbsp&nbsp'+ j[i].name +'</td><td>'+ j[i].cost +'</td>';
                 if (i==0)
                   generatedTable += '<td rowspan="2"><input type="Number" name="attributesQuantity[]" value="1"></td></tr>';
               }
@@ -432,12 +438,4 @@ html
             newTextField.after().html(generatedTable);
             newTextField.appendTo('[data-customizeDivTag = "'+d+'"]');
           })
-        }
-        function submitForms () {
-            $('form[name="toSubmit"]').each(function () {
-              var $form = $(this);
-              $.post('/addOrder', $form.serialize(), function () {
-                  alert('Form 2 submitted');
-                });
-            })
         }
