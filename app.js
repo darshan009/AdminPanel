@@ -82,6 +82,7 @@ app.get('/addMenu/delete/:id', userController.isAdmin, menuController.deleteMenu
 //order
 app.get('/orderList', userController.isAdmin, orderController.getOrderList);
 app.get('/addOrder', userController.isAdmin, orderController.getAddOrder);
+app.get('/viewOrder/:id', userController.isAdmin, orderController.getViewOrder);
 app.get('/editOrder/:id', userController.isAdmin, orderController.getEditOrder);
 app.post('/addOrder', userController.isAdmin, orderController.postAddOrder);
 app.post('/editOrder/:id', userController.isAdmin, orderController.postAddOrder);

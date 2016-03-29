@@ -142,11 +142,11 @@ html
                 span Order
                 i.fa.fa-angle-left.pull-right
               ul.treeview-menu
-                li.active
+                li
                   a(href='/orderList')
                     i.fa.fa-circle-o
                     |  List of Orders
-                li
+                li.active
                   a(href='/addOrder')
                     i.fa.fa-circle-o
                     |  Place an Order
@@ -156,52 +156,60 @@ html
         // Main content
         section.content
           .row
-            .box
-              .box-header
-                h3.box-title Customized Order List
+            .box.box-info
+              .box-header.with-border
+                h3.box-title View order
               // /.box-header
-              .box-body
-                table#example2.table.table-bordered.table-hover
-                  thead
-                    tr
-                      th Menu
-                      th Date
-                      th User
-                      th Details
-                  tbody
-                    if customizedResult
-                      each customizedResults in customizedResult
-                        tr
-                          td
-                            a(href='/editOrder/#{customizedResults.id}')
-                              | #{customizedResults.title}
-                          td #{customizedResults.date}
-                          td #{customizedResults.user}
-                          td #{customizedResult.details}
-          .row
-            .box
-              .box-header
-                h3.box-title Non-Customized Order List
-              // /.box-header
-              .box-body
-                table#example3.table.table-bordered.table-hover
-                  thead
-                    tr
-                      th Menu
-                      th Date
-                      th User
-                      th Details
-                  tbody
-                    if nonCustomizedResult
-                      each nonCustomizedResults in nonCustomizedResult
-                        tr
-                          td
-                            a(href='/viewOrder/#{nonCustomizedResults.id}')
-                              | #{nonCustomizedResults.title}
-                          td #{nonCustomizedResults.date}
-                          td #{nonCustomizedResults.user}
-                          td #{nonCustomizedResults.details}
-              // /.box-body
+              // form start
+              form.form-horizontal(method='POST' name='toSubmit')
+                .box-body
+                  .form-group
+                    label.col-sm-2.control-label Selected Menus
+                    .col-sm-10
+                      br
+                      if(fullResult)
+                        ol
+                          each fullResults, index in fullResult
+                            div(data-removePreId=index)
+                              li
+                                input(type='hidden', data-getposition=index, name='getPosition[]', value = '#{fullResults.getPosition}')
+                                input(type='hidden', data-customizeorderid=index, name="allMenus[]", value= '#{fullResults.id}')
+                                | #{fullResults.title}
+                                if (fullResults.attributes.name)
+                                  table.table.table-bordered.table-hover
+                                    tbody
+                                      tr
+                                        td
+                                          input(type='radio', checked, name="preAttributesName[#{index}]", value='#{fullResults.attributes.name}')
+                                          | #{fullResults.attributes.name}
+                                        td
+                                          input(type="hidden" name = "preAttributesQuantity[]" value = '#{fullResults.attributes.quantity}')
+                                          | #{fullResults.attributes.quantity}
+                            br
+                  .form-group
+                    label.col-sm-2.control-label User
+                    .col-sm-10
+                      p
+                        | #{result?(result.user?result.user:''):''}
+                  .form-group
+                    label.col-sm-2.control-label User Address tag
+                    .col-sm-10
+                        p #{result?(result.address.tag?result.address.tag:''):''}
+                  if (fullResult)
+                    .form-group
+                      label.col-sm-2.control-label Full Address
+                      .col-sm-10
+                        input.form-control(type='text', id='', name='tag[]' placeholder='Add a tag - Home, Office or custom' disabled value=(result?(result.address.tag?result.address.tag:''):''))
+                        input.form-control(type='text', id='', name='flatNo[]' placeholder='Building Name and Flat Number' disabled)
+                        input.form-control(type='text', id='', name='streetAddress[]' disabled placeholder='Enter your street Address...' value=(result?(result.address.streetAddress?result.address.streetAddress:''):''))
+                        input.form-control(type='text', id='', name='landmark[]' disabled placeholder='Landmark' value=(result?(result.address.landmark?result.address.landmark:''):''))
+                        input.form-control(type='Number', id='', name='pincode[]' disabled placeholder='Pincode' value=(result?(result.address.pincode?result.address.pincode:''):''))
+                        input.form-control(type='Number', id='', name='pincode[]' disabled placeholder='Contact Number' value=(result?(result.address.contactNo?result.address.contactNo:''):''))
+                // /.box-body
+                .box-footer
+                    a(href='/editOrder/#{result._id}')
+                      button.btn.btn-info.pull-right(type='button') Edit
+                // /.box-footer
             // /.box
           // /.row
         // /.content
@@ -227,24 +235,15 @@ html
     script(src='../public/plugins/datatables/dataTables.bootstrap.min.js')
     // AdminLTE App
     script(src='../public/dist/js/app.min.js')
+    // InputMask
+    script(src='../public/plugins/input-mask/jquery.inputmask.js')
+    script(src='../public/plugins/input-mask/jquery.inputmask.date.extensions.js')
+    script(src='../public/plugins/input-mask/jquery.inputmask.extensions.js')
     // page script
     script.
       $(function () {
       $("#example1").DataTable();
-      $('#example2').DataTable({
-      "paging": true,
-      "lengthChange": false,
-      "searching": false,
-      "ordering": true,
-      "info": true,
-      "autoWidth": false
-      });
-      $('#example3').DataTable({
-      "paging": true,
-      "lengthChange": false,
-      "searching": false,
-      "ordering": true,
-      "info": true,
-      "autoWidth": false
-      });
+      $("[data-mask]").inputmask();
+      //Datemask2 mm/dd/yyyy
+      $("#datemask2").inputmask("mm/dd/yyyy", {"placeholder": "mm/dd/yyyy"});
       });

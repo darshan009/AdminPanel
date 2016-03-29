@@ -62,6 +62,42 @@ exports.getAddOrder = function(req, res){
   });
 };
 
+exports.getViewOrder = function(req, res){
+  Order.findById(req.params.id)
+  .populate('menu._id')
+  .exec(function(err, order) {
+    Item.populate(order, 'menu._id.item', function(err, result) {
+      if(!result) res.end("No order found")
+      User.findOne({email : order.user}).exec(function(err, userFound) {
+        if (!order) res.end("Order not found")
+        var fullResult = [];
+        for (var i=0; i<result.menu.length; i++){
+          fullResult[i] = {
+            id : result.menu[i]._id._id,
+            title : result.menu[i]._id.item.title,
+            attributes : result.menu[i].attributes
+          }
+          if (result.menu[i].subItems.length > 0)
+            fullResult[i].getPosition = false;
+          else if (result.menu[i].attributes.name)
+            fullResult[i].getPosition = "hasAttributes";
+          else
+            fullResult[i].getPosition = "normal"
+        }
+        var addressTag = [];
+        for (var i=0; i<userFound.address.length; i++)
+          addressTag.push(userFound.address[i].tag);
+        console.log(result);
+        res.render('viewOrder', {
+          addressTag : addressTag,
+          result : result,
+          fullResult : fullResult //result.menu._id.
+        });
+      })
+    })
+  });
+};
+
 exports.getEditOrder = function(req, res){
   Order.findById(req.params.id)
   .populate('menu._id')
