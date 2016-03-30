@@ -206,6 +206,9 @@ html
                                           | #{fullResults.attributes.name}
                                         td
                                           input(type="hidden" name = "preAttributesQuantity[]" value = '#{fullResults.attributes.quantity}')
+                                          | #{fullResults.attributes.cost}
+                                        td
+                                          input(type="hidden" name = "preAttributesQuantity[]" value = '#{fullResults.attributes.quantity}')
                                           | #{fullResults.attributes.quantity}
                               .btn-tools.pull-right
                                 button#index.btn.btn-box-tool(type='button' data-count=index onclick='deletePreSelectBox(#{index})')

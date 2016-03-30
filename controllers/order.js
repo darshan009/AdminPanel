@@ -125,7 +125,7 @@ exports.getEditOrder = function(req, res){
             var addressTag = [];
             for (var i=0; i<userFound.address.length; i++)
               addressTag.push(userFound.address[i].tag);
-            console.log(result);
+            console.log(result.menu[0]._id.item.attributes[0].cost);
             res.render('addOrder', {
               itemCategories: itemCategories,
               users: users,
@@ -142,104 +142,114 @@ exports.getEditOrder = function(req, res){
 
 exports.postAddOrder = function(req, res){
   if(req.params.id){
-    Order.findById(req.params.id).exec(function(err, order){
-      var allMenus = [];
-      for (var i=0; i<req.body.allMenus.length; i++){
-        if(req.body.allMenus[i] != '')
-          allMenus.push(req.body.allMenus[i]);
-      }
-      Menu.find({_id : {$in : allMenus}})
-      .populate('item', 'totalCost')
-      .exec(function(err, menus){
-        User.findOne({email: req.body.user}).exec(function(err, user){
-          order.user= req.body.user;
-          order.address = req.body.address;
-          /*-------------------adding in cost--------------
-          var totalCostToSub = 0;
-          var orderMenuFound = [];
-          for (var i=0; i<order.menu.length; i++) {
-            for (var j=0; j<menus.length; j++){
-              if ((menus[j]._id).toString() == (order.menu[i]._id).toString())
-                orderMenuFound.push(order.menu[i]._id)
-            }
-          }
-
-          for (var i=0; i<order.menu.length; i++) {
-
-          }
-          totalCostToSub += menus[j].item.totalCost;
-          var newAmount = Number(user.amount);
-          user.amount = 0;
-          newAmount -= totalCostToSub;
-          user.amount = newAmount;
-          user.save(function (err) {
-            if (err) return err;
-          });
-          * ------------adding cost-------------
-          */
-          console.log("------------adding new menu-------------")
-          console.log(order.menu);
-          console.log(req.body.attributesName)
-          console.log(req.body.preAttributesName)
-          order.menu = [];
-          var j = 0;
-          var k = 0;
-          for (var i=0; i<req.body.getPosition.length; i++) {
-            //customized
-            if (req.body.getPosition[i] == 'true') {
-              //yet to get a solution ---- subItems
-            }// this part has attributes - half, full
-            else if (req.body.getPosition[i] == 'hasAttributes') {
-              if (i > req.body.preAttributesName.length){
-                order.menu.push({
-                  _id : allMenus[i],
-                  attributes : {
-                    name : req.body.attributesName[j],
-                    quantity : req.body.attributesQuantity[j]
-                  }
-                })
-                j++;
-              }else {
-                order.menu.push({
-                  _id : allMenus[i],
-                  attributes : {
-                    name : req.body.preAttributesName[k],
-                    quantity : req.body.preAttributesQuantity[k]
-                  }
-                })
-                k++;
-              }
-            }//this is the non-customized part
-            else {
-              order.menu.push({
-                _id : allMenus[i]
-              })
-            }
-          }
-          console.log(order.menu)
-          var fullUserAddress = {};
-          if (user.address)
-            for (var i=0; i<user.address.length; i++)
-              if (user.address[i].tag == req.body.address) {
-                fullUserAddress = {
-                  tag : user.address[i].tag,
-                  flatNo : user.address[i].flatNo,
-                  streetAddress : user.address[i].streetAddress,
-                  landmark : user.address[i].landmark,
-                  pincode : user.address[i].pincode,
-                  contactNo : user.contactNo
-                }
-              }
-          order.address = {};
-          order.address = fullUserAddress;
-          order.save(function (err) {
-              if (err) return err
-          })
-          res.redirect('/orderList');
-        });
-      });
-    });
-  }
+     Order.findById(req.params.id).exec(function(err, order){
+       var previousTotal = Number(order.grandTotal);
+       var allMenus = [];
+       for (var i=0; i<req.body.allMenus.length; i++){
+         if(req.body.allMenus[i] != '')
+           allMenus.push(req.body.allMenus[i]);
+       }
+       Menu.find({_id : {$in : allMenus}})
+       .populate('item')
+       .exec(function(err, menus){
+         User.findOne({email: req.body.user}).exec(function(err, user){
+           order.user= req.body.user;
+           order.address = req.body.address;
+           console.log("------------adding new menu-------------")
+           console.log(order.menu);
+           //sorting of menus
+           var sortedMenus = [];
+           for (var i=0; i<allMenus.length; i++)
+             for (var j=0; j<menus.length; j++)
+               if ( allMenus[i] == menus[j]._id )
+                 sortedMenus.push(menus[j]);
+           console.log(sortedMenus);
+           order.menu = [];
+           var j = 0;
+           var k = 0;
+           var totalCost = 0;
+           for (var i=0; i<req.body.getPosition.length; i++) {
+             //customized
+             if (req.body.getPosition[i] == 'true') {
+               //yet to get a solution ---- subItems
+             }// this part has attributes - half, full
+             else if (req.body.getPosition[i] == 'hasAttributes') {
+               if (i > req.body.preAttributesName.length){
+                 for (var l=0; l<sortedMenus[i].item.attributes.length; l++)
+                   if (sortedMenus[i].item.attributes[l].name == req.body.attributesName[j])
+                     totalCost += sortedMenus[i].item.attributes[l].cost * req.body.attributesQuantity[j];
+                 order.menu.push({
+                   _id : allMenus[i],
+                   attributes : {
+                     name : req.body.attributesName[j],
+                     quantity : req.body.attributesQuantity[j]
+                   }
+                 })
+                 j++;
+               }else {
+                 order.menu.push({
+                   _id : allMenus[i],
+                   attributes : {
+                     name : req.body.preAttributesName[k],
+                     quantity : req.body.preAttributesQuantity[k]
+                   }
+                 })
+                 for (var l=0; l<sortedMenus[i].item.attributes.length; l++)
+                   if (sortedMenus[i].item.attributes[l].name == req.body.preAttributesName[k])
+                     totalCost += sortedMenus[i].item.attributes[l].cost * req.body.preAttributesQuantity[k];
+                 k++;
+               }
+             }//this is the non-customized part
+             else {
+               order.menu.push({
+                 _id : allMenus[i]
+               })
+               totalCost += sortedMenus[i].item.totalCost;
+             }
+           }
+           console.log("-----------cost check---------");
+           console.log(totalCost);
+           console.log(order.menu)
+           console.log(order.menu.subItems)
+           order.grandTotal = 0;
+           order.grandTotal += Number(totalCost);
+           var newAmount = Number(user.amount);
+           user.amount = 0;
+           if (totalCost < previousTotal) {
+             var amountToAdd = previousTotal - totalCost;
+             newAmount += amountToAdd;
+           }else if (totalCost > previousTotal){
+             var amountToSub = totalCost - previousTotal;
+             newAmount -= amountToSub;
+           }
+           console.log(newAmount);
+           user.amount += newAmount;
+           user.save(function (err) {
+             if (err) return err;
+           });
+           var fullUserAddress = {};
+           if (user.address)
+             for (var i=0; i<user.address.length; i++)
+               if (user.address[i].tag == req.body.address) {
+                 fullUserAddress = {
+                   tag : user.address[i].tag,
+                   flatNo : user.address[i].flatNo,
+                   streetAddress : user.address[i].streetAddress,
+                   landmark : user.address[i].landmark,
+                   pincode : user.address[i].pincode,
+                   contactNo : user.contactNo
+                 }
+               }
+           order.address = {};
+           order.address = fullUserAddress;
+           order.save(function (err) {
+               if (err) return err
+           })
+           res.redirect('/orderList');
+         });
+       });
+     });
+   }
   else {
     var allMenus = [];
     console.log(req.body.allMenus)
@@ -249,18 +259,23 @@ exports.postAddOrder = function(req, res){
     }
     console.log(allMenus)
     Menu.find({_id : {$in : allMenus}})
-    .populate('item', 'totalCost')
+    .populate('item')
     .exec(function(err, menus){
       User.findOne({email: req.body.user}).exec(function(err, user){
         var order = new Order({
           user: req.body.user
         })
         console.log(menus)
-        //for customized orders
         console.log("-------------get position started------------")
-        console.log(req.body.getPosition.length)
-        console.log(req.body.attributesName)
-        console.log(req.body.attributesQuantity)
+        //sorting of menus
+        var sortedMenus = [];
+        for (var i=0; i<allMenus.length; i++){
+          for (var j=0; j<menus.length; j++){
+            if ( allMenus[i] == menus[j]._id )
+              sortedMenus.push(menus[j]);
+          }
+        }
+        console.log(sortedMenus);
         // -------------- old adding of subItems--------------------
         // var subItems = [];
         // for (var i=0; i<req.body.getPosition.length; i++){
@@ -285,12 +300,17 @@ exports.postAddOrder = function(req, res){
         console.log(req.body.getPosition);
         console.log(allMenus);
         var j = 0;
+        var totalCost = 0;
         for (var i=0; i<req.body.getPosition.length; i++){
           //customized
           if (req.body.getPosition[i] == 'true'){
             //yet to get a solution
           }// this part has attributes - half, full
           else if (req.body.getPosition[i] == 'hasAttributes') {
+            console.log("---------cost check-----------");
+            for (var k=0; k<sortedMenus[i].item.attributes.length; k++)
+              if (sortedMenus[i].item.attributes[k].name == req.body.attributesName[j])
+                totalCost += sortedMenus[i].item.attributes[k].cost * req.body.attributesQuantity[j];
             order.menu.push({
               _id : allMenus[i],
               attributes : {
@@ -304,10 +324,14 @@ exports.postAddOrder = function(req, res){
             order.menu.push({
               _id : allMenus[i]
             })
+            totalCost += sortedMenus[i].item.totalCost;
           }
         }
+        console.log(totalCost);
         console.log(order.menu)
         console.log(order.menu.subItems)
+        order.grandTotal = 0;
+        order.grandTotal += totalCost;
         var fullUserAddress = {};
         if(user.address)
           for (var i=0; i<user.address.length; i++)
@@ -326,18 +350,13 @@ exports.postAddOrder = function(req, res){
         order.save(function (err) {
           if (err) return err;
         });
-        // var totalCostToSub = 0;
-        // if (menus)
-        //   for (var i=0; i<menus.length; i++) {
-        //     totalCostToSub += menus[i].item.totalCost;
-        //   }
-        // var newAmount = Number(user.amount);
-        // user.amount = 0;
-        // newAmount -= totalCostToSub;
-        // user.amount = newAmount;
-        // user.save(function (err) {
-        //   if (err) return err;
-        // });
+        var newAmount = Number(user.amount);
+        user.amount = 0;
+        newAmount -= totalCost;
+        user.amount = newAmount;
+        user.save(function (err) {
+          if (err) return err;
+        });
         res.redirect('/orderList');
       });
     });
@@ -367,18 +386,19 @@ exports.getMenusFromOptions = function(req, res){
   .exec(function(err, menusList){
       var menusListJson = []
       console.log(menusList);
-      for(var i=0; i<menusList.length; i++){
-        menusListJson[i] = {
-          id: menusList[i]._id,
-          item: menusList[i].item.title
+      if (menusList)
+        for(var i=0; i<menusList.length; i++){
+          menusListJson[i] = {
+            id: menusList[i]._id,
+            item: menusList[i].item.title
+          }
+          if (menusList[i].item.subItems.length > 0)
+            menusListJson[i].checked = false;
+          else if (menusList[i].item.attributes)
+            menusListJson[i].checked = "hasAttributes";
+          else
+            menusListJson[i].checked = "normal"
         }
-        if (menusList[i].item.subItems.length > 0)
-          menusListJson[i].checked = false;
-        else if (menusList[i].item.attributes)
-          menusListJson[i].checked = "hasAttributes";
-        else
-          menusListJson[i].checked = "normal"
-      }
       res.send(menusListJson);
   });
 };
