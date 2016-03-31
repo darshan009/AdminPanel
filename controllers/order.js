@@ -412,14 +412,20 @@ exports.getMenusFromOptions = function(req, res){
 exports.getUserAddress = function(req, res){
   if(req.query.userEmail) var userEmail = req.query.userEmail
   User.findOne({email: userEmail}).exec(function(err, user){
-    var userAddressJson = [];
+    var userJson = [];
     if (user.address)
       for(var i=0; i<user.address.length; i++)
-        userAddressJson[i] = {
-          address : user.address[i].tag
+        userJson[i] = {
+          address : user.address[i].tag,
+          flatNo : user.address[i].flatNo,
+          streetAddress : user.address[i].streetAddress,
+          landmark : user.address[i].landmark,
+          pincode : user.address[i].pincode,
+          contactNo : user.contactNo
         }
-    console.log(userAddressJson)
-    res.send(userAddressJson);
+    userJson[0].amount = user.amount;
+    console.log(userJson)
+    res.send(userJson);
   })
 };
 

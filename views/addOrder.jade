@@ -225,6 +225,7 @@ html
                           | #{result?(result.user?result.user:''):''}
                         each user in users
                           option #{user.email}
+                    #userAmount
                   .form-group
                     label.col-sm-2.control-label Select User Address
                     .col-sm-10
@@ -244,6 +245,7 @@ html
                         input.form-control(type='text', id='', name='landmark[]' disabled placeholder='Landmark' value=(result?(result.address.landmark?result.address.landmark:''):''))
                         input.form-control(type='Number', id='', name='pincode[]' disabled placeholder='Pincode' value=(result?(result.address.pincode?result.address.pincode:''):''))
                         input.form-control(type='Number', id='', name='pincode[]' disabled placeholder='Contact Number' value=(result?(result.address.contactNo?result.address.contactNo:''):''))
+                  #userAddress
                 // /.box-body
                 .box-footer
                   if(result)
@@ -381,9 +383,20 @@ html
             userEmail: $userEmail
           }, function(j){
             var options = '';
-            for (var i = 0; i < j.length; i++)
+            var newTextField = $(document.createElement('div'));
+            var newAddressField = $(document.createElement('div'));
+            var addressField = '';
+            for (var i = 0; i < j.length; i++) {
               options += '<option>' + j[i].address + '</option>';
+              addressField += '<div class="form-group"><label class="col-sm-2 control-label">Full Address</label><div class="col-sm-10"><input type="text" disabled="disabled" placeholder="Tag" value="'+ j[i].address +'" class="form-control"/><input type="text" disabled="disabled" placeholder="Building Name and Flat Number" value="'+ j[i].flatNo +'" class="form-control"/><input type="text" disabled="disabled" placeholder="Enter your street Address..." value="'+ j[i].streetAddress +'" class="form-control"/><input type="text" disabled="disabled" placeholder="Landmark" value="'+ j[i].landmark +'" class="form-control"/><input type="Number" disabled="disabled" placeholder="Pincode" value="'+ j[i].pincode +'" class="form-control"/><input type="Number"  disabled="disabled" placeholder="Contact Number" value="'+ j[i].contactNo +'" class="form-control"/></div></div>';
+            }
             $("select#getUserAddress").html(options);
+            $("#userAmount").html('');
+            newTextField.after().html('<label class="col-sm-2 control-label">User amount</label><div class="col-sm-10"><p>'+ j[0].amount +'</p></div>');
+            newTextField.appendTo('#userAmount');
+            $("#userAddress").html('');
+            newAddressField.after().html(addressField);
+            newAddressField.appendTo('#userAddress');
           })
         })
         var count = 0;
@@ -391,7 +404,6 @@ html
           var newTextField = $(document.createElement('div'))
           var menuData = $(this).find(':selected').attr('data-menuName');
           var check = $("option:selected", this).attr("data-checked");
-          //newTextField.after().html('<div data-removeId="'+count+'"><label class="col-sm-2 control-label">Selected Menu</label><div class="col-sm-10"><p name="allMenus[]" value="'+$(this).val()+'">'+ menuData +'</p><div class="btn-tools"><button class="btn btn-box-tool" type="button" onclick="deleteSelectBox('+count+')"><i class="fa fa-times"></i></button></div></div>')
           newTextField.after().html('<div data-removeId="'+count+'"><label class="col-sm-2 control-label">Selected</label><div class="col-sm-10"><input type="hidden" data-getPosition='+count+' name="getPosition[]" value="'+check+'"><input type = "hidden" data-customizeOrderId="'+count+'"  name="allMenus[]" value="'+$(this).val()+'">'+ menuData +'<div class="btn-tools"><div data-customizeDivTag="'+ count +'"></div><button class="btn btn-box-tool pull-left" data-removeBtn='+count+' type="button" onclick="customizeMenu('+count+','+check+')">Customize</button><button class="btn btn-box-tool  pull-right" type="button" onclick="deleteSelectBox('+count+')"><i class="fa fa-times"></i></button></div></div>');
           newTextField.appendTo('#selectedMenu');
           console.log(check);

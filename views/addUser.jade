@@ -188,12 +188,10 @@ html
                     label.col-sm-2.control-label(for='exampleInputFile') Image
                     .col-sm-10
                       input#exampleInputFile(type='file' name='image')
-                  .form-group
-                    label.col-sm-2.control-label Password
-                    .col-sm-10
-                      if user
-                        button.btn.btn-default(type='submit') Change Password
-                      else
+                  if !user
+                    .form-group
+                      label.col-sm-2.control-label Password
+                      .col-sm-10
                         input.form-control(type='password', id='', required='true' name='password', placeholder='Password')
                   .form-group
                     label.col-sm-2.control-label Contact Number
