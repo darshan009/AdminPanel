@@ -1,6 +1,7 @@
 var mongoose = require('mongoose');
 
 var orderSchema = new mongoose.Schema({
+  state: { type: String, enum: ['Published', 'Archieved'], default: 'Published'},
   user: { type: String, ref: 'User' },
   menu: [{
     _id : { type: mongoose.Schema.Types.ObjectId, ref: 'Menu' },

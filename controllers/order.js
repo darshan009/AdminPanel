@@ -16,28 +16,30 @@ exports.getOrderList = function(req, res) {
       var z = 0;
       for (var i=0; i<results.length; i++){
         for (var j=0; j<results[i].menu.length; j++){
-          if (results[i].menu[j].subItems.length > 0)
-            customizedResult[z] = {
-                id : orders[i]._id,
-                title : results[i].menu[j]._id.item.title,
-                date : results[i].menu[j]._id.date,
-                user : results[i].user
-                //details : results[i].menu[j].subItems
-            }
-          else{
-            nonCustomizedResult[z] = {
-                id : orders[i]._id,
-                title : results[i].menu[j]._id.item.title,
-                date : results[i].menu[j]._id.date,
-                user : results[i].user
-            }
-            if (results[i].menu[j].attributes.name)
-              nonCustomizedResult[z].details = results[i].menu[j].attributes.name;
+          if (results[i].state == 'Published') {
+            if (results[i].menu[j].subItems.length > 0)
+              customizedResult[z] = {
+                  id : orders[i]._id,
+                  title : results[i].menu[j]._id.item.title,
+                  date : results[i].menu[j]._id.date,
+                  user : results[i].user
+                  //details : results[i].menu[j].subItems
+              }
             else{
-              //nonCustomizedResult[z].details = results[i].menu[j]._id.item
+              nonCustomizedResult[z] = {
+                  id : orders[i]._id,
+                  title : results[i].menu[j]._id.item.title,
+                  date : results[i].menu[j]._id.date,
+                  user : results[i].user
+              }
+              if (results[i].menu[j].attributes.name)
+                nonCustomizedResult[z].details = results[i].menu[j].attributes.name;
+              else{
+                //nonCustomizedResult[z].details = results[i].menu[j]._id.item
+              }
             }
+            z++;
           }
-          z++;
         }
       }
       console.log("-------end-------")
@@ -367,7 +369,10 @@ exports.deleteOrder = function(req,res){
   Order.findById(req.params.id).exec(function(err, order){
     if(err) return err;
     console.log(order)
-    order.remove();
+    order.state = 'Archieved';
+    order.save(function(err){
+      if (err) return err
+    });
     res.redirect('/orderList');
   });
 };
