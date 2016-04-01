@@ -42,13 +42,45 @@ exports.getOrderList = function(req, res) {
           }
         }
       }
-      console.log("-------end-------")
-      console.log(customizedResult)
-      console.log(nonCustomizedResult)
       res.render('orderList', {
         customizedResult : customizedResult,
         nonCustomizedResult : nonCustomizedResult
       });
+    })
+  });
+};
+
+exports.getOrdersByDate = function(req, res) {
+  if (req.query.date)
+    var dateSelected = req.query.date;
+  else
+    var dateSelected = undefined;
+  Order.find()
+  .populate('menu._id', null, {date : dateSelected})
+  .exec(function(err, orders) {
+    Item.populate(orders, 'menu._id.item', function(err, results){
+      console.log(results)
+      var menuList = [], k = 0, orderList = [];
+      var z = 0;
+      for (var i=0; i<results.length; i++){
+        if (results[i].state == 'Published') {
+          for (var j=0; j<results[i].menu.length; j++) {
+            if (results[i].menu[j]._id != null) {
+              menuList.push(results[i].menu[j]);
+            }
+          }
+          if (menuList.length > 0) {
+            orderList[k] = {
+              id : results[i]._id,
+              user : results[i].user,
+              address : results[i].address,
+              menu : menuList
+            }
+            k++;
+          }
+        }
+      }
+      res.send(orderList);
     })
   });
 };

@@ -88,6 +88,8 @@ app.get('/editOrder/:id', userController.isAdmin, orderController.getEditOrder);
 app.post('/addOrder', userController.isAdmin, orderController.postAddOrder);
 app.post('/editOrder/:id', userController.isAdmin, orderController.postAddOrder);
 app.get('/addOrder/delete/:id/:userEmail', userController.isAdmin, orderController.deleteOrder);
+//datePickedOrderList
+app.get('/getOrdersByDate', orderController.getOrdersByDate);
 //assembly
 app.get('/assembly', userController.isAdmin, assemblyController.getAssemblyList);
 app.get('/getOrderByCategory', assemblyController.getOrderByCategory);

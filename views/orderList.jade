@@ -159,52 +159,60 @@ html
       .content-wrapper
         // Main content
         section.content
-          .row
-            .box
-              .box-header
-                h3.box-title Customized Order List
-              // /.box-header
-              .box-body
-                table#example2.table.table-bordered.table-hover
-                  thead
-                    tr
-                      th Menu
-                      th Date
-                      th User
-                      th Details
-                  tbody
-                    if customizedResult
-                      each customizedResults in customizedResult
-                        tr
-                          td
-                            a(href='/editOrder/#{customizedResults.id}')
-                              | #{customizedResults.title}
-                          td #{customizedResults.date}
-                          td #{customizedResults.user}
+          .box.box-info
+            .box-header.with-border
+              h3.box-title Pick a date
+            .box-body
+              label.col-sm-2.control-label Pick a date
+              .col-sm-4
+                input.form-control(type='text' required id='dateSelected' name='date' data-inputmask="'alias': 'mm/dd/yyyy'", data-mask='')
+              .col-sm-2
+                button.btn.btn-info#datePicker(type = 'button') Submit
+          .nav-tabs-custom
+            ul.nav.nav-tabs
+              li.active
+                a(href='#activity', data-toggle='tab') Customized Order List
+              li
+                a(href='#timeline', data-toggle='tab') Non-Customized Order List
+            .tab-content
+              #activity.active.tab-pane
+                .box-body
+                  table#example2.table.table-bordered.table-hover
+                    thead
+                      tr
+                        th Menu
+                        th Date
+                        th User
+                        th Details
+                    tbody
+                      if customizedResult
+                        each customizedResults in customizedResult
+                          tr
+                            td
+                              a(href='/editOrder/#{customizedResults.id}')
+                                | #{customizedResults.title}
+                            td #{customizedResults.date}
+                            td #{customizedResults.user}
                           td #{customizedResult.details}
-          .row
-            .box
-              .box-header
-                h3.box-title Non-Customized Order List
-              // /.box-header
-              .box-body
-                table#example3.table.table-bordered.table-hover
-                  thead
-                    tr
-                      th Menu
-                      th Date
-                      th User
-                      th Details
-                  tbody
-                    if nonCustomizedResult
-                      each nonCustomizedResults in nonCustomizedResult
-                        tr
-                          td
-                            a(href='/viewOrder/#{nonCustomizedResults.id}')
-                              | #{nonCustomizedResults.title}
-                          td #{nonCustomizedResults.date}
-                          td #{nonCustomizedResults.user}
-                          td #{nonCustomizedResults.details}
+              #timeline.tab-pane
+                .box-body
+                  table#example3.table.table-bordered.table-hover
+                    thead
+                      tr
+                        th Menu
+                        th Date
+                        th User
+                        th Details
+                    tbody
+                      if nonCustomizedResult
+                        each nonCustomizedResults in nonCustomizedResult
+                          tr
+                            td
+                              a(href='/viewOrder/#{nonCustomizedResults.id}')
+                                | #{nonCustomizedResults.title}
+                            td #{nonCustomizedResults.date}
+                            td #{nonCustomizedResults.user}
+                            td #{nonCustomizedResults.details}
               // /.box-body
             // /.box
           // /.row
@@ -258,5 +266,38 @@ html
       $("[data-mask]").inputmask();
       //Datemask2 mm/dd/yyyy
       $("#datemask2").inputmask("mm/dd/yyyy", {"placeholder": "mm/dd/yyyy"});
+      $('#datePicker').click(function(){
+        $date = $('#dateSelected').val();
+        $.getJSON('/getOrdersByDate',{
+          date : $date,
+          ajax : true
+        }, function(results){
+          var addToCustomizedTable = '';
+          var addToNonCustomizedTable = '';
+          for (var i=0; i<results.length; i++){
+            for (var j=0; j<results[i].menu.length; j++){
+              if (results[i].menu[j].subItems.length > 0) {
+
+              }
+              else{
+                var date = new Date(results[i].menu[j]._id.date).toDateString();
+                addToNonCustomizedTable += '<tr><td><a href='+results[i].id+'>'+results[i].menu[j]._id.item.title+'</a></td><td>'+date+'</td><td>'+results[i].user+'</td>';
+                if (results[i].menu[j].attributes != null)
+                  addToNonCustomizedTable += '<td>'+ results[i].menu[j].attributes.name +'</td></tr>';
+                else if (results[i].menu[j]._id.item.subItems.length > 0) {
+                  addToNonCustomizedTable += '<td>';
+                  for (var l = 0; l < results[i].menu[j]._id.item.subItems.length; l++) {
+                    addToNonCustomizedTable += ''+ results[i].menu[j]._id.item.subItems[l].quantity+'-'+results[i].menu[j]._id.item.subItems[l].name +',  '+results[i].menu[j]._id.item.subItems[l].container+'-container<br>';
+                  }
+                  addToNonCustomizedTable += ' </td></tr>';
+                }
+                else
+                  addToNonCustomizedTable += '</tr>';
+              }
+            }
+          }
+          $('#example3 tbody').html('');
+          $('#example3 tbody').append(addToNonCustomizedTable);
+        })
       });
       });

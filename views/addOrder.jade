@@ -174,7 +174,7 @@ html
                   .form-group
                     label.col-sm-2.control-label Meal type
                     .col-sm-10
-                      select.form-control(name = 'meal' id='mealSelected')
+                      select.form-control(name = 'meal' id='mealSelected' disabled)
                         option(selected='selected')
                           | #{order?(order.meal?order.meal:''):''}
                         option Lunch
@@ -182,7 +182,7 @@ html
                   .form-group
                     label.col-sm-2.control-label Category
                     .col-sm-10
-                      select.form-control(name = 'category' id = 'categorySelected')
+                      select.form-control(name = 'category' id = 'categorySelected' disabled)
                         option(selected='selected')
                           | #{order?(order.category?order.category:''):''}
                         each itemCategory in itemCategories
@@ -190,7 +190,7 @@ html
                   .form-group
                     label.col-sm-2.control-label Select Menu
                     .col-sm-10
-                      select.form-control(id='getMenuList')
+                      select.form-control(id='getMenuList' disabled)
                         option
                       br
                       if(fullResult)
@@ -233,7 +233,7 @@ html
                   .form-group
                     label.col-sm-2.control-label Select User Address
                     .col-sm-10
-                      select.form-control(name = 'address' id = 'getUserAddress')
+                      select.form-control(name = 'address' id = 'getUserAddress' disabled)
                         option(selected='selected')
                           | #{result?(result.address.tag?result.address.tag:''):''}
                         if(addressTag)
@@ -257,7 +257,7 @@ html
                       button.btn.btn-info.pull-left(type='button') Delete
                     button.btn.btn-info.pull-right#submitButton(type='submit' onclick = '') Edit
                   else
-                    button.btn.btn-info.pull-right#submitButton(type='submit' onclick = '') Add
+                    button.btn.btn-info.pull-right#submitButton(type='submit' disabled) Add
                 // /.box-footer
             // /.box
           // /.row
@@ -307,6 +307,7 @@ html
       //populate
       $(function(){
         $("input#dateSelected").focusout(function(){
+          $('#mealSelected').attr('disabled', false);
           $date = $(this).val();
           $meal = $("#mealSelected").val();
           $category = $("#categorySelected").val();
@@ -332,6 +333,8 @@ html
         })
         //mealSelected
         $("select#mealSelected").change(function(){
+          $('#categorySelected').attr('disabled', false);
+          $('#getMenuList').attr('disabled', false);
           $date = $("#dateSelected").val();
           $meal = $(this).val();
           $category = $("#categorySelected").val();
@@ -382,6 +385,7 @@ html
         })
         //getUserAddress
         $("select#userSelectedEmail").change(function(){
+          $('#getUserAddress').attr('disabled', false);
           $userEmail = $(this).val();
           $.getJSON("/getUserAddress",{
             userEmail: $userEmail
@@ -405,6 +409,7 @@ html
         })
         var count = 0;
         $("select#getMenuList").change(function(){
+          $('#submitButton').attr('disabled', false);
           var newTextField = $(document.createElement('div'))
           var menuData = $(this).find(':selected').attr('data-menuName');
           var check = $("option:selected", this).attr("data-checked");
