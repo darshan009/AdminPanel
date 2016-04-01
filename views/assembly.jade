@@ -163,9 +163,18 @@ html
             .col-md-6
               .box.box-primary
                 .box-header
-                  h3.box-title Customized
+                  h3.box-title
+                    b Customized
                 // /.box-header
                 .box-body
+                  form.form-horizontal
+                    .form-group
+                      label.col-sm-2.control-label Meal type
+                      .col-sm-6
+                        select.form-control(name = 'meal' id='customizedMealSelected')
+                          option(selected='selected')
+                          option Lunch
+                          option Dinner
                   table
                     tr
                       td
@@ -176,9 +185,18 @@ html
             .col-md-6
               .box.box-info
                 .box-header
-                  h3.box-title Non-Customized
+                  h3.box-title
+                    b Non-Customized
                 // /.box-header
                 .box-body
+                  form.form-horizontal
+                    .form-group
+                      label.col-sm-2.control-label Meal type
+                      .col-sm-6
+                        select.form-control(name = 'meal' id='mealSelected')
+                          option(selected='selected')
+                          option Lunch
+                          option Dinner
                   table
                     tr
                       each itemCategory in itemCategories
@@ -189,6 +207,7 @@ html
             .box.box-success
               .box-header
                 h3.box-title Order List
+                button.btn.btn-info.pull-right#disabler(type = 'button') Done
               // /.box-header
               .box-body#displaySection
                 table#example2.table.table-bordered.table-hover
@@ -246,13 +265,16 @@ html
       //non-customized
       $('button#selectedCategory').click(function(){
         $category = $(this).val();
+        $meal = $('#mealSelected').val();
+        if ( !$('#mealSelected').val() )
+          alert("Please Select Lunch or Dinner");
         $.getJSON("/getOrderByCategory", {
         category : $category,
+        meal : $meal,
         ajax : true
         },function(j){
-          //var addToTable = '';
           var newTableField = $(document.createElement('div'))
-          var addToTable = '<table id="example2" class="table table-bordered table-hover"><thead><th>User</th><th>Meal</th><th>Details</th></thead><tbody>';
+          var addToTable = '';
           console.log(j.length)
           for (var i = 0; i < j.length; i++) {
             for (var k = 0; k < j[i].menu.length; k++) {
@@ -271,11 +293,9 @@ html
             }
           }
           addToTable += '</tbody></table>'
-          //$('#example2 tbody').append(addToTable);
-          //$(addToTable).appendTo($('#example2 tbody'));
-          newTableField.after().html(addToTable);
-          $('#displaySection').html('');
-          newTableField.appendTo('#displaySection');
+          $('#example2').attr('data-targetButton', $category);
+          $('#example2 tbody').html('');
+          $('#example2 tbody').append(addToTable);
         })
       });
       //customized
@@ -287,5 +307,10 @@ html
         },function(j){
           console.log(j);
         })
+      });
+      $('button#disabler').click(function(){
+        var dataTagetButton = $('#example2').attr('data-targetButton');
+        $('#example2 tbody').html('');
+        $(':button[value = '+dataTagetButton+']').attr('disabled', true);
       });
       });

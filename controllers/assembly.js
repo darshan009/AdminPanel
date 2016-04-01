@@ -13,17 +13,24 @@ exports.getAssemblyList = function(req, res) {
 
 exports.getOrderByCategory = function(req, res) {
   var queryCategory = req.query.category;
+  var mealSelected = req.query.meal;
+  var dateTime = new Date().toDateString();
   Order.find()
-  .populate('menu._id', null, { category : queryCategory })
+  .populate('menu._id', null, {
+    category : queryCategory,
+    meal : mealSelected,
+    date : dateTime
+  })
   .exec(function(err, orders){
     Item.populate(orders, 'menu._id.item', function(err, results) {
+      console.log(dateTime);
       var orderList = [], k =0;
       for (var i=0; i<results.length; i++) {
         var menuList = [];
         if (results[i].state == 'Published') {
           for (var j=0; j<results[i].menu.length; j++) {
             if (results[i].menu[j]._id != null) {
-               console.log(results[i].menu[j]._id.category);
+               console.log(results[i].menu[j]._id.meal);
                menuList.push(results[i].menu[j]);
              }
           }
