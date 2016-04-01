@@ -249,7 +249,7 @@ html
                 // /.box-body
                 .box-footer
                   if(result)
-                    a(href='/addOrder/delete/#{result._id}')
+                    a(href='/addOrder/delete/#{result._id}/#{result.user}')
                       button.btn.btn-info.pull-left(type='button') Delete
                     button.btn.btn-info.pull-right#submitButton(type='submit' onclick = '') Edit
                   else

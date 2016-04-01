@@ -136,7 +136,7 @@ html
                   a(href='/addMenu')
                     i.fa.fa-circle-o
                     |  Add a Menu
-            li.active
+            li
               a(href='/order')
                 i.fa.fa-share
                 span Order
@@ -150,57 +150,54 @@ html
                   a(href='/addOrder')
                     i.fa.fa-circle-o
                     |  Place an Order
+            li.active
+              a(href='/assembly')
+                i.fa.fa-pie-chart
+                | Assembly
         // /.sidebar
       // Content Wrapper. Contains page content
       .content-wrapper
         // Main content
         section.content
           .row
-            .box
+            .col-md-6
+              .box.box-primary
+                .box-header
+                  h3.box-title Customized
+                // /.box-header
+                .box-body
+                  table
+                    tr
+                      td
+                        button.btn.btn-app#selectedCustomized(type='button' value = 'Classic Indian')
+                          | Classic Indian
+                        button.btn.btn-app#selectedCustomized(type='button' value = 'Indian')
+                          | Indian
+            .col-md-6
+              .box.box-info
+                .box-header
+                  h3.box-title Non-Customized
+                // /.box-header
+                .box-body
+                  table
+                    tr
+                      each itemCategory in itemCategories
+                        td
+                          button.btn.btn-app#selectedCategory(type='button' value = '#{itemCategory.name}')
+                            | #{itemCategory.name}
+          .row
+            .box.box-success
               .box-header
-                h3.box-title Customized Order List
+                h3.box-title Order List
               // /.box-header
-              .box-body
+              .box-body#displaySection
                 table#example2.table.table-bordered.table-hover
                   thead
                     tr
-                      th Menu
-                      th Date
                       th User
+                      th Meal
                       th Details
                   tbody
-                    if customizedResult
-                      each customizedResults in customizedResult
-                        tr
-                          td
-                            a(href='/editOrder/#{customizedResults.id}')
-                              | #{customizedResults.title}
-                          td #{customizedResults.date}
-                          td #{customizedResults.user}
-                          td #{customizedResult.details}
-          .row
-            .box
-              .box-header
-                h3.box-title Non-Customized Order List
-              // /.box-header
-              .box-body
-                table#example3.table.table-bordered.table-hover
-                  thead
-                    tr
-                      th Menu
-                      th Date
-                      th User
-                      th Details
-                  tbody
-                    if nonCustomizedResult
-                      each nonCustomizedResults in nonCustomizedResult
-                        tr
-                          td
-                            a(href='/viewOrder/#{nonCustomizedResults.id}')
-                              | #{nonCustomizedResults.title}
-                          td #{nonCustomizedResults.date}
-                          td #{nonCustomizedResults.user}
-                          td #{nonCustomizedResults.details}
               // /.box-body
             // /.box
           // /.row
@@ -243,16 +240,52 @@ html
       "info": true,
       "autoWidth": false
       });
-      $('#example3').DataTable({
-      "paging": true,
-      "lengthChange": false,
-      "searching": false,
-      "ordering": true,
-      "info": true,
-      "autoWidth": false
-      });
       $("[data-mask]").inputmask();
       //Datemask2 mm/dd/yyyy
       $("#datemask2").inputmask("mm/dd/yyyy", {"placeholder": "mm/dd/yyyy"});
+      //non-customized
+      $('button#selectedCategory').click(function(){
+        $category = $(this).val();
+        $.getJSON("/getOrderByCategory", {
+        category : $category,
+        ajax : true
+        },function(j){
+          //var addToTable = '';
+          var newTableField = $(document.createElement('div'))
+          var addToTable = '<table id="example2" class="table table-bordered table-hover"><thead><th>User</th><th>Meal</th><th>Details</th></thead><tbody>';
+          console.log(j.length)
+          for (var i = 0; i < j.length; i++) {
+            for (var k = 0; k < j[i].menu.length; k++) {
+              addToTable += '<tr><td>'+ j[i].user +'</td><td>'+ j[i].menu[k]._id.item.title +'</td>';
+              if (j[i].menu[k].attributes)
+                addToTable += '<td>'+ j[i].menu[k].attributes.name +'</td></tr>';
+              else if (j[i].menu[k]._id.item.subItems.length > 0){
+                addToTable += '<td>'
+                for (var l = 0; l < j[i].menu[k]._id.item.subItems.length; l++) {
+                  addToTable += ''+ j[i].menu[k]._id.item.subItems[l].quantity+'-'+j[i].menu[k]._id.item.subItems[l].name +',  '+j[i].menu[k]._id.item.subItems[l].container+'-container<br>';
+                }
+                addToTable += ' </td></tr>';
+              }
+              else
+                addToTable += '</tr>';
+            }
+          }
+          addToTable += '</tbody></table>'
+          //$('#example2 tbody').append(addToTable);
+          //$(addToTable).appendTo($('#example2 tbody'));
+          newTableField.after().html(addToTable);
+          $('#displaySection').html('');
+          newTableField.appendTo('#displaySection');
+        })
+      });
+      //customized
+      $('button#selectedCustomized').click(function(){
+        $category = $(this).val();
+        $.getJSON("/getCustomizedOrderByCategory", {
+        category : $category,
+        ajax : true
+        },function(j){
+          console.log(j);
+        })
       });
       });

@@ -367,13 +367,19 @@ exports.postAddOrder = function(req, res){
 
 exports.deleteOrder = function(req,res){
   Order.findById(req.params.id).exec(function(err, order){
-    if(err) return err;
-    console.log(order)
-    order.state = 'Archieved';
-    order.save(function(err){
-      if (err) return err
+    User.findOne({email : req.params.userEmail}).exec(function(err, user){
+      if(err) return err;
+      console.log(order)
+      user.amount += order.grandTotal;
+      order.state = 'Archieved';
+      user.save(function(err){
+        if (err) return err
+      });
+      order.save(function(err){
+        if (err) return err
+      });
+      res.redirect('/orderList');
     });
-    res.redirect('/orderList');
   });
 };
 
