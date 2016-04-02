@@ -174,7 +174,7 @@ html
                   .form-group
                     label.col-sm-2.control-label Meal type
                     .col-sm-10
-                      select.form-control(name = 'meal' id='mealSelected' disabled)
+                      select.form-control(name = 'meal' id='mealSelected' )
                         option(selected='selected')
                           | #{order?(order.meal?order.meal:''):''}
                         option Lunch
@@ -182,7 +182,7 @@ html
                   .form-group
                     label.col-sm-2.control-label Category
                     .col-sm-10
-                      select.form-control(name = 'category' id = 'categorySelected' disabled)
+                      select.form-control(name = 'category' id = 'categorySelected' )
                         option(selected='selected')
                           | #{order?(order.category?order.category:''):''}
                         each itemCategory in itemCategories
@@ -190,7 +190,7 @@ html
                   .form-group
                     label.col-sm-2.control-label Select Menu
                     .col-sm-10
-                      select.form-control(id='getMenuList' disabled)
+                      select.form-control(id='getMenuList' )
                         option
                       br
                       if(fullResult)
@@ -233,7 +233,7 @@ html
                   .form-group
                     label.col-sm-2.control-label Select User Address
                     .col-sm-10
-                      select.form-control(name = 'address' id = 'getUserAddress' disabled)
+                      select.form-control(name = 'address' id = 'getUserAddress' )
                         option(selected='selected')
                           | #{result?(result.address.tag?result.address.tag:''):''}
                         if(addressTag)
@@ -254,10 +254,10 @@ html
                 .box-footer
                   if(result)
                     a(href='/addOrder/delete/#{result._id}/#{result.user}')
-                      button.btn.btn-info.pull-left(type='button') Delete
-                    button.btn.btn-info.pull-right#submitButton(type='submit' onclick = '') Edit
+                      button.btn.btn-info.pull-left(type='button') Cancel Order
+                    button.btn.btn-info.pull-right#submitButton(type='submit') Edit
                   else
-                    button.btn.btn-info.pull-right#submitButton(type='submit' disabled) Add
+                    button.btn.btn-info.pull-right#submitButton(type='submit') Add
                 // /.box-footer
             // /.box
           // /.row
@@ -304,6 +304,11 @@ html
       //Datemask2 mm/dd/yyyy
       $("#datemask2").inputmask("mm/dd/yyyy", {"placeholder": "mm/dd/yyyy"});
       });
+      $('#getUserAddress').attr('disabled', true);
+      $('#mealSelected').attr('disabled', true);
+      $('#categorySelected').attr('disabled', true);
+      $('#getUserAddress').attr('disabled', true);
+      $('#submitButton').attr('disabled', true);
       //populate
       $(function(){
         $("input#dateSelected").focusout(function(){
@@ -450,7 +455,7 @@ html
             //var subItemsName = [];
             for (var i = 0; i < j.length; i++){
               if(j[i].quantity){
-                generatedTable += '<tr><td><input name = "subItemsName[]" value='+ j[i].name +'></td><td><input type = "Number" name = "subItemsQuantity[]" value = '+ j[i].quantity +'></td><td>'+ j[i].cost +'</td><td><input type = "Number" name = "subItemsContainer[]" value = '+ j[i].container +'></td></tr>';
+                generatedTable += '<tr><td><input name = "subItemsName['+d+']" value='+ j[i].name +'></td><td><input type = "Number" name = "subItemsQuantity['+d+']" value = '+ j[i].quantity +'></td><td>'+ j[i].cost +'</td><td><input type = "Number" name = "subItemsContainer['+d+']" value = '+ j[i].container +'></td></tr>';
               }
               else{
                 generatedTable += '<tr><td><input type = "radio" checked name = "attributesName['+d+']" value='+ j[i].name +'>&nbsp&nbsp'+ j[i].name +'</td><td>'+ j[i].cost +'</td>';

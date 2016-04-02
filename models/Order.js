@@ -16,12 +16,7 @@ var orderSchema = new mongoose.Schema({
     }
   }],
   address: {
-    tag : String,
-    flatNo : String,
-    streetAddress : String,
-    landmark : String,
-    pincode : Number,
-    contactNo : Number
+    _id : { type: mongoose.Schema.Types.ObjectId, ref: 'Address' }
   },
   grandTotal : Number
 });

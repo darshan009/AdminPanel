@@ -102,7 +102,9 @@ exports.getViewOrder = function(req, res){
   .exec(function(err, order) {
     Item.populate(order, 'menu._id.item', function(err, result) {
       if(!result) res.end("No order found")
-      User.findOne({email : order.user}).exec(function(err, userFound) {
+      User.findOne({email : order.user})
+      .populate('address')
+      .exec(function(err, userFound) {
         if (!order) res.end("Order not found")
         var fullResult = [];
         for (var i=0; i<result.menu.length; i++){
@@ -120,7 +122,7 @@ exports.getViewOrder = function(req, res){
         }
         var addressTag = [];
         for (var i=0; i<userFound.address.length; i++)
-          addressTag.push(userFound.address[i].tag);
+          addressTag.push(userFound.address[i]._id.tag);
         console.log(result);
         res.render('viewOrder', {
           addressTag : addressTag,
@@ -158,7 +160,7 @@ exports.getEditOrder = function(req, res){
             }
             var addressTag = [];
             for (var i=0; i<userFound.address.length; i++)
-              addressTag.push(userFound.address[i].tag);
+              addressTag.push(userFound.address[i]._id.tag);
             console.log(result.menu[0]._id.item.attributes[0].cost);
             res.render('addOrder', {
               itemCategories: itemCategories,
@@ -186,9 +188,10 @@ exports.postAddOrder = function(req, res){
        Menu.find({_id : {$in : allMenus}})
        .populate('item')
        .exec(function(err, menus){
-         User.findOne({email: req.body.user}).exec(function(err, user){
+         User.findOne({email: req.body.user})
+         .populate('address')
+         .exec(function(err, user){
            order.user= req.body.user;
-           order.address = req.body.address;
            console.log("------------adding new menu-------------")
            console.log(order.menu);
            //sorting of menus
@@ -264,13 +267,13 @@ exports.postAddOrder = function(req, res){
            var fullUserAddress = {};
            if (user.address)
              for (var i=0; i<user.address.length; i++)
-               if (user.address[i].tag == req.body.address) {
+               if (user.address[i]._id.tag == req.body.address) {
                  fullUserAddress = {
-                   tag : user.address[i].tag,
-                   flatNo : user.address[i].flatNo,
-                   streetAddress : user.address[i].streetAddress,
-                   landmark : user.address[i].landmark,
-                   pincode : user.address[i].pincode,
+                   tag : user.address[i]._id.tag,
+                   flatNo : user.address[i]._id.flatNo,
+                   streetAddress : user.address[i]._id.streetAddress,
+                   landmark : user.address[i]._id.landmark,
+                   pincode : user.address[i]._id.pincode,
                    contactNo : user.contactNo
                  }
                }
@@ -285,6 +288,7 @@ exports.postAddOrder = function(req, res){
      });
    }
   else {
+    console.log(req.body);
     var allMenus = [];
     console.log(req.body.allMenus)
     for (var i=0; i<req.body.allMenus.length; i++){
@@ -295,7 +299,9 @@ exports.postAddOrder = function(req, res){
     Menu.find({_id : {$in : allMenus}})
     .populate('item')
     .exec(function(err, menus){
-      User.findOne({email: req.body.user}).exec(function(err, user){
+      User.findOne({email: req.body.user})
+      .populate('address')
+      .exec(function(err, user){
         var order = new Order({
           user: req.body.user
         })
@@ -310,35 +316,14 @@ exports.postAddOrder = function(req, res){
           }
         }
         console.log(sortedMenus);
-        // -------------- old adding of subItems--------------------
-        // var subItems = [];
-        // for (var i=0; i<req.body.getPosition.length; i++){
-        //   if(req.body.subItemsName){
-        //     order.menu[i] = {
-        //       _id : allMenus[req.body.getPosition[i]],
-        //       subItems : [],
-        //     }
-        //     console.log(order.menu[i]);
-        //     for (var j=0; j<req.body.subItemsName[i].length; j++)
-        //       order.menu[i].subItems[j] = {
-        //         name : req.body.subItemsName[i][j],
-        //         quantity : Number(req.body.subItemsQuantity[i][j]),
-        //         container : Number(req.body.subItemsContainer[i][j])
-        //       }
-        //     //order.menu[i].subItems = subItems;
-        //     console.log(order.menu[i].subItems)
-        //   }
-        // }
-        //-----------------new adding of customized part-------------
         console.log(order.menu);
         console.log(req.body.getPosition);
         console.log(allMenus);
         var j = 0;
-        var totalCost = 0;
+        var totalCost = 0, subItems = [];
         for (var i=0; i<req.body.getPosition.length; i++){
           //customized
-          if (req.body.getPosition[i] == 'true'){
-            //yet to get a solution
+          if (req.body.getPosition[i] == 'true') {
           }// this part has attributes - half, full
           else if (req.body.getPosition[i] == 'hasAttributes') {
             console.log("---------cost check-----------");
@@ -367,15 +352,15 @@ exports.postAddOrder = function(req, res){
         order.grandTotal = 0;
         order.grandTotal += totalCost;
         var fullUserAddress = {};
-        if(user.address)
+        if (user.address)
           for (var i=0; i<user.address.length; i++)
-            if (user.address[i].tag == req.body.address) {
+            if (user.address[i]._id.tag == req.body.address) {
               fullUserAddress = {
-                tag : user.address[i].tag,
-                flatNo : user.address[i].flatNo,
-                streetAddress : user.address[i].streetAddress,
-                landmark : user.address[i].landmark,
-                pincode : user.address[i].pincode,
+                tag : user.address[i]._id.tag,
+                flatNo : user.address[i]._id.flatNo,
+                streetAddress : user.address[i]._id.streetAddress,
+                landmark : user.address[i]._id.landmark,
+                pincode : user.address[i]._id.pincode,
                 contactNo : user.contactNo
               }
             }
@@ -449,16 +434,18 @@ exports.getMenusFromOptions = function(req, res){
 //ajax get user addresses
 exports.getUserAddress = function(req, res){
   if(req.query.userEmail) var userEmail = req.query.userEmail
-  User.findOne({email: userEmail}).exec(function(err, user){
+  User.findOne({email: userEmail})
+  .populate('address')
+  .exec(function(err, user){
     var userJson = [];
     if (user.address)
       for(var i=0; i<user.address.length; i++)
         userJson[i] = {
-          address : user.address[i].tag,
-          flatNo : user.address[i].flatNo,
-          streetAddress : user.address[i].streetAddress,
-          landmark : user.address[i].landmark,
-          pincode : user.address[i].pincode,
+          address : user.address[i]._id.tag,
+          flatNo : user.address[i]._id.flatNo,
+          streetAddress : user.address[i]._id.streetAddress,
+          landmark : user.address[i]._id.landmark,
+          pincode : user.address[i]._id.pincode,
           contactNo : user.contactNo
         }
     userJson[0].amount = user.amount;
