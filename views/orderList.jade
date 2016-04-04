@@ -193,7 +193,12 @@ html
                                 | #{customizedResults.title}
                             td #{customizedResults.date}
                             td #{customizedResults.user}
-                          td #{customizedResult.details}
+                            td
+                              each details in customizedResults.details
+                                | #{details.quantity}-#{details.name}, #{details.container}-container
+                                br
+                              b
+                                | Total Quantity - #{customizedResults.quantity}
               #timeline.tab-pane
                 .box-body
                   table#example3.table.table-bordered.table-hover
@@ -212,7 +217,19 @@ html
                                 | #{nonCustomizedResults.title}
                             td #{nonCustomizedResults.date}
                             td #{nonCustomizedResults.user}
-                            td #{nonCustomizedResults.details}
+                            if (nonCustomizedResults.details.length > 0)
+                              td
+                                each details in nonCustomizedResults.details
+                                  | #{details.quantity}-#{details.name}, #{details.container}-container
+                                  br
+                                | Total Quantity - #{nonCustomizedResults.quantity}
+                            else if (nonCustomizedResults.nameAtt)
+                              td
+                                | #{nonCustomizedResults.quantityAtt}-#{nonCustomizedResults.nameAtt}
+                                br
+                            else
+                              td
+                                | #{nonCustomizedResults.quantity}
               // /.box-body
             // /.box
           // /.row
@@ -276,10 +293,17 @@ html
           var addToNonCustomizedTable = '';
           for (var i=0; i<results.length; i++){
             for (var j=0; j<results[i].menu.length; j++){
-              if (results[i].menu[j].subItems.length > 0) {
-
+              if (results[i].menu[j].subItems) {
+                console.log("customized")
+                var date = new Date(results[i].menu[j]._id.date).toDateString();
+                addToCustomizedTable += '<tr><td><a href='+results[i].id+'>'+results[i].menu[j]._id.item.title+'</a></td><td>'+date+'</td><td>'+results[i].user+'</td><td>';
+                for (var k=0; k<results[i].menu[j].subItems._id.subItemsArray.length; k++){
+                  addToCustomizedTable += ''+results[i].menu[j].subItems._id.subItemsArray[k].quantity+'-'+results[i].menu[j].subItems._id.subItemsArray[k].name+','+results[i].menu[j].subItems._id.subItemsArray[k].container+'-container<br>';
+                }
+                addToCustomizedTable +='<b>Total Quantity - '+results[i].menu[j].singleQuantity+'</td></tr>';
               }
               else{
+                console.log("non-customized")
                 var date = new Date(results[i].menu[j]._id.date).toDateString();
                 addToNonCustomizedTable += '<tr><td><a href='+results[i].id+'>'+results[i].menu[j]._id.item.title+'</a></td><td>'+date+'</td><td>'+results[i].user+'</td>';
                 if (results[i].menu[j].attributes != null)
@@ -296,6 +320,8 @@ html
               }
             }
           }
+          $('#example2 tbody').html('');
+          $('#example2 tbody').append(addToCustomizedTable);
           $('#example3 tbody').html('');
           $('#example3 tbody').append(addToNonCustomizedTable);
         })

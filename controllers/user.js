@@ -100,9 +100,10 @@ exports.postAddUser = function(req, res, next){
         for (var i=0; i<user.address.length; i++) {
           for (var j=0; j<req.body.preaddressId.length; j++)
             if ( user.address[i]._id == req.body.preaddressId[j])
-              found == true;
+              found = true;
           if (!found)
-            user.address[i]._id.pull();
+            //user.address[i]._id.pull();
+          found = false;
         }
         // for newly added addresses
         if (req.body.streetAddress)

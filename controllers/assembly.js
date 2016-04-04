@@ -51,8 +51,16 @@ exports.getOrderByCategory = function(req, res) {
 };
 
 exports.getCustomizedOrderByCategory = function(req, res){
+  var queryCategory = req.query.category;
+  var mealSelected = req.query.meal;
+  var dateTime = new Date().toDateString();
   Order.find()
-  .populate('menu._id', null, { category : queryCategory })
+  .populate('menu._id', null, {
+    category : queryCategory,
+    meal : mealSelected,
+    date : dateTime
+   })
+  .populate('menu.subItems._id')
   .exec(function(err, orders){
     Item.populate(orders, 'menu._id.item', function(err, results) {
       var orderList = [], k =0;
@@ -60,13 +68,14 @@ exports.getCustomizedOrderByCategory = function(req, res){
         var menuList = [];
         if (results[i].state == 'Published') {
           for (var j=0; j<results[i].menu.length; j++) {
-            if (results[i].menu[j]._id != null && results[i].menu[j].subItems.length > 0) {
+            if (results[i].menu[j]._id != null && results[i].menu[j].subItems && results[i].menu[j].subItems._id != null) {
                console.log(results[i].menu[j]._id.category);
                menuList.push(results[i].menu[j]);
              }
           }
           if (menuList.length > 0){
             orderList[k] = {
+              id : results[i]._id,
               user : results[i].user,
               address : results[i].address,
               menu : menuList
@@ -76,6 +85,7 @@ exports.getCustomizedOrderByCategory = function(req, res){
         }
       }
       console.log(orderList);
+      //console.log(orderList[0].menu);
       res.send(orderList);
     });
   });

@@ -5,15 +5,16 @@ var orderSchema = new mongoose.Schema({
   user: { type: String, ref: 'User' },
   menu: [{
     _id : { type: mongoose.Schema.Types.ObjectId, ref: 'Menu' },
-    subItems: [{
-       "name" : { type: String },
-       "quantity" : {type: Number, default: '1'},
-       "container": { type: Number , default: '1'}
-    }],
+    subItems: {
+       _id : { type: mongoose.Schema.Types.ObjectId, ref: 'SubItems' }
+    },
     attributes : {
       "name" : String,
-      "quantity" : Number
-    }
+      "quantity" : Number,
+      "cost" : Number
+    },
+    subTotal: Number,
+    singleQuantity: { type: Number, default : '1' }
   }],
   address: {
     _id : { type: mongoose.Schema.Types.ObjectId, ref: 'Address' }

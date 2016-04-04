@@ -74,12 +74,18 @@ exports.deleteItemCategory = function(req,res){
            if (item) var paramsItemCategory = item.category;
            ItemCategory.findById(paramsItemCategory).exec(function(err, itemCategory){
              if(err) return next(err);
+             if (item)
+               if ((item.subItems.length == 0) && (item.attributes.length == 0))
+                var singleCost = true;
+               else
+                var singleCost = false;
              res.render('addItem', {
                item: item,
                userChef: userChef,
                itemCategories: itemCategories,
                itemCategory: itemCategory,
-               paramsUserChef: paramsUserChef
+               paramsUserChef: paramsUserChef,
+               singleCost : singleCost
              });
            })
          })
@@ -151,27 +157,33 @@ exports.deleteItemCategory = function(req,res){
          });
          item.subItems = [];
          var totalCost = 0;
-         for(var i=0; i<locals.name.length; i++){
-           if (locals.cost[i] != ''){
-             item.subItems.push({
-               name : locals.name[i],
-               cost : locals.cost[i],
-               quantity : locals.quantity[i],
-               container : locals.container[i]
-             })
-             totalCost += item.subItems[i].cost;
+         if (locals.name)
+           for(var i=0; i<locals.name.length; i++) {
+             if (locals.cost[i] != ''){
+               item.subItems.push({
+                 name : locals.name[i],
+                 cost : locals.cost[i],
+                 quantity : locals.quantity[i],
+                 container : locals.container[i]
+               })
+               totalCost += Number(locals.cost[i]) * Number(locals.quantity[i]);
+             }
            }
-         }
+         item.attributes = [];
+         if (locals.nameAtt)
+           for(var i=0; i<locals.nameAtt.length; i++){
+             if (locals.nameAtt[i] != '' && locals.costAtt[i] != '') {
+               item.attributes.push({
+                 name : locals.nameAtt[i],
+                 cost : locals.costAtt[i]
+               })
+               totalCost += Number(locals.costAtt[i]);
+             }
+           }
+         if (locals.singleCost)
+            totalCost += locals.singleCost;
          item.totalCost = 0;
          item.totalCost += totalCost;
-         item.attributes = [];
-         for(var i=0; i<locals.nameAtt.length; i++){
-           if (locals.nameAtt[i] != '' && locals.costAtt[i] != '')
-             item.attributes.push({
-               name : locals.nameAtt[i],
-               cost : locals.costAtt[i]
-             })
-          }
          item.save(function (err, items) {
              if (err) return err
          });

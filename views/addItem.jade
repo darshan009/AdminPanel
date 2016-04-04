@@ -220,8 +220,8 @@ html
                       thead
                         tr
                           th Name
-                          th Cost
-                          th Quantity
+                          th Cost for 1
+                          th Default quantity
                           th Container
                       tbody
                         if item
@@ -230,20 +230,11 @@ html
                               td
                                 input(type='text' name='name[]' placeholder='Sub-Item name' value=(items?(items.name?items.name:''):''))
                               td
-                                input(type='Number' name='cost[]' placeholder='Cost' value=(items?(items.cost?items.cost:''):''))
+                                input(type='Number' name='cost[]' placeholder='Cost for 1' value=(items?(items.cost?items.cost:''):''))
                               td
                                 input(type='Number' name='quantity[]' placeholder='Quantity' value=(items?(items.quantity?items.quantity:''):''))
                               td
                                 input(type='Number' name='container[]' placeholder='Container Number' value=(items?(items.container?items.container:''):''))
-                          tr
-                            td
-                              input(type='text' name='name[]' placeholder='Sub-Item name')
-                            td
-                              input(type='Number' name='cost[]' placeholder='Cost')
-                            td
-                              input(type='Number' name='quantity[]' placeholder='Quantity')
-                            td
-                              input(type='Number' name='container[]' placeholder='Container Number')
                     button.btn.btn-info.pull-right(onclick='addTableRow()', type='button') Add a row
                 .form-group
                   label.col-sm-2.control-label Attributes
@@ -261,11 +252,12 @@ html
                                   input(type='text' name='nameAtt[]' placeholder='Attribute name' value=(items?(items.name?items.name:''):''))
                                 td
                                   input(type='Number' name='costAtt[]' placeholder='Cost' value=(items?(items.cost?items.cost:''):''))
-                            td
-                              input(type='text' name='nameAtt[]' placeholder='Attribute name')
-                            td
-                              input(type='Number' name='costAtt[]' placeholder='Cost')
                     button.btn.btn-info.pull-right(onclick='addTableRowPartTwo()', type='button') Add a row
+                if (!item || singleCost)
+                  .form-group
+                    label.col-sm-2.control-label Single Cost
+                    .col-sm-10
+                      input.form-control#singleCost(type='Number' name='singleCost' placeholder='Single Item cost' value=(item?(item.totalCost?item.totalCost:''):''))
                 .box-footer
                   if(item)
                     a(href='/addItem/delete/#{item._id}')
@@ -302,6 +294,7 @@ html
     // page script
     script.
       function addTableRow() {
+        document.getElementById("singleCost").setAttribute('disabled', true)
         var table = document.getElementById("hi");
         var row = table.insertRow(1);
         var cell1 = row.insertCell(0);
@@ -329,10 +322,12 @@ html
         var cell4Data = document.createElement("input");
         cell4Data.type = "Number";
         cell4Data.name = "container[]";
+        cell4Data.value = "1";
         cell4Data.placeholder = "Container Number";
         cell4.appendChild(cell4Data);
       }
       function addTableRowPartTwo() {
+        document.getElementById("singleCost").setAttribute('disabled', true)
         var table = document.getElementById("attributesTable");
         var row = table.insertRow(1);
         var cell1 = row.insertCell(0);
