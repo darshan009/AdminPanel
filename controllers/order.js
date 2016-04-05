@@ -119,45 +119,35 @@ exports.getAddOrder = function(req, res){
 
 exports.getViewOrder = function(req, res){
   Order.findById(req.params.id)
+  .populate('address._id')
   .populate('menu._id')
+  .populate('menu.subItems._id')
   .exec(function(err, order) {
     Item.populate(order, 'menu._id.item', function(err, result) {
       if(!result) res.end("No order found")
-      User.findOne({email : order.user})
-      .populate('address._id')
-      .exec(function(err, userFound) {
-        if (!order) res.end("Order not found")
-        var fullResult = [];
-        for (var i=0; i<result.menu.length; i++){
-          fullResult[i] = {
-            id : result.menu[i]._id._id,
-            title : result.menu[i]._id.item.title,
-            attributes : result.menu[i].attributes
-          }
-          if (result.menu[i].subItems.length > 0)
-            fullResult[i].getPosition = false;
-          else if (result.menu[i].attributes.name)
-            fullResult[i].getPosition = "hasAttributes";
-          else
-            fullResult[i].getPosition = "normal"
+      if (!order) res.end("Order not found")
+      var fullResult = [];
+      for (var i=0; i<result.menu.length; i++){
+        fullResult[i] = {
+          id : result.menu[i]._id._id,
+          title : result.menu[i]._id.item.title,
+          attributes : result.menu[i].attributes
         }
-        var addressTag = [];
-        for (var i=0; i<userFound.address.length; i++)
-          addressTag.push(userFound.address[i]._id.tag);
-        console.log(result);
-        res.render('viewOrder', {
-          addressTag : addressTag,
-          result : result,
-          fullResult : fullResult //result.menu._id.
-        });
-      })
+      }
+      console.log(result);
+      res.render('viewOrder', {
+        result : result,
+        fullResult : fullResult //result.menu._id.
+      });
     })
   });
 };
 
 exports.getEditOrder = function(req, res){
   Order.findById(req.params.id)
+  .populate('address._id')
   .populate('menu._id')
+  .populate('menu.subItems._id')
   .exec(function(err, order) {
     Item.populate(order, 'menu._id.item', function(err, result) {
       if(!result) res.end("No order found")
@@ -165,30 +155,16 @@ exports.getEditOrder = function(req, res){
         User.find().exec(function(err, users) {
           User.findOne({email : order.user}).exec(function(err, userFound) {
             if (!order) res.end("Order not found")
-            var fullResult = [];
-            for (var i=0; i<result.menu.length; i++){
-              fullResult[i] = {
-                id : result.menu[i]._id._id,
-                title : result.menu[i]._id.item.title,
-                attributes : result.menu[i].attributes
-              }
-              if (result.menu[i].subItems.length > 0)
-                fullResult[i].getPosition = false;
-              else if (result.menu[i].attributes.name)
-                fullResult[i].getPosition = "hasAttributes";
-              else
-                fullResult[i].getPosition = "normal"
-            }
             var addressTag = [];
             for (var i=0; i<userFound.address.length; i++)
               addressTag.push(userFound.address[i]._id.tag);
             //console.log(result.menu[0]._id.item.attributes[0].cost);
             res.render('addOrder', {
+              userFound : userFound,
               itemCategories: itemCategories,
               users: users,
               addressTag : addressTag,
-              result : result,
-              fullResult : fullResult //result.menu._id.
+              result : result
             });
           })
         })
@@ -199,13 +175,17 @@ exports.getEditOrder = function(req, res){
 
 exports.postAddOrder = function(req, res){
   if(req.params.id){
-     Order.findById(req.params.id).exec(function(err, order){
+     Order.findById(req.params.id)
+     .populate('menu._id')
+     .populate('menu.subItems._id')
+     .exec(function(err, order){
        var previousTotal = Number(order.grandTotal);
        var allMenus = [];
-       for (var i=0; i<req.body.allMenus.length; i++){
-         if(req.body.allMenus[i] != '')
-           allMenus.push(req.body.allMenus[i]);
-       }
+       if (req.body.allMenus)
+         for (var i=0; i<req.body.allMenus.length; i++){
+           if(req.body.allMenus[i] != '')
+             allMenus.push(req.body.allMenus[i]);
+         }
        Menu.find({_id : {$in : allMenus}})
        .populate('item')
        .exec(function(err, menus){
@@ -224,81 +204,85 @@ exports.postAddOrder = function(req, res){
            console.log(sortedMenus);
            var found = false, deletedMenuCost = 0;
            //delete deleted menus from order
-           for (var y=0; y<req.body.allPreMenus.length; y++) {
-             for (var z=0; z<order.menu.length; z++)
-               if (order.menu[z] == allPreMenus[y])
-                found = true;
-             if (!found) {
-              if (order.menu[z]._id.subItems)
-                deletedMenuCost += Number(order.menu[z]._id.subItems.subTotal);
-              else if (order.menu[z]._id.attributes)
-                deletedMenuCost += Number(order.menu[z].attributes.cost) * Number(order.menu[z].attributes.quantity);
-              else
-                deletedMenuCost += Number(order.menu[z]._id.item.totalCost);
-              order.menu[z].pull();
+           console.log(req.body.allPreMenus);
+           if (req.body.allPreMenus && req.body.allPreMenus.length != order.menu.length)
+             for (var z=0; z<order.menu.length; z++) {
+               for (var y=0; y<req.body.allPreMenus.length; y++)
+                 if (order.menu[z]._id._id == req.body.allPreMenus[y]) {
+                   found = true;
+                   break;
+                 }
+               if (!found) {
+                deletedMenuCost += Number(order.menu[z].subTotal);
+                order.menu.splice(z, 1);
+               }
+              found = false;
              }
-            found = false;
-           }
            //adding of new menus
            var j = 0, subItemsCounter = 0;
            var totalCost = 0, subItems = [];
-           for (var i=0; i<req.body.getPosition.length; i++){
-             //customized
-             if (req.body.getPosition[i] == 'true') {
-               var subItems = new SubItems({
-                 order : {
-                   _id : order._id
-                 },
-                 subItemsArray : []
-               });
-               console.log("---------subItems check-----------");
-               for (var k=0; k<req.body.subItemsName[subItemsCounter].length; k++)
-                 subItems.subItemsArray.push({
-                   name : req.body.subItemsName[subItemsCounter][k],
-                   quantity : Number(req.body.subItemsQuantity[subItemsCounter][k]),
-                   container : Number(req.body.subItemsContainer[subItemsCounter][k])
+           if (req.body.getPosition)
+             for (var i=0; i<req.body.getPosition.length; i++){
+               //customized
+               if (req.body.getPosition[i] == 'true') {
+                 var subItems = new SubItems({
+                   order : {
+                     _id : order._id
+                   },
+                   subItemsArray : []
+                 });
+                 console.log("---------subItems check-----------");
+                 for (var k=0; k<req.body.subItemsName[subItemsCounter].length; k++)
+                   subItems.subItemsArray.push({
+                     name : req.body.subItemsName[subItemsCounter][k],
+                     quantity : Number(req.body.subItemsQuantity[subItemsCounter][k]),
+                     container : Number(req.body.subItemsContainer[subItemsCounter][k])
+                   })
+                 order.menu.push({
+                   _id : allMenus[i],
+                   subItems : {
+                     _id : subItems._id
+                   },
+                   subTotal : subTotal,
+                   singleQuantity : req.body.singleQuantity[i]
+                 });
+                 subItems.save(function (err) {
+                   if (err) return err;
+                 });
+                 subItemsCounter++;
+                 console.log(order.menu[i])
+               }// this part has attributes - half, full
+               else if (req.body.getPosition[i] == 'hasAttributes') {
+                 console.log("---------cost check-----------");
+                 for (var k=0; k<sortedMenus[i].item.attributes.length; k++)
+                   if (sortedMenus[i].item.attributes[k].name == req.body.attributesName[j])
+                     totalCost += sortedMenus[i].item.attributes[k].cost * req.body.singleQuantity[i];
+                 order.menu.push({
+                   _id : allMenus[i],
+                   attributes : {
+                     name : req.body.attributesName[j],
+                     quantity : req.body.attributesQuantity[j]
+                   },
+                   subTotal : subTotal,
+                   singleQuantity : req.body.singleQuantity[i]
                  })
-               console.log(subItems);
-               order.menu.push({
-                 _id : allMenus[i],
-                 subItems : {
-                   _id : subItems._id
-                 }
-               });
-               subItems.save(function (err) {
-                 if (err) return err;
-               });
-               subItemsCounter++;
-               console.log(order.menu[i])
-               console.log(order.menu[i].subItems)
-             }// this part has attributes - half, full
-             else if (req.body.getPosition[i] == 'hasAttributes') {
-               console.log("---------cost check-----------");
-               for (var k=0; k<sortedMenus[i].item.attributes.length; k++)
-                 if (sortedMenus[i].item.attributes[k].name == req.body.attributesName[j])
-                   totalCost += sortedMenus[i].item.attributes[k].cost * req.body.singleQuantity[i];
-               order.menu.push({
-                 _id : allMenus[i],
-                 attributes : {
-                   name : req.body.attributesName[j],
-                   //quantity : req.body.attributesQuantity[j]
-                 }
-               })
-               j++;
-             }//this is the non-customized part
-             else {
-               order.menu.push({
-                 _id : allMenus[i]
-               })
-               totalCost += sortedMenus[i].item.totalCost;
+                 j++;
+               }//this is the non-customized part
+               else {
+                 order.menu.push({
+                   _id : allMenus[i],
+                   subTotal : Number(sortedMenus[i].item.totalCost) * req.body.singleQuantity[i],
+                   singleQuantity : req.body.singleQuantity[i]
+                 })
+                 totalCost += sortedMenus[i].item.totalCost;
+               }
              }
-           }
            console.log("-----------cost check---------");
            console.log(totalCost);
            console.log(order.menu)
-           console.log(order.menu.subItems)
            order.grandTotal = 0;
-           totalCost += deletedMenuCost;
+           totalCost -= deletedMenuCost;
+           totalCost += previousTotal;
            order.grandTotal += Number(totalCost);
            var newAmount = Number(user.amount);
            user.amount = 0;

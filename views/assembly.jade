@@ -299,7 +299,7 @@ html
         })
       });
       //customized
-      $('button#selectedCustomized').click(function(){
+      $('button#lectedCustomized').click(function(){
         $category = $(this).val();
         $meal = $('#customizedMealSelected').val();
         if ( !$('#customizedMealSelected').val() )
@@ -329,6 +329,60 @@ html
         $('#example2').attr('data-CustomizedButton', $category);
         $('#example2 tbody').html('');
         $('#example2 tbody').append(addToTable);
+        $('#example2').DataTable({
+        "paging": true,
+        "lengthChange": false,
+        "searching": false,
+        "ordering": true,
+        "info": true,
+        "autoWidth": false
+        });
+        })
+      });
+      $('button#disabler').click(function(){
+        var dataTagetButton = $('#example2').attr('data-targetButton');
+        var CustomizedButton = $('#example2').attr('data-CustomizedButton');
+        $('#example2 tbody').html('');
+        $(':button[value = '+dataTagetButton+']').attr('disabled', true);
+        $(':button[value = '+CustomizedButton+']').attr('disabled', true);
+      });
+      //server request
+      $('button#selectedCustomized').click(function(){
+        $category = $(this).val();
+        $meal = $('#customizedMealSelected').val();
+        if ( !$('#customizedMealSelected').val() )
+          alert("Please Select Lunch or Dinner");
+        $.getJSON("http://os.foodees.in/Services/Services.svc/Gettodaysorderbycustomer/"+'04-04-2016'+','+$meal, {
+        },function(j){
+        console.log(j);
+        var newTableField = $(document.createElement('div'))
+        var addToTable = '';
+        console.log(j.length);
+        for (var i = 0; i < j.length; i++) {
+          for (var k = 0; k < j[i].menu.length; k++) {
+            addToTable += '<tr><td>'+ j[i].user +'</td><td>'+ j[i].menu[k]._id.item.title +'</td>';
+            if (j[i].menu[k].subItems){
+              addToTable += '<td>'
+              for (var l = 0; l < j[i].menu[k].subItems._id.subItemsArray.length; l++)
+                addToTable += ''+ j[i].menu[k].subItems._id.subItemsArray[l].quantity+'-'+j[i].menu[k].subItems._id.subItemsArray[l].name +',  '+j[i].menu[k].subItems._id.subItemsArray[l].container+'-container<br>';
+              addToTable += ' </td></tr>';
+            }
+            else
+              addToTable += '</tr>';
+          }
+        }
+        addToTable += '</tbody></table>'
+        $('#example2').attr('data-CustomizedButton', $category);
+        $('#example2 tbody').html('');
+        $('#example2 tbody').append(addToTable);
+        $('#example2').DataTable({
+        "paging": true,
+        "lengthChange": false,
+        "searching": false,
+        "ordering": true,
+        "info": true,
+        "autoWidth": false
+        });
         })
       });
       $('button#disabler').click(function(){

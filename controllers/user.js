@@ -99,10 +99,18 @@ exports.postAddUser = function(req, res, next){
         var found = false;
         for (var i=0; i<user.address.length; i++) {
           for (var j=0; j<req.body.preaddressId.length; j++)
-            if ( user.address[i]._id == req.body.preaddressId[j])
+            if ( user.address[i]._id == req.body.preaddressId[j]) {
               found = true;
-          if (!found)
-            //user.address[i]._id.pull();
+              break;
+            }
+          if (!found) {
+            var addressId = user.address[i]._id;
+            Address.remove({_id : addressId}, function(err){
+              if (err) return err;
+              console.log("address removed");
+            });
+            user.address.splice(i, 1);
+          }
           found = false;
         }
         // for newly added addresses

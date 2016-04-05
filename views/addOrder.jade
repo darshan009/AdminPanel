@@ -193,34 +193,45 @@ html
                       select.form-control(id='getMenuList' )
                         option
                       br
-                      if(fullResult)
+                  if (result)
+                    .form-group
+                      label.col-sm-2.control-label Added Menus
+                      .col-sm-10
                         ol
-                          each fullResults, index in fullResult
+                          each menu, index in result.menu
                             div(data-removePreId=index)
-                              li
-                                input(type='hidden', data-getposition=index, name='getPrePosition[]', value = '#{fullResults.getPosition}')
-                                input(type='hidden', data-customizeorderid=index, name="allPreMenus[]", value= '#{fullResults.id}')
-                                | #{fullResults.title}
-                                if (fullResults.attributes.name)
+                              table.table.table-bordered.table-hover
+                                tbody
+                                  tr
+                                    td
+                                      li
+                                        input(type='hidden', name="allPreMenus[]", value= '#{menu._id._id}')
+                                        | #{menu._id.item.title}
+                                      td
+                                        | #{menu.singleQuantity}
+                                if (menu.subItems._id)
+                                  table.table.table-bordered.table-hover
+                                    tbody
+                                      each subItemsArray in menu.subItems._id.subItemsArray
+                                        tr
+                                          td #{subItemsArray.name}
+                                          td #{subItemsArray.quantity}
+                                          td #{subItemsArray.cost}
+                                          td #{subItemsArray.container}
+                                else if (menu.attributes.name)
                                   table.table.table-bordered.table-hover
                                     tbody
                                       tr
                                         td
-                                          input(type='radio', checked, name="preAttributesName[#{index}]", value='#{fullResults.attributes.name}')
-                                          | #{fullResults.attributes.name}
-                                        td
-                                          input(type="hidden" name = "preAttributesQuantity[]" value = '#{fullResults.attributes.quantity}')
-                                          | #{fullResults.attributes.cost}
-                                        td
-                                          input(type="hidden" name = "preAttributesQuantity[]" value = '#{fullResults.attributes.quantity}')
-                                          | #{fullResults.attributes.quantity}
+                                          input(type='radio', checked, name="")
+                                          | #{menu.attributes.name}
                               .btn-tools.pull-right
                                 button#index.btn.btn-box-tool(type='button' data-count=index onclick='deletePreSelectBox(#{index})')
                                   i.fa.fa-times
-                            br
-                            br
-                    #selectedMenu
-                      br
+                              br
+                              br
+                  #selectedMenu
+                    br
                   .form-group
                     label.col-sm-2.control-label User
                     .col-sm-10
@@ -235,21 +246,21 @@ html
                     .col-sm-10
                       select.form-control(name = 'address' id = 'getUserAddress' )
                         option(selected='selected')
-                          | #{result?(result.address.tag?result.address.tag:''):''}
+                          | #{result?(result.address._id.tag?result.address._id.tag:''):''}
                         if(addressTag)
                           each addressTags in addressTag
                             option #{addressTags}
-                  if (fullResult)
-                    .form-group
-                      label.col-sm-2.control-label Address
-                      .col-sm-10
-                        input.form-control(type='text', id='', name='tag[]' placeholder='Add a tag - Home, Office or custom' disabled value=(result?(result.address.tag?result.address.tag:''):''))
-                        input.form-control(type='text', id='', name='flatNo[]' placeholder='Building Name and Flat Number' disabled)
-                        input.form-control(type='text', id='', name='streetAddress[]' disabled placeholder='Enter your street Address...' value=(result?(result.address.streetAddress?result.address.streetAddress:''):''))
-                        input.form-control(type='text', id='', name='landmark[]' disabled placeholder='Landmark' value=(result?(result.address.landmark?result.address.landmark:''):''))
-                        input.form-control(type='Number', id='', name='pincode[]' disabled placeholder='Pincode' value=(result?(result.address.pincode?result.address.pincode:''):''))
-                        input.form-control(type='Number', id='', name='pincode[]' disabled placeholder='Contact Number' value=(result?(result.address.contactNo?result.address.contactNo:''):''))
                   #userAddress
+                    if (result)
+                      .form-group
+                        label.col-sm-2.control-label Address
+                        .col-sm-10
+                          input.form-control(type='text', id='', name='tag[]' placeholder='Add a tag - Home, Office or custom' disabled value=(result?(result.address._id.tag?result.address._id.tag:''):''))
+                          input.form-control(type='text', id='', name='flatNo[]' placeholder='Building Name and Flat Number' disabled value=(result?(result.address._id.flatNo?result.address._id.flatNo:''):''))
+                          input.form-control(type='text', id='', name='streetAddress[]' disabled placeholder='Enter your street Address...' value=(result?(result.address._id.streetAddress?result.address._id.streetAddress:''):''))
+                          input.form-control(type='text', id='', name='landmark[]' disabled placeholder='Landmark' value=(result?(result.address._id.landmark?result.address._id.landmark:''):''))
+                          input.form-control(type='Number', id='', name='pincode[]' disabled placeholder='Pincode' value=(result?(result.address._id.pincode?result.address._id.pincode:''):''))
+                          input.form-control(type='Number', id='', name='pincode[]' disabled placeholder='Contact Number' value=(userFound?(userFound.contactNo?userFound.contactNo:''):''))
                 // /.box-body
                 .box-footer
                   if(result)
@@ -304,11 +315,9 @@ html
       //Datemask2 mm/dd/yyyy
       $("#datemask2").inputmask("mm/dd/yyyy", {"placeholder": "mm/dd/yyyy"});
       });
-      $('#getUserAddress').attr('disabled', true);
       $('#mealSelected').attr('disabled', true);
       $('#categorySelected').attr('disabled', true);
-      $('#getUserAddress').attr('disabled', true);
-      $('#submitButton').attr('disabled', true);
+      //$('#submitButton').attr('disabled', true);
       //populate
       $(function(){
         $("input#dateSelected").focusout(function(){
@@ -390,7 +399,6 @@ html
         })
         //getUserAddress
         $("select#userSelectedEmail").change(function(){
-          $('#getUserAddress').attr('disabled', false);
           $userEmail = $(this).val();
           $.getJSON("/getUserAddress",{
             userEmail: $userEmail

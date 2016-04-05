@@ -189,7 +189,7 @@ html
                         each customizedResults in customizedResult
                           tr
                             td
-                              a(href='/editOrder/#{customizedResults.id}')
+                              a(href='/viewOrder/#{customizedResults.id}')
                                 | #{customizedResults.title}
                             td #{customizedResults.date}
                             td #{customizedResults.user}
@@ -324,6 +324,22 @@ html
           $('#example2 tbody').append(addToCustomizedTable);
           $('#example3 tbody').html('');
           $('#example3 tbody').append(addToNonCustomizedTable);
+          $('#example2').DataTable({
+          "paging": true,
+          "lengthChange": false,
+          "searching": false,
+          "ordering": true,
+          "info": true,
+          "autoWidth": false
+          });
+          $('#example3').DataTable({
+          "paging": true,
+          "lengthChange": false,
+          "searching": false,
+          "ordering": true,
+          "info": true,
+          "autoWidth": false
+          });
         })
       });
       });
