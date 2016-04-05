@@ -12,6 +12,8 @@ html
     link(rel='stylesheet', href='https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css')
     // Ionicons
     link(rel='stylesheet', href='https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css')
+    // datepicker
+    link(rel='stylesheet', href='../public/bootstrap/css/datepicker.css')
     // DataTables
     link(rel='stylesheet', href='../public/plugins/datatables/dataTables.bootstrap.css')
     // Theme style
@@ -165,7 +167,10 @@ html
             .box-body
               label.col-sm-2.control-label Pick a date
               .col-sm-4
-                input.form-control(type='text' required id='dateSelected' name='date' data-inputmask="'alias': 'mm/dd/yyyy'", data-mask='')
+                .input-group
+                  .input-group-addon
+                    i.fa.fa-calendar
+                  input.form-control.datepicker(type='text' required id='dateSelected' name='date')
               .col-sm-2
                 button.btn.btn-info#datePicker(type = 'button') Submit
           .nav-tabs-custom
@@ -222,14 +227,16 @@ html
                                 each details in nonCustomizedResults.details
                                   | #{details.quantity}-#{details.name}, #{details.container}-container
                                   br
-                                | Total Quantity - #{nonCustomizedResults.quantity}
+                                b
+                                  | Total Quantity - #{nonCustomizedResults.quantity}
                             else if (nonCustomizedResults.nameAtt)
                               td
                                 | #{nonCustomizedResults.quantityAtt}-#{nonCustomizedResults.nameAtt}
                                 br
                             else
                               td
-                                | #{nonCustomizedResults.quantity}
+                                b
+                                  | Quantity - #{nonCustomizedResults.quantity}
               // /.box-body
             // /.box
           // /.row
@@ -254,12 +261,10 @@ html
     // DataTables
     script(src='../public/plugins/datatables/jquery.dataTables.min.js')
     script(src='../public/plugins/datatables/dataTables.bootstrap.min.js')
+    // date-picker
+    script(src='../public/bootstrap/js/bootstrap-datepicker.js')
     // AdminLTE App
     script(src='../public/dist/js/app.min.js')
-    // InputMask
-    script(src='../public/plugins/input-mask/jquery.inputmask.js')
-    script(src='../public/plugins/input-mask/jquery.inputmask.date.extensions.js')
-    script(src='../public/plugins/input-mask/jquery.inputmask.extensions.js')
     // page script
     script.
       $(function () {
@@ -280,9 +285,8 @@ html
       "info": true,
       "autoWidth": false
       });
-      $("[data-mask]").inputmask();
-      //Datemask2 mm/dd/yyyy
-      $("#datemask2").inputmask("mm/dd/yyyy", {"placeholder": "mm/dd/yyyy"});
+      //Date picker
+      $('.datepicker').datepicker();
       $('#datePicker').click(function(){
         $date = $('#dateSelected').val();
         $.getJSON('/getOrdersByDate',{

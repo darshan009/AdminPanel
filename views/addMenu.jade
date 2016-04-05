@@ -12,6 +12,8 @@ html
     link(rel='stylesheet', href='https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css')
     // Ionicons
     link(rel='stylesheet', href='https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css')
+    // datepicker
+    link(rel='stylesheet', href='../public/bootstrap/css/datepicker.css')
     // DataTables
     link(rel='stylesheet', href='../public/plugins/datatables/dataTables.bootstrap.css')
     // Theme style
@@ -172,7 +174,7 @@ html
                   .form-group
                     label.col-sm-2.control-label Pick a date
                     .col-sm-10
-                      input.form-control(type='text', name='date' data-inputmask="'alias': 'mm/dd/yyyy'", data-mask='' value=(menu?(menu.date?menu.date:''):''))
+                      input.form-control.datepicker(type='text', name='date' value=(menu?(menu.date?menu.date:''):''))
                   .form-group
                     label.col-sm-2.control-label Meal type
                     .col-sm-10
@@ -228,20 +230,14 @@ html
     // DataTables
     script(src='../public/plugins/datatables/jquery.dataTables.min.js')
     script(src='../public/plugins/datatables/dataTables.bootstrap.min.js')
+    // date-picker
+    script(src='../public/bootstrap/js/bootstrap-datepicker.js')
     // AdminLTE App
     script(src='../public/dist/js/app.min.js')
-    // InputMask
-    script(src='../public/plugins/input-mask/jquery.inputmask.js')
-    script(src='../public/plugins/input-mask/jquery.inputmask.date.extensions.js')
-    script(src='../public/plugins/input-mask/jquery.inputmask.extensions.js')
     // page script
     script.
       $(function () {
       $("#example1").DataTable();
-      //Money Euro
-      //Datemask dd/mm/yyyy
-      $("#datemask2").inputmask("mm/dd/yyyy", {"placeholder": "mm/dd/yyyy"});
-      $("[data-mask]").inputmask();
       $('#example2').DataTable({
       "paging": true,
       "lengthChange": false,
@@ -250,6 +246,8 @@ html
       "info": true,
       "autoWidth": false
       });
+      //Date picker
+      $('.datepicker').datepicker();
       });
       //populate
       $(function(){
