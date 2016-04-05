@@ -177,11 +177,10 @@ html
                           option Dinner
                   table
                     tr
-                      td
-                        button.btn.btn-app#selectedCustomized(type='button' value = 'Classic Indian')
-                          | Classic Indian
-                        button.btn.btn-app#selectedCustomized(type='button' value = 'Indian')
-                          | Indian
+                      each customizableCategories in customizableCategory
+                        td
+                          button.btn.btn-app#selectedCustomized(type='button' data-getButton='c-#{customizableCategories.id}' value = '#{customizableCategories.name}')
+                            | #{customizableCategories.name}
             .col-md-6
               .box.box-info
                 .box-header
@@ -201,7 +200,7 @@ html
                     tr
                       each itemCategory in itemCategories
                         td
-                          button.btn.btn-app#selectedCategory(type='button' value = '#{itemCategory.name}')
+                          button.btn.btn-app#selectedCategory(type='button' data-getButton='n-#{itemCategory._id}' value = '#{itemCategory.name}')
                             | #{itemCategory.name}
           .row
             .box.box-success
@@ -259,6 +258,7 @@ html
       $('button#selectedCategory').click(function(){
         $category = $(this).val();
         $meal = $('#mealSelected').val();
+        $buttonDisablerId = $(this).attr('data-getButton');
         if ( !$('#mealSelected').val() )
           alert("Please Select Lunch or Dinner");
         $.getJSON("/getOrderByCategory", {
@@ -286,7 +286,7 @@ html
             }
           }
           addToTable += '</tbody></table>'
-          $('#example2').attr('data-targetButton', $category);
+          $('#example2').attr('data-targetButton', $buttonDisablerId);
           $('#example2 tbody').html('');
           $('#example2 tbody').append(addToTable);
         })
@@ -294,6 +294,7 @@ html
       //customized
       $('button#selectedCustomized').click(function(){
         $category = $(this).val();
+        $buttonDisablerId = $(this).attr('data-getButton');
         $meal = $('#customizedMealSelected').val();
         if ( !$('#customizedMealSelected').val() )
           alert("Please Select Lunch or Dinner");
@@ -319,7 +320,7 @@ html
           }
         }
         addToTable += '</tbody></table>'
-        $('#example2').attr('data-CustomizedButton', $category);
+        $('#example2').attr('data-CustomizedButton', $buttonDisablerId);
         $('#example2 tbody').html('');
         $('#example2 tbody').append(addToTable);
         $('#example2').DataTable({
@@ -382,7 +383,7 @@ html
         var dataTagetButton = $('#example2').attr('data-targetButton');
         var CustomizedButton = $('#example2').attr('data-CustomizedButton');
         $('#example2 tbody').html('');
-        $(':button[value = '+dataTagetButton+']').attr('disabled', true);
-        $(':button[value = '+CustomizedButton+']').attr('disabled', true);
+        $(':button[data-getButton = '+dataTagetButton+']').attr('disabled', true);
+        $(':button[data-getButton = '+CustomizedButton+']').attr('disabled', true);
       });
       });

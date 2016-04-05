@@ -213,27 +213,24 @@ html
                       label.col-sm-2.control-label Amount in acccount
                       .col-sm-10
                         p #{user.amount}
-                  .form-group
-                    label.col-sm-2.control-label Address
-                    .col-sm-10
-                      if(addressList)
-                        each addressLists in addressList
-                          input.form-control( type = 'hidden' name = 'preaddressId[]' value = '#{addressLists._id._id}')
-                          input.form-control(type='text', id='', name='pretag[]' required='true' placeholder='Add a tag - Home, Office or custom' value=(user?(addressLists._id.tag?addressLists._id.tag:''):''))
-                          input.form-control(type='text', id='', name='preflatNo[]' required='true' placeholder='Building Name and Flat Number' value=(addressLists?(addressLists._id.flatNo?addressLists._id.flatNo:''):''))
-                          input.form-control(type='text', id='', name='prestreetAddress[]' required='true' placeholder='Enter your street Address...' value=(addressLists?(addressLists._id.streetAddress?addressLists._id.streetAddress:''):''))
-                          input.form-control(type='text', id='', name='prelandmark[]' required='true' placeholder='Landmark' value=(user?(addressLists._id.landmark?addressLists._id.landmark:''):''))
-                          input.form-control(type='Number', id='', name='prepincode[]' required='true' placeholder='Pincode' value=(user?(addressLists._id.pincode?addressLists._id.pincode:''):''))
-                          br
-                      else
-                        input.form-control(type='text', id='', name='tag[]' required='true' placeholder='Add a tag - Home, Office or custom')
-                        input.form-control(type='text', id='', name='flatNo[]' required='true' placeholder='Building Name and Flat Number')
-                        input.form-control(type='text', id='', name='streetAddress[]' required='true' placeholder='Enter your street Address...')
-                        input.form-control(type='text', id='', name='landmark[]' required='true' placeholder='Landmark')
-                        input.form-control(type='Number', id='', name='pincode[]' required='true' placeholder='Pincode')
-                        br
-                    #wrapper
-                  button.btn.btn-info.pull-right(onclick='addAddress()', type='button') Add one more address
+                  if(addressList)
+                    .form-group
+                      label.col-sm-2.control-label Address
+                      .col-sm-10
+                        each addressLists, index in addressList
+                          #preAddress(data-removePreId=index)
+                            input.form-control( type = 'hidden' name = 'preaddressId[]' value = '#{addressLists._id._id}')
+                            input.form-control(type='text', id='', name='pretag[]' required='true' placeholder='Add a tag - Home, Office or custom' value=(user?(addressLists._id.tag?addressLists._id.tag:''):''))
+                            input.form-control(type='text', id='', name='preflatNo[]' required='true' placeholder='Building Name and Flat Number' value=(addressLists?(addressLists._id.flatNo?addressLists._id.flatNo:''):''))
+                            input.form-control(type='text', id='', name='prestreetAddress[]' required='true' placeholder='Enter your street Address...' value=(addressLists?(addressLists._id.streetAddress?addressLists._id.streetAddress:''):''))
+                            input.form-control(type='text', id='', name='prelandmark[]' required='true' placeholder='Landmark' value=(user?(addressLists._id.landmark?addressLists._id.landmark:''):''))
+                            input.form-control(type='Number', id='', name='prepincode[]' required='true' placeholder='Pincode' value=(user?(addressLists._id.pincode?addressLists._id.pincode:''):''))
+                            br
+                            .btn-tools.pull-right
+                              button#index.btn.btn-box-tool(type='button' data-count=index onclick='deletePreSelectBox(#{index})')
+                                i.fa.fa-times
+                  #wrapper
+                  button.btn.btn-info.pull-right(onclick='addAddress()', type='button') Add address
                 // /.box-body
                 .box-footer
                   if user
@@ -279,8 +276,15 @@ html
       "autoWidth": false
       });
       });
+      var count = 0;
       function addAddress() {
         var newTextArea = $(document.createElement('div'))
-        newTextArea.after().html('<label class="col-sm-2 control-label">Address</label><div class="col-sm-10"><input type="text" id="" name="tag[]" required="true" placeholder="Home or Office" value="" class="form-control"/><input type="text" id="" name="flatNo[]" required="true" placeholder="Building Name and Flat Number" value="" class="form-control"/><input type="text" id="" name="streetAddress[]" required="true" placeholder="Enter your street Address..." value="" class="form-control"/><input type="text" id="" name="landmark[]" required="true" placeholder="Landmark" value="" class="form-control"/><input type="Number" id="" name="pincode[]" required="true" placeholder="Pincode" value="" class="form-control"/></div>');
+        newTextArea.after().html('<div class = "form-group"><label class="col-sm-2 control-label">Address</label><div class="col-sm-10"><div data-removeId='+count+'><input type="text" id="" name="tag[]" required="true" placeholder="Home or Office" value="" class="form-control"/><input type="text" id="" name="flatNo[]" required="true" placeholder="Building Name and Flat Number" value="" class="form-control"/><input type="text" id="" name="streetAddress[]" required="true" placeholder="Enter your street Address..." value="" class="form-control"/><input type="text" id="" name="landmark[]" required="true" placeholder="Landmark" value="" class="form-control"/><input type="Number" id="" name="pincode[]" required="true" placeholder="Pincode" value="" class="form-control"/></div></div></div>');
         newTextArea.appendTo('#wrapper');
+        count++;
+      }
+      //deleting address
+      function deletePreSelectBox(d){
+        var x = $('[data-removePreId="'+d+'"]');
+        x.remove();
       }

@@ -77,6 +77,25 @@ exports.postAddUser = function(req, res, next){
         var fullAddress = [];
         console.log("-------preaddressId-------");
         console.log(req.body.preaddressId);
+        // removing address ID from user.address if removed
+        var found = false;
+        if (req.body.preaddressId && req.body.preaddressId.length != user.address.length)
+          for (var i=0; i<user.address.length; i++) {
+            for (var j=0; j<req.body.preaddressId.length; j++)
+              if ( user.address[i]._id == req.body.preaddressId[j]) {
+                found = true;
+                break;
+              }
+            if (!found) {
+              var addressId = user.address[i]._id;
+              Address.remove({_id : addressId}, function(err){
+                if (err) return err;
+                console.log("address removed");
+              });
+              user.address.splice(i, 1);
+            }
+            found = false;
+          }
         // for pre added addresses
         if (req.body.preaddressId)
           for (var i=0; i<req.body.preaddressId.length; i++) {
@@ -95,24 +114,6 @@ exports.postAddUser = function(req, res, next){
               console.log(address);
             });
           }
-        // removing address ID from user.address if removed
-        var found = false;
-        for (var i=0; i<user.address.length; i++) {
-          for (var j=0; j<req.body.preaddressId.length; j++)
-            if ( user.address[i]._id == req.body.preaddressId[j]) {
-              found = true;
-              break;
-            }
-          if (!found) {
-            var addressId = user.address[i]._id;
-            Address.remove({_id : addressId}, function(err){
-              if (err) return err;
-              console.log("address removed");
-            });
-            user.address.splice(i, 1);
-          }
-          found = false;
-        }
         // for newly added addresses
         if (req.body.streetAddress)
           for (var i=0; i<req.body.streetAddress.length; i++) {

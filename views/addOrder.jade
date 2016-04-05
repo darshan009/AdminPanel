@@ -172,7 +172,10 @@ html
                   .form-group
                     label.col-sm-2.control-label Pick a date
                     .col-sm-10
-                      input.form-control.datepicker(type='text', id='dateSelected' name='date')
+                      .input-group
+                        .input-group-addon
+                          i.fa.fa-calendar
+                        input.form-control.datepicker(type='text', id='dateSelected' name='date')
                   .form-group
                     label.col-sm-2.control-label Meal type
                     .col-sm-10

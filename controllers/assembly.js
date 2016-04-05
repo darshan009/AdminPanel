@@ -6,8 +6,22 @@ var Menu = require('../models/Menu');
 
 exports.getAssemblyList = function(req, res) {
   ItemCategory.find().exec(function(err, itemCategories) {
-    if (err) return err;
-    res.render('assembly', {itemCategories : itemCategories});
+    Item.find()
+    .populate('category')
+    .exec(function(err, items) {
+      if (err) return err;
+      var customizableCategory = [];
+      for (var i=0; i<items.length; i++)
+        if (items[i].subItems.length > 0)
+          customizableCategory.push({
+            id : items[i].category._id,
+            name : items[i].category.name
+          });
+      res.render('assembly', {
+        itemCategories : itemCategories,
+        customizableCategory : customizableCategory
+      });
+    })
   });
 };
 
