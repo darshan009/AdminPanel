@@ -432,7 +432,8 @@ html
           generatedMenu += '<div data-removeId="'+count+'"><label class="col-sm-2 control-label">Selected</label><div class="col-sm-10"><input type="hidden" data-getPosition='+count+' name="getPosition[]" value="'+check+'"><input type = "hidden" data-customizeOrderId="'+count+'"  name="allMenus[]" value="'+$(this).val()+'"><table class="table table-bordered table-hover"><tbody><td>'+ menuData +'</td>';
           generatedMenu += '<td>Quantity : <input type = "text" class="" name = "singleQuantity[]" value = "1"></td></tbody></table>';
           if (check != 'normal')
-            generatedMenu += '<div class="btn-tools"><div data-customizeDivTag="'+ count +'"></div><button class="btn btn-box-tool pull-left" data-removeBtn='+count+' type="button" onclick="customizeMenu('+count+','+check+')">Customize</button><button class="btn btn-box-tool  pull-right" type="button" onclick="deleteSelectBox('+count+')"><i class="fa fa-times"></i></button></div></div>';
+            generatedMenu += '<div class="btn-tools"><div data-customizeDivTag="'+ count +'"></div><button class="btn btn-box-tool pull-left" data-removeBtn='+count+' type="button" onclick="customizeMenu('+count+','+check+')">Customize</button>';
+          generatedMenu += '<button class="btn btn-box-tool  pull-right" type="button" onclick="deleteSelectBox('+count+')"><i class="fa fa-times"></i></button></div></div>';
           newTextField.after().html(generatedMenu);
           newTextField.appendTo('#selectedMenu');
           console.log(check);

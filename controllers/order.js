@@ -374,17 +374,16 @@ exports.postAddOrder = function(req, res){
               })
               subTotal += req.body.subItemsQuantity[subItemsCounter][k] * req.body.subItemsCost[subItemsCounter][k];
             }
-            //subItems.subTotal = subTotal;
             console.log(subItems);
             order.menu.push({
               _id : allMenus[i],
               subItems : {
                 _id : subItems._id
               },
-              subTotal : subTotal,
+              subTotal : subTotal * req.body.singleQuantity[i],
               singleQuantity : req.body.singleQuantity[i]
             });
-            totalCost += subTotal;
+            totalCost += subTotal * req.body.singleQuantity[i];
             subItems.save(function (err) {
               if (err) return err;
             });
@@ -402,10 +401,10 @@ exports.postAddOrder = function(req, res){
                 name : req.body.attributesName[j],
                 //quantity : req.body.attributesQuantity[j]
               },
-              subTotal : subTotal,
+              subTotal : subTotal * req.body.singleQuantity[i],
               singleQuantity : req.body.singleQuantity[i]
             })
-            totalCost += subTotal;
+            totalCost += subTotal * req.body.singleQuantity[i];
             j++;
           }//this is the non-customized part
           else {

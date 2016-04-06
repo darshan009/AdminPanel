@@ -213,6 +213,7 @@ html
                   thead
                     tr
                       th User
+                      th Address
                       th Meal
                       th Details
                   tbody
@@ -268,21 +269,31 @@ html
         },function(j){
           var newTableField = $(document.createElement('div'))
           var addToTable = '';
-          console.log(j.length)
-          for (var i = 0; i < j.length; i++) {
-            for (var k = 0; k < j[i].menu.length; k++) {
-              addToTable += '<tr><td>'+ j[i].user +'</td><td>'+ j[i].menu[k]._id.item.title +'</td>';
-              if (j[i].menu[k].attributes)
-                addToTable += '<td>'+j[i].menu[k].attributes.quantity+'-'+ j[i].menu[k].attributes.name +'</td></tr>';
-              else if (j[i].menu[k]._id.item.subItems.length > 0){
-                addToTable += '<td>'
-                for (var l = 0; l < j[i].menu[k]._id.item.subItems.length; l++) {
-                  addToTable += ''+ j[i].menu[k]._id.item.subItems[l].quantity+'-'+j[i].menu[k]._id.item.subItems[l].name +',  '+j[i].menu[k]._id.item.subItems[l].container+'-container<br>';
-                }
-                addToTable += '<b>Total Quantity - '+j[i].menu[k].singleQuantity+'</td></tr>';
+          for (var m=0; m<j.length; m++) {
+            console.log(j[m].orderList.length)
+            for (var i = 0; i < j[m].orderList.length; i++) {
+              if (i==0) {
+                addToTable += '<tr><td rowspan='+j[m].menuLength+'>'+ j[m].user +'</td>';
+                addToTable += '<td rowspan='+j[m].menuLength+'>'+ j[m].orderList[i].address._id.tag +',</br>';
+                addToTable += ''+ j[m].orderList[i].address._id.flatNo +',</br>';
+                addToTable += ''+ j[m].orderList[i].address._id.streetAddress +',</br>';
+                addToTable += ''+ j[m].orderList[i].address._id.landmark +',</br>';
+                addToTable += ''+ j[m].orderList[i].address._id.pincode +'</td>';
               }
-              else
-                addToTable += '<td><b>Quantity - '+j[i].menu[k].singleQuantity+'</b></td></tr>';
+              for (var k = 0; k < j[m].orderList[i].menu.length; k++) {
+                addToTable += '<td>'+ j[m].orderList[i].menu[k]._id.item.title +'</td>';
+                if (j[m].orderList[i].menu[k].attributes)
+                  addToTable += '<td>'+j[m].orderList[i].menu[k].attributes.quantity+'-'+ j[m].orderList[i].menu[k].attributes.name +'</td></tr>';
+                else if (j[m].orderList[i].menu[k]._id.item.subItems.length > 0){
+                  addToTable += '<td>'
+                  for (var l = 0; l < j[m].orderList[i].menu[k]._id.item.subItems.length; l++) {
+                    addToTable += ''+ j[m].orderList[i].menu[k]._id.item.subItems[l].quantity+'-'+j[m].orderList[i].menu[k]._id.item.subItems[l].name +',  '+j[m].orderList[i].menu[k]._id.item.subItems[l].container+'-container<br>';
+                  }
+                  addToTable += '<b>Total Quantity - '+j[m].orderList[i].menu[k].singleQuantity+'</td></tr>';
+                }
+                else
+                  addToTable += '<td><b>Quantity - '+j[m].orderList[i].menu[k].singleQuantity+'</b></td></tr>';
+              }
             }
           }
           addToTable += '</tbody></table>'
@@ -306,17 +317,27 @@ html
         var newTableField = $(document.createElement('div'))
         var addToTable = '';
         console.log(j.length);
-        for (var i = 0; i < j.length; i++) {
-          for (var k = 0; k < j[i].menu.length; k++) {
-            addToTable += '<tr><td>'+ j[i].user +'</td><td>'+ j[i].menu[k]._id.item.title +'</td>';
-            if (j[i].menu[k].subItems){
-              addToTable += '<td>'
-              for (var l = 0; l < j[i].menu[k].subItems._id.subItemsArray.length; l++)
-                addToTable += ''+ j[i].menu[k].subItems._id.subItemsArray[l].quantity+'-'+j[i].menu[k].subItems._id.subItemsArray[l].name +',  '+j[i].menu[k].subItems._id.subItemsArray[l].container+'-container<br>';
-              addToTable += '<b>Total Quantity - '+j[i].menu[k].singleQuantity+'</td></tr>';
+        for (var m=0; m<j.length; m++) {
+          for (var i = 0; i < j[m].orderList.length; i++) {
+            if (i==0) {
+              addToTable += '<tr><td rowspan='+j[m].menuLength+'>'+ j[m].user +'</td>';
+              addToTable += '<td rowspan='+j[m].menuLength+'>'+ j[m].orderList[i].address._id.tag +',</br>';
+              addToTable += ''+ j[m].orderList[i].address._id.flatNo +',</br>';
+              addToTable += ''+ j[m].orderList[i].address._id.streetAddress +',</br>';
+              addToTable += ''+ j[m].orderList[i].address._id.landmark +',</br>';
+              addToTable += ''+ j[m].orderList[i].address._id.pincode +'</td>';
             }
-            else
-              addToTable += '</tr>';
+            for (var k = 0; k < j[m].orderList[i].menu.length; k++) {
+              addToTable += '<td>'+ j[m].orderList[i].menu[k]._id.item.title +'</td>';
+              if (j[m].orderList[i].menu[k].subItems){
+                addToTable += '<td>'
+                for (var l = 0; l < j[m].orderList[i].menu[k].subItems._id.subItemsArray.length; l++)
+                  addToTable += ''+ j[m].orderList[i].menu[k].subItems._id.subItemsArray[l].quantity+'-'+j[m].orderList[i].menu[k].subItems._id.subItemsArray[l].name +',  '+j[m].orderList[i].menu[k].subItems._id.subItemsArray[l].container+'-container<br>';
+                addToTable += '<b>Total Quantity - '+j[m].orderList[i].menu[k].singleQuantity+'</td></tr>';
+              }
+              else
+                addToTable += '</tr>';
+            }
           }
         }
         addToTable += '</tbody></table>'

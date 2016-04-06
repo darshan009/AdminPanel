@@ -11,11 +11,10 @@ var secrets = require('./config/secrets');
 var app = express();
 
 //mongoose connection
-mongoose.connect(secrets.mongodburl, function(){
+mongoose.connect(secrets.mongodburl);
+mongoose.connection.on('error', console.error.bind(console, 'connection error'));
+mongoose.connection.once('open', function callback(){
   console.log("Mongoose connected to mongolab");
-});
-mongoose.connection.on('error', function(){
-  console.log("Mongoose connection error");
 });
 
 //views, bodyparser, cookieParser, session
