@@ -261,144 +261,168 @@ html
         $meal = $('#mealSelected').val();
         $buttonDisablerId = $(this).attr('data-getButton');
         if ( !$('#mealSelected').val() )
-          alert("Please Select Lunch or Dinner");
-        $.getJSON("/getOrderByCategory", {
+        alert("Please Select Lunch or Dinner");
+        //get todays date
+        var today = new Date();
+        var dd = today.getDate();
+        var mm = today.getMonth()+1; //January is 0!
+        var yyyy = today.getFullYear();
+        if(dd<10){
+            dd='0'+dd
+        }
+        if(mm<10){
+            mm='0'+mm
+        }
+        var today = dd+'-'+mm+'-'+yyyy;
+        console.log(today);
+        $.getJSON("http://os.foodees.in/Services/Services.svc/Gettodaysorderbycustomer/"+today+','+$meal, {
         category : $category,
         meal : $meal,
         ajax : true
         },function(j){
-          var newTableField = $(document.createElement('div'))
+          //first sorting of all orders by users && category
+          var noncustomizedOrders = j.GettodaysorderbycustomerResult.listnoncustomizeorder;
+          var listOfUsers = [], ordersByCategory = [], sortedOrderList = [];
+          for (var i=0; i<noncustomizedOrders.length; i++) {
+            //get all users in orders
+            if (listOfUsers.indexOf(noncustomizedOrders[i].customerName) < 0)
+              listOfUsers.push(noncustomizedOrders[i].customerName);
+            //get all Orders by selected category
+            if (noncustomizedOrders[i].catName == $category)
+              ordersByCategory.push(noncustomizedOrders[i]);
+          }
+
+          //group all orders by users
+          for (var k=0; k<listOfUsers.length; k++) {
+            sortedOrderList[k] = {
+              user : listOfUsers[i],
+              orderList : []
+            }
+            //push all orders of that user here
+            for (var l=0; l<ordersByCategory.length; l++)
+              if (listOfUsers[k] == ordersByCategory[l].customerName)
+                sortedOrderList[k].orderList.push(ordersByCategory[l])
+            //get orders length for each user
+            sortedOrderList[k].ordersLength = sortedOrderList[k].orderList.length;
+          }
+
+          console.log(sortedOrderList);
+
+
+          //displaying of sortedOrderList
           var addToTable = '';
-          for (var m=0; m<j.length; m++) {
-            console.log(j[m].orderList.length)
-            for (var i = 0; i < j[m].orderList.length; i++) {
-              if (i==0) {
-                addToTable += '<tr><td rowspan='+j[m].menuLength+'>'+ j[m].user +'</td>';
-                addToTable += '<td rowspan='+j[m].menuLength+'>'+ j[m].orderList[i].address._id.tag +',</br>';
-                addToTable += ''+ j[m].orderList[i].address._id.flatNo +',</br>';
-                addToTable += ''+ j[m].orderList[i].address._id.streetAddress +',</br>';
-                addToTable += ''+ j[m].orderList[i].address._id.landmark +',</br>';
-                addToTable += ''+ j[m].orderList[i].address._id.pincode +'</td>';
+          for (var m=0; m<sortedOrderList.length; m++) {
+            for (var i = 0; i < sortedOrderList[m].orderList.length; i++) {
+              if (i == 0) {
+                addToTable += '<tr><td rowspan='+sortedOrderList[m].orderList.length+'>'+ sortedOrderList[m].user +'</td>';
+                var formattedString = sortedOrderList[m].orderList[0].custaddress.split(",").join(",<br />");
+                addToTable += '<td rowspan='+sortedOrderList[m].orderList.length+'>'+ formattedString +'</td>';
               }
-              for (var k = 0; k < j[m].orderList[i].menu.length; k++) {
-                addToTable += '<td>'+ j[m].orderList[i].menu[k]._id.item.title +'</td>';
-                if (j[m].orderList[i].menu[k].attributes)
-                  addToTable += '<td>'+j[m].orderList[i].menu[k].attributes.quantity+'-'+ j[m].orderList[i].menu[k].attributes.name +'</td></tr>';
-                else if (j[m].orderList[i].menu[k]._id.item.subItems.length > 0){
-                  addToTable += '<td>'
-                  for (var l = 0; l < j[m].orderList[i].menu[k]._id.item.subItems.length; l++) {
-                    addToTable += ''+ j[m].orderList[i].menu[k]._id.item.subItems[l].quantity+'-'+j[m].orderList[i].menu[k]._id.item.subItems[l].name +',  '+j[m].orderList[i].menu[k]._id.item.subItems[l].container+'-container<br>';
-                  }
-                  addToTable += '<b>Total Quantity - '+j[m].orderList[i].menu[k].singleQuantity+'</td></tr>';
-                }
-                else
-                  addToTable += '<td><b>Quantity - '+j[m].orderList[i].menu[k].singleQuantity+'</b></td></tr>';
+              addToTable += '<td>'+ sortedOrderList[m].orderList[i].Meal_Name +'</td>';
+              addToTable += '<td>'
+              if (sortedOrderList[m].orderList[i].subdetails) {
+                var formattedString = sortedOrderList[m].orderList[i].subdetails.split(",").join(",<br />");
+                addToTable += ''+ formattedString+',<br>';
               }
+              addToTable += '<b>Container-'+sortedOrderList[m].orderList[i].containertype+'</b><br>';
+              addToTable += '<b>Total Quantity - '+sortedOrderList[m].orderList[i].qty+'</td></tr>';
+              addToTable += '</td></tr>';
             }
           }
           addToTable += '</tbody></table>'
-          $('#example2').attr('data-targetButton', $buttonDisablerId);
+          $('#example2').attr('data-CustomizedButton', $buttonDisablerId);
           $('#example2 tbody').html('');
           $('#example2 tbody').append(addToTable);
+          $('#example2').DataTable({
+          "paging": true,
+          "lengthChange": false,
+          "searching": false,
+          "ordering": true,
+          "info": true,
+          "autoWidth": false
+          });
         })
       });
-      //customized
+      //server request for customized
       $('button#selectedCustomized').click(function(){
         $category = $(this).val();
         $buttonDisablerId = $(this).attr('data-getButton');
         $meal = $('#customizedMealSelected').val();
         if ( !$('#customizedMealSelected').val() )
           alert("Please Select Lunch or Dinner");
-        $.getJSON("/getCustomizedOrderByCategory", {
-        category : $category,
-        meal : $meal,
-        ajax : true
+        //get todays date
+        var today = new Date();
+        var dd = today.getDate();
+        var mm = today.getMonth()+1; //January is 0!
+        var yyyy = today.getFullYear();
+        if(dd<10){
+            dd='0'+dd
+        }
+        if(mm<10){
+            mm='0'+mm
+        }
+        var today = dd+'-'+mm+'-'+yyyy;
+        console.log(today);
+        $.getJSON("http://os.foodees.in/Services/Services.svc/Gettodaysorderbycustomer/"+today+','+$meal, {
         },function(j){
-        var newTableField = $(document.createElement('div'))
-        var addToTable = '';
-        console.log(j.length);
-        for (var m=0; m<j.length; m++) {
-          for (var i = 0; i < j[m].orderList.length; i++) {
-            if (i==0) {
-              addToTable += '<tr><td rowspan='+j[m].menuLength+'>'+ j[m].user +'</td>';
-              addToTable += '<td rowspan='+j[m].menuLength+'>'+ j[m].orderList[i].address._id.tag +',</br>';
-              addToTable += ''+ j[m].orderList[i].address._id.flatNo +',</br>';
-              addToTable += ''+ j[m].orderList[i].address._id.streetAddress +',</br>';
-              addToTable += ''+ j[m].orderList[i].address._id.landmark +',</br>';
-              addToTable += ''+ j[m].orderList[i].address._id.pincode +'</td>';
+          var customizedOrders = j.GettodaysorderbycustomerResult.listcustomizeorder;
+          var listOfUsers = [], ordersByCategory = [], sortedOrderList = [];
+          for (var i=0; i<customizedOrders.length; i++) {
+            //get all users in orders
+            if (listOfUsers.indexOf(customizedOrders[i].customerName) < 0)
+              listOfUsers.push(customizedOrders[i].customerName);
+            //get all Orders by selected category
+            if (customizedOrders[i].catName == $category)
+              ordersByCategory.push(customizedOrders[i]);
+          }
+
+          //group all orders by users
+          for (var k=0; k<listOfUsers.length; k++) {
+            sortedOrderList[k] = {
+              user : listOfUsers[k],
+              orderList : []
             }
-            for (var k = 0; k < j[m].orderList[i].menu.length; k++) {
-              addToTable += '<td>'+ j[m].orderList[i].menu[k]._id.item.title +'</td>';
-              if (j[m].orderList[i].menu[k].subItems){
+            //push all orders of that user here
+            for (var l=0; l<ordersByCategory.length; l++)
+              if (listOfUsers[k] == ordersByCategory[l].customerName)
+                sortedOrderList[k].orderList.push(ordersByCategory[l])
+            //get orders length for each user
+            sortedOrderList[k].ordersLength = sortedOrderList[k].orderList.length;
+          }
+
+          //displaying of sortedOrderList
+          var addToTable = '';
+          for (var m=0; m<sortedOrderList.length; m++) {
+            for (var i = 0; i < sortedOrderList[m].orderList.length; i++) {
+              if (i == 0) {
+                addToTable += '<tr><td rowspan='+sortedOrderList[m].orderList.length+'>'+ sortedOrderList[m].user +'</td>';
+                var formattedString = sortedOrderList[m].orderList[0].custaddress.split(",").join(",<br />");
+                addToTable += '<td rowspan='+sortedOrderList[m].orderList.length+'>'+ formattedString +'</td>';
+              }
+              addToTable += '<td>'+ sortedOrderList[m].orderList[i].Meal_Name +'</td>';
+              if (sortedOrderList[m].orderList[i].subdetails) {
                 addToTable += '<td>'
-                for (var l = 0; l < j[m].orderList[i].menu[k].subItems._id.subItemsArray.length; l++)
-                  addToTable += ''+ j[m].orderList[i].menu[k].subItems._id.subItemsArray[l].quantity+'-'+j[m].orderList[i].menu[k].subItems._id.subItemsArray[l].name +',  '+j[m].orderList[i].menu[k].subItems._id.subItemsArray[l].container+'-container<br>';
-                addToTable += '<b>Total Quantity - '+j[m].orderList[i].menu[k].singleQuantity+'</td></tr>';
+                var formattedString = sortedOrderList[m].orderList[i].subdetails.split(",").join(",<br />");
+                addToTable += ''+ formattedString+',<br><b>Container-'+sortedOrderList[m].orderList[i].containertype+'</b><br>';
+                addToTable += '<b>Total Quantity - '+sortedOrderList[m].orderList[i].qty+'</td></tr>';
               }
               else
                 addToTable += '</tr>';
             }
           }
-        }
-        addToTable += '</tbody></table>'
-        $('#example2').attr('data-CustomizedButton', $buttonDisablerId);
-        $('#example2 tbody').html('');
-        $('#example2 tbody').append(addToTable);
-        $('#example2').DataTable({
-        "paging": true,
-        "lengthChange": false,
-        "searching": false,
-        "ordering": true,
-        "info": true,
-        "autoWidth": false
+          addToTable += '</tbody></table>'
+          $('#example2').attr('data-CustomizedButton', $buttonDisablerId);
+          $('#example2 tbody').html('');
+          $('#example2 tbody').append(addToTable);
+          $('#example2').DataTable({
+          "paging": true,
+          "lengthChange": false,
+          "searching": false,
+          "ordering": true,
+          "info": true,
+          "autoWidth": false
+          });
         });
-        })
-      });
-      $('button#disabler').click(function(){
-        var dataTagetButton = $('#example2').attr('data-targetButton');
-        var CustomizedButton = $('#example2').attr('data-CustomizedButton');
-        $('#example2 tbody').html('');
-        $(':button[value = '+dataTagetButton+']').attr('disabled', true);
-        $(':button[value = '+CustomizedButton+']').attr('disabled', true);
-      });
-      //server request
-      $('button#select').click(function(){
-        $category = $(this).val();
-        $meal = $('#customizedMealSelected').val();
-        if ( !$('#customizedMealSelected').val() )
-          alert("Please Select Lunch or Dinner");
-        $.getJSON("http://os.foodees.in/Services/Services.svc/Gettodaysorderbycustomer/"+'04-04-2016'+','+$meal, {
-        },function(j){
-        console.log(j);
-        var newTableField = $(document.createElement('div'))
-        var addToTable = '';
-        console.log(j.length);
-        for (var i = 0; i < j.length; i++) {
-          for (var k = 0; k < j[i].menu.length; k++) {
-            addToTable += '<tr><td>'+ j[i].user +'</td><td>'+ j[i].menu[k]._id.item.title +'</td>';
-            if (j[i].menu[k].subItems){
-              addToTable += '<td>'
-              for (var l = 0; l < j[i].menu[k].subItems._id.subItemsArray.length; l++)
-                addToTable += ''+ j[i].menu[k].subItems._id.subItemsArray[l].quantity+'-'+j[i].menu[k].subItems._id.subItemsArray[l].name +',  '+j[i].menu[k].subItems._id.subItemsArray[l].container+'-container<br>';
-              addToTable += ' </td></tr>';
-            }
-            else
-              addToTable += '</tr>';
-          }
-        }
-        addToTable += '</tbody></table>'
-        $('#example2').attr('data-CustomizedButton', $category);
-        $('#example2 tbody').html('');
-        $('#example2 tbody').append(addToTable);
-        $('#example2').DataTable({
-        "paging": true,
-        "lengthChange": false,
-        "searching": false,
-        "ordering": true,
-        "info": true,
-        "autoWidth": false
-        });
-        })
       });
       $('button#disabler').click(function(){
         var dataTagetButton = $('#example2').attr('data-targetButton');
