@@ -90,7 +90,7 @@ app.get('/addOrder/delete/:id/:userEmail', userController.isAdmin, orderControll
 //datePickedOrderList
 app.get('/getOrdersByDate', orderController.getOrdersByDate);
 //assembly
-app.get('/assembly', userController.isAdmin, assemblyController.getAssemblyList);
+app.get('/assembly', assemblyController.getAssemblyList);
 app.get('/getOrderByCategory', assemblyController.getOrderByCategory);
 app.get('/getCustomizedOrderByCategory', assemblyController.getCustomizedOrderByCategory)
 //populate menu in add order

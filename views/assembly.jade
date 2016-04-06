@@ -80,76 +80,77 @@ html
           // sidebar menu: : style can be found in sidebar.less
           ul.sidebar-menu
             li.header MAIN NAVIGATION
-            li
-              a(href='#')
-                i.fa.fa-table
-                span User
-                i.fa.fa-angle-left.pull-right
-              ul.treeview-menu
-                li
-                  a(href='/userList')
-                    i.fa.fa-circle-o
-                    |  List of Users
-                li
-                  a(href='/addUser')
-                    i.fa.fa-circle-o
-                    |  Add a User
-            li
-              a(href='/item')
-                i.fa.fa-calendar
-                span Item
-                i.fa.fa-angle-left.pull-right
-              ul.treeview-menu
-                li
-                  a(href='/itemList')
-                    i.fa.fa-circle-o
-                    |  List of Items
-                li
-                  a(href='/addItem')
-                    i.fa.fa-circle-o
-                    |  Add an Item
-            li
-              a(href='#')
-                i.fa.fa-envelope
-                span ItemCategory
-                i.fa.fa-angle-left.pull-right
-              ul.treeview-menu
-                li
-                  a(href='/categoryList')
-                    i.fa.fa-circle-o
-                    |  List of Categories
-                li
-                  a(href='/addCategory')
-                    i.fa.fa-circle-o
-                    |  Add a category
-            li.treeview
-              a(href='#')
-                i.fa.fa-folder
-                span Menu
-                i.fa.fa-angle-left.pull-right
-              ul.treeview-menu
-                li
-                  a(href='/menuList')
-                    i.fa.fa-circle-o
-                    |  List of Menu
-                li
-                  a(href='/addMenu')
-                    i.fa.fa-circle-o
-                    |  Add a Menu
-            li
-              a(href='/order')
-                i.fa.fa-share
-                span Order
-                i.fa.fa-angle-left.pull-right
-              ul.treeview-menu
-                li.active
-                  a(href='/orderList')
-                    i.fa.fa-circle-o
-                    |  List of Orders
-                li
-                  a(href='/addOrder')
-                    i.fa.fa-circle-o
-                    |  Place an Order
+            if (currentUser.type != 'Chef')
+              li
+                a(href='#')
+                  i.fa.fa-table
+                  span User
+                  i.fa.fa-angle-left.pull-right
+                ul.treeview-menu
+                  li
+                    a(href='/userList')
+                      i.fa.fa-circle-o
+                      |  List of Users
+                  li
+                    a(href='/addUser')
+                      i.fa.fa-circle-o
+                      |  Add a User
+              li
+                a(href='/item')
+                  i.fa.fa-calendar
+                  span Item
+                  i.fa.fa-angle-left.pull-right
+                ul.treeview-menu
+                  li
+                    a(href='/itemList')
+                      i.fa.fa-circle-o
+                      |  List of Items
+                  li
+                    a(href='/addItem')
+                      i.fa.fa-circle-o
+                      |  Add an Item
+              li
+                a(href='#')
+                  i.fa.fa-envelope
+                  span ItemCategory
+                  i.fa.fa-angle-left.pull-right
+                ul.treeview-menu
+                  li
+                    a(href='/categoryList')
+                      i.fa.fa-circle-o
+                      |  List of Categories
+                  li
+                    a(href='/addCategory')
+                      i.fa.fa-circle-o
+                      |  Add a category
+              li.treeview
+                a(href='#')
+                  i.fa.fa-folder
+                  span Menu
+                  i.fa.fa-angle-left.pull-right
+                ul.treeview-menu
+                  li
+                    a(href='/menuList')
+                      i.fa.fa-circle-o
+                      |  List of Menu
+                  li
+                    a(href='/addMenu')
+                      i.fa.fa-circle-o
+                      |  Add a Menu
+              li
+                a(href='/order')
+                  i.fa.fa-share
+                  span Order
+                  i.fa.fa-angle-left.pull-right
+                ul.treeview-menu
+                  li.active
+                    a(href='/orderList')
+                      i.fa.fa-circle-o
+                      |  List of Orders
+                  li
+                    a(href='/addOrder')
+                      i.fa.fa-circle-o
+                      |  Place an Order
             li.active
               a(href='/assembly')
                 i.fa.fa-pie-chart
@@ -206,7 +207,7 @@ html
             .box.box-success
               .box-header
                 h3.box-title Order List
-                button.btn.btn-info.pull-right#disabler(type = 'button') Done
+                button.btn.btn-info.pull-right#disabler(type = 'button') Assembled
               // /.box-header
               .box-body#displaySection
                 table#example2.table.table-bordered.table-hover
@@ -285,8 +286,8 @@ html
           var listOfUsers = [], ordersByCategory = [], sortedOrderList = [];
           for (var i=0; i<noncustomizedOrders.length; i++) {
             //get all users in orders
-            if (listOfUsers.indexOf(noncustomizedOrders[i].customerName) < 0)
-              listOfUsers.push(noncustomizedOrders[i].customerName);
+            if (listOfUsers.indexOf(noncustomizedOrders[i].custaddress) < 0)
+              listOfUsers.push(noncustomizedOrders[i].custaddress);
             //get all Orders by selected category
             if (noncustomizedOrders[i].catName == $category)
               ordersByCategory.push(noncustomizedOrders[i]);
@@ -295,26 +296,25 @@ html
           //group all orders by users
           for (var k=0; k<listOfUsers.length; k++) {
             sortedOrderList[k] = {
-              user : listOfUsers[i],
+              user : listOfUsers[k],
               orderList : []
             }
             //push all orders of that user here
             for (var l=0; l<ordersByCategory.length; l++)
-              if (listOfUsers[k] == ordersByCategory[l].customerName)
+              if (listOfUsers[k] == ordersByCategory[l].custaddress)
                 sortedOrderList[k].orderList.push(ordersByCategory[l])
             //get orders length for each user
             sortedOrderList[k].ordersLength = sortedOrderList[k].orderList.length;
           }
 
-          console.log(sortedOrderList);
-
+          console.log(listOfUsers.length);
 
           //displaying of sortedOrderList
           var addToTable = '';
           for (var m=0; m<sortedOrderList.length; m++) {
             for (var i = 0; i < sortedOrderList[m].orderList.length; i++) {
               if (i == 0) {
-                addToTable += '<tr><td rowspan='+sortedOrderList[m].orderList.length+'>'+ sortedOrderList[m].user +'</td>';
+                addToTable += '<tr><td rowspan='+sortedOrderList[m].orderList.length+'>'+ sortedOrderList[m].orderList[0].customerName +'</td>';
                 var formattedString = sortedOrderList[m].orderList[0].custaddress.split(",").join(",<br />");
                 addToTable += '<td rowspan='+sortedOrderList[m].orderList.length+'>'+ formattedString +'</td>';
               }
@@ -326,6 +326,8 @@ html
               }
               addToTable += '<b>Container-'+sortedOrderList[m].orderList[i].containertype+'</b><br>';
               addToTable += '<b>Total Quantity - '+sortedOrderList[m].orderList[i].qty+'</td></tr>';
+              if (sortedOrderList[m].orderList[i].specialinstruction)
+                addToTable += '<b> Speacial Instruction - '+sortedOrderList[m].orderList[i].specialinstruction+'';
               addToTable += '</td></tr>';
             }
           }
@@ -369,8 +371,8 @@ html
           var listOfUsers = [], ordersByCategory = [], sortedOrderList = [];
           for (var i=0; i<customizedOrders.length; i++) {
             //get all users in orders
-            if (listOfUsers.indexOf(customizedOrders[i].customerName) < 0)
-              listOfUsers.push(customizedOrders[i].customerName);
+            if (listOfUsers.indexOf(customizedOrders[i].custaddress) < 0)
+              listOfUsers.push(customizedOrders[i].custaddress);
             //get all Orders by selected category
             if (customizedOrders[i].catName == $category)
               ordersByCategory.push(customizedOrders[i]);
@@ -384,7 +386,7 @@ html
             }
             //push all orders of that user here
             for (var l=0; l<ordersByCategory.length; l++)
-              if (listOfUsers[k] == ordersByCategory[l].customerName)
+              if (listOfUsers[k] == ordersByCategory[l].custaddress)
                 sortedOrderList[k].orderList.push(ordersByCategory[l])
             //get orders length for each user
             sortedOrderList[k].ordersLength = sortedOrderList[k].orderList.length;
@@ -395,7 +397,7 @@ html
           for (var m=0; m<sortedOrderList.length; m++) {
             for (var i = 0; i < sortedOrderList[m].orderList.length; i++) {
               if (i == 0) {
-                addToTable += '<tr><td rowspan='+sortedOrderList[m].orderList.length+'>'+ sortedOrderList[m].user +'</td>';
+                addToTable += '<tr><td rowspan='+sortedOrderList[m].orderList.length+'>'+ sortedOrderList[m].orderList[0].customerName +'</td>';
                 var formattedString = sortedOrderList[m].orderList[0].custaddress.split(",").join(",<br />");
                 addToTable += '<td rowspan='+sortedOrderList[m].orderList.length+'>'+ formattedString +'</td>';
               }

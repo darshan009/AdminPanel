@@ -7,10 +7,15 @@ exports.isAdmin = function(req, res, next){
   if(req.user){
     if((req.user.type).toLowerCase() == "admin")
       next();
+    else if ((req.user.type).toLowerCase() == "chef") {
+      if (req.originalUrl == '/assembly')
+        next();
+      res.redirect('/assembly');
+    }
     else res.end("Your not authorized");
   }
-  else
-    res.redirect('/');
+  //else
+    //res.redirect('/');
 };
 //login logout signup
 exports.getLogin = function(req, res, next){
