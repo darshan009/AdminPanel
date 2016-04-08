@@ -155,7 +155,17 @@ html
             li
               a(href='/assembly')
                 i.fa.fa-pie-chart
-                | Assembly
+                span Assembly
+                i.fa.fa-angle-left.pull-right
+              ul.treeview-menu
+                li
+                  a(href='/orderList')
+                    i.fa.fa-circle-o
+                    |  Single orders
+                li.active
+                  a(href='/addOrder')
+                    i.fa.fa-circle-o
+                    |  Mixed Orders
         // /.sidebar
       // Content Wrapper. Contains page content
       .content-wrapper

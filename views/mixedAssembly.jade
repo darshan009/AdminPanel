@@ -157,14 +157,14 @@ html
                   span Assembly
                   i.fa.fa-angle-left.pull-right
                 ul.treeview-menu
-                  li.active
+                  li
                     a(href='/assembly')
                       i.fa.fa-circle-o
                       |  Single orders
-                  li
+                  li.active
                     a(href='/mixedAssembly')
                       i.fa.fa-circle-o
-                      |  Mixed Orders
+                      |  Single orders with Extra
                   li
                     a(href='/multipleAssembly')
                       i.fa.fa-circle-o
@@ -189,15 +189,7 @@ html
                         option(selected='selected')
                         option Lunch
                         option Dinner
-                  .form-group
-                    label.col-sm-2.control-label Select Category
-                    .col-sm-6
-                      table
-                        tr
-                          each itemCategory in itemCategories
-                            td
-                              button.btn.btn-app#selectedCategory(type='button' data-getButton='n-#{itemCategory._id}' value = '#{itemCategory.name}')
-                                | #{itemCategory.name}
+                    button.btn.btn-info(type= 'button' id='displayMixed') Display today's Mixed Orders
           .row#displaySection
               // /.box-body
             // /.box
@@ -229,10 +221,8 @@ html
     script.
       $(function () {
       //non-customized
-      $('button#selectedCategory').click(function(){
-        $category = $(this).val();
+      $('button#displayMixed').click(function(){
         $meal = $('#mealSelected').val();
-        $buttonDisablerId = $(this).attr('data-getButton');
         if ( !$('#mealSelected').val() )
         alert("Please Select Lunch or Dinner");
         //get todays date
@@ -249,9 +239,6 @@ html
         var today = dd+'-'+mm+'-'+yyyy;
         console.log(today);
         $.getJSON("http://os.foodees.in/Services/Services.svc/Gettodaysorderbycustomer/"+'07-04-2016'+','+$meal, {
-        category : $category,
-        meal : $meal,
-        ajax : true
         },function(j){
           //get all orders
           var allOrders = [], listOfOrdersByAddress = [];
@@ -280,21 +267,31 @@ html
             listOfOrdersByAddress[k].orderCount = 0;
             for (var l=0; l<allOrders.length; l++) {
               if (listOfOrdersByAddress[k].address == allOrders[l].custaddress) {
+                listOfOrdersByAddress[k].orderList.push(allOrders[l]);
                 listOfOrdersByAddress[k].orderCount++;
-                //get all Orders by selected category & per address
-                if (allOrders[l].catName == $category)
-                  listOfOrdersByAddress[k].orderList.push(allOrders[l]);
               }
             }
           }
 
-          console.log(listOfOrdersByAddress);
-
-          //displaying of listOfOrdersByAddress
-          var addToTable = '<div class="box box-success"><div class="box-header"><h3 class="box-title">Order List - <b>'+$category+'</b></h3></div><!-- /.box-header--><div id="displaySection" class="box-body"><table id="example2" class="table table-bordered table-hover"><thead><tr><th>User</th><th>Address</th><th>Meal</th><th>Details</th></tr></thead><tbody>';
+          //console.log(listOfOrdersByAddress);
+          //find if mixed
           for (var m=0; m<listOfOrdersByAddress.length; m++) {
+            var extrasCount = 1;
             for (var i = 0; i < listOfOrdersByAddress[m].orderList.length; i++) {
-              if (listOfOrdersByAddress[m].orderCount == 1) {
+              if ((listOfOrdersByAddress[m].orderList[i].catName).toLowerCase() == 'extras') {
+                extrasCount++;
+                if (extrasCount == listOfOrdersByAddress[m].orderList.length)
+                  listOfOrdersByAddress[m].mixed = true;
+              }
+            }
+          }
+          console.log(listOfOrdersByAddress);
+          //displaying of listOfOrdersByAddress
+          var addToTable = '<div class="box box-success"><div class="box-header"><h3 class="box-title">Mixed Order List</h3></div><!-- /.box-header--><div id="displaySection" class="box-body"><table id="example2" class="table table-bordered table-hover"><thead><tr><th>User</th><th>Address</th><th>Meal</th><th>Details</th></tr></thead><tbody>';
+          for (var m=0; m<listOfOrdersByAddress.length; m++) {
+            console.log(listOfOrdersByAddress[m].mixed);
+            for (var i = 0; i < listOfOrdersByAddress[m].orderList.length; i++) {
+              if (listOfOrdersByAddress[m].mixed) {
                 if (i == 0) {
                   addToTable += '<tr><td rowspan='+listOfOrdersByAddress[m].orderList.length+'>'+ listOfOrdersByAddress[m].orderList[0].customerName +'</td>';
                   var formattedString = listOfOrdersByAddress[m].address.split(",").join(",<br />");
@@ -318,7 +315,6 @@ html
           }
           addToTable += '</tbody></table><br /><button id="" type="button" class="btn btn-info pull-left" onclick = "printDiv()">Print</button><button id="" type="button" class="btn btn-info pull-right">Next</button></div></div>';
           //console.log(addToTable)
-          $('#displaySection').attr('data-CustomizedButton', $buttonDisablerId);
           $('#displaySection').html('');
           $('#displaySection').append(addToTable);
           $('#example2').DataTable({
@@ -331,7 +327,6 @@ html
           });
         })
       });
-
 
 
         $('button#disabler').click(function(){

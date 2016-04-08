@@ -9,22 +9,30 @@ exports.getAssemblyList = function(req, res) {
     Item.find()
     .populate('category')
     .exec(function(err, items) {
-      if (err) return err;
-      var customizableCategory = [];
-      for (var i=0; i<items.length; i++)
-        if (items[i].subItems.length > 0)
-          customizableCategory.push({
-            id : items[i].category._id,
-            name : items[i].category.name
-          });
+      if (err) return next(err);
       res.render('assembly', {
-        itemCategories : itemCategories,
-        customizableCategory : customizableCategory
+        itemCategories : itemCategories
       });
     })
   });
 };
 
+exports.getMixedAssemblyList = function(req, res, next) {
+  ItemCategory.find().exec(function(err, itemCategories) {
+    Item.find()
+    .populate('category')
+    .exec(function(err, items) {
+      if (err) return next(err);
+      res.render('mixedAssembly', {
+        itemCategories : itemCategories
+      });
+    })
+  });
+};
+
+exports.getMultipleAssemblyList = function(req, res, next) {
+  res.render('multipleAssembly');
+};
 exports.getOrderByCategory = function(req, res) {
   var queryCategory = req.query.category;
   var mealSelected = req.query.meal;
