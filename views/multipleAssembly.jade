@@ -220,113 +220,189 @@ html
     // page script
     script.
       $(function () {
-      //non-customized
-      $('button#displayMixed').click(function(){
-        $meal = $('#mealSelected').val();
-        if ( !$('#mealSelected').val() )
-        alert("Please Select Lunch or Dinner");
-        //get todays date
-        var today = new Date();
-        var dd = today.getDate();
-        var mm = today.getMonth()+1; //January is 0!
-        var yyyy = today.getFullYear();
-        if(dd<10){
-            dd='0'+dd
-        }
-        if(mm<10){
-            mm='0'+mm
-        }
-        var today = dd+'-'+mm+'-'+yyyy;
-        console.log(today);
-        $.getJSON("http://os.foodees.in/Services/Services.svc/Gettodaysorderbycustomer/"+'07-04-2016'+','+$meal, {
-        },function(j){
-          //get all orders
-          var allOrders = [], listOfOrdersByAddress = [];
-          allOrders = allOrders.concat(j.GettodaysorderbycustomerResult.listnoncustomizeorder);
-          allOrders = allOrders.concat(j.GettodaysorderbycustomerResult.listcustomizeorder);
-          var listOfOrdersByAddressCounter = 0, listOfAddresses = [];
-          console.log(allOrders.length)
-          //sort all orders
-          for (var i=0; i<allOrders.length; i++) {
-            //get all unique addresses
-            if (listOfAddresses.indexOf(allOrders[i].custaddress) < 0) {
-              listOfOrdersByAddress[listOfOrdersByAddressCounter] = {
-                address : allOrders[i].custaddress
-              };
-              listOfAddresses.push(allOrders[i].custaddress);
-              listOfOrdersByAddressCounter++;
-            }
+        //non-customized
+        $('button#displayMixed').click(function(){
+          $meal = $('#mealSelected').val();
+          if ( !$('#mealSelected').val() )
+          alert("Please Select Lunch or Dinner");
+          //get todays date
+          var today = new Date();
+          var dd = today.getDate();
+          var mm = today.getMonth()+1; //January is 0!
+          var yyyy = today.getFullYear();
+          if(dd<10){
+              dd='0'+dd
           }
-          console.log(listOfOrdersByAddress.length);
-          /*
-          *----- get orders by each user
-          *----- sort by mealType && category
-          */
-          for (var k=0; k<listOfOrdersByAddress.length; k++) {
-            listOfOrdersByAddress[k].orderList = [];
-            listOfOrdersByAddress[k].orderCount = 0;
-            for (var l=0; l<allOrders.length; l++) {
-              if (listOfOrdersByAddress[k].address == allOrders[l].custaddress) {
-                listOfOrdersByAddress[k].orderList.push(allOrders[l]);
-                listOfOrdersByAddress[k].orderCount++;
+          if(mm<10){
+              mm='0'+mm
+          }
+          var today = dd+'-'+mm+'-'+yyyy;
+          console.log(today);
+          $.getJSON("http://os.foodees.in/Services/Services.svc/Gettodaysorderbycustomer/"+'06-04-2016'+','+$meal, {
+          },function(j){
+            //get all orders
+            var allOrders = [], listOfOrdersByAddress = [], sortedMixedOrders = [];
+            allOrders = allOrders.concat(j.GettodaysorderbycustomerResult.listnoncustomizeorder);
+            allOrders = allOrders.concat(j.GettodaysorderbycustomerResult.listcustomizeorder);
+            var listOfOrdersByAddressCounter = 0, listOfAddresses = [];
+            console.log(allOrders.length)
+            //sort all orders
+            for (var i=0; i<allOrders.length; i++) {
+              //get all unique addresses
+              if (listOfAddresses.indexOf(allOrders[i].custaddress) < 0) {
+                listOfOrdersByAddress[listOfOrdersByAddressCounter] = {
+                  address : allOrders[i].custaddress
+                };
+                listOfAddresses.push(allOrders[i].custaddress);
+                listOfOrdersByAddressCounter++;
               }
             }
-          }
+            console.log(listOfOrdersByAddress.length);
+            /*
+            *----- get orders by each user
+            *----- sort by mealType && category
+            */
+            for (var k=0; k<listOfOrdersByAddress.length; k++) {
+              listOfOrdersByAddress[k].orderList = [];
+              listOfOrdersByAddress[k].orderCount = 0;
+              for (var l=0; l<allOrders.length; l++) {
+                if (listOfOrdersByAddress[k].address == allOrders[l].custaddress) {
+                  listOfOrdersByAddress[k].orderList.push(allOrders[l]);
+                  listOfOrdersByAddress[k].orderCount++;
+                }
+              }
+            }
 
-          //console.log(listOfOrdersByAddress);
-          //find if mixed
-          for (var m=0; m<listOfOrdersByAddress.length; m++) {
-            var extrasCount = 1;
-            for (var i = 0; i < listOfOrdersByAddress[m].orderList.length; i++) {
-              if ((listOfOrdersByAddress[m].orderList[i].catName).toLowerCase() == 'extras') {
-                extrasCount++;
-                if (extrasCount == listOfOrdersByAddress[m].orderList.length)
-                  listOfOrdersByAddress[m].mixed = true;
+            //console.log(listOfOrdersByAddress);
+            //find if mixed
+            for (var m=0; m<listOfOrdersByAddress.length; m++) {
+              var extrasCount = 1;
+              for (var i = 0; i < listOfOrdersByAddress[m].orderList.length; i++) {
+                if ((listOfOrdersByAddress[m].orderList[i].catName).toLowerCase() == 'extras') {
+                  extrasCount++;
+                  if (extrasCount == listOfOrdersByAddress[m].orderList.length)
+                    listOfOrdersByAddress[m].mixed = true;
+                }
               }
             }
-          }
-          //displaying of listOfOrdersByAddress
-          var addToTable = '<div class="box box-success"><div class="box-header"><h3 class="box-title">Mixed Order List</h3></div><!-- /.box-header--><div id="displaySection" class="box-body"><table id="example2" class="table table-bordered table-hover"><thead><tr><th>User</th><th>Address</th><th>Meal</th><th>Details</th></tr></thead><tbody>';
-          for (var m=0; m<listOfOrdersByAddress.length; m++) {
-            //console.log(m);
-            for (var i = 0; i < listOfOrdersByAddress[m].orderList.length; i++) {
-              if (listOfOrdersByAddress[m].orderList.length > 1 && !listOfOrdersByAddress[m].mixed) {
-                console.log(i);
-                if (i == 0) {
-                  addToTable += '<tr><td rowspan='+listOfOrdersByAddress[m].orderList.length+'>'+ listOfOrdersByAddress[m].orderList[0].customerName +'</td>';
-                  var formattedString = listOfOrdersByAddress[m].address.split(",").join(",<br />");
-                  addToTable += '<td rowspan='+listOfOrdersByAddress[m].orderList.length+'>'+ formattedString +'</td>';
+            
+            //sort listOfOrdersByAddress by similar orders
+            var positions = [];
+            for (var a=0; a<listOfOrdersByAddress.length; a++) {
+              for (var b=a+1; b<listOfOrdersByAddress.length; b++) {
+                var foundCount = 0;
+                for (var c=0; c<listOfOrdersByAddress[a].orderList.length; c++) {
+                  for (var d=0; d<listOfOrdersByAddress[b].orderList.length; d++) {
+                    if (listOfOrdersByAddress[a].orderList.length == listOfOrdersByAddress[b].orderList.length) {
+                      if (listOfOrdersByAddress[a].orderList[c].Meal_Name == listOfOrdersByAddress[b].orderList[d].Meal_Name) {
+                        foundCount++;
+                      }
+                      if (foundCount == listOfOrdersByAddress[a].orderList.length) {
+                        positions.push(a);
+                        positions.push(b);
+                      }
+                    }
+                  }
                 }
-                addToTable += '<td>'+ listOfOrdersByAddress[m].orderList[i].Meal_Name +'</td>';
-                addToTable += '<td>'
-                if (listOfOrdersByAddress[m].orderList[i].subdetails) {
-                  var formattedString = listOfOrdersByAddress[m].orderList[i].subdetails.split(",").join(",<br />");
-                  addToTable += ''+ formattedString+',<br>';
-                }
-                addToTable += '<b>Container-'+listOfOrdersByAddress[m].orderList[i].containertype+'</b><br>';
-                addToTable += '<b>Total Quantity - '+listOfOrdersByAddress[m].orderList[i].qty+'';
-                if (listOfOrdersByAddress[m].orderList[i].specialinstruction)
-                  addToTable += '<br /><b> Speacial Instruction - '+listOfOrdersByAddress[m].orderList[i].specialinstruction+'</td></tr>';
-                else
+              }
+            }
+            //get unique positions
+            var uniquePositions = [];
+            for (var a=0; a<positions.length; a++) {
+              if (uniquePositions.indexOf(positions[a]) < 0)
+                uniquePositions.push(positions[a]);
+            }
+            console.log(uniquePositions);
+            //now get sorted arrays
+            for (var b=0; b<uniquePositions.length; b++) {
+              if (listOfOrdersByAddress[uniquePositions[b]].orderList.length > 1 && !listOfOrdersByAddress[uniquePositions[b]].mixed)
+                sortedMixedOrders.push(listOfOrdersByAddress[uniquePositions[b]]);
+            }
+            
+            console.log(sortedMixedOrders.length);
+            console.log(sortedMixedOrders);
+            
+            $('#displaySection').html('');
+            //displaying of sortedMixedOrders
+            var addToTable = '<div class="box box-success"><div class="box-header"><h3 class="box-title">Mixed Order List</h3></div><!-- /.box-header--><div id="displaySection" class="box-body"><table id="example3" class="table table-bordered table-hover"><thead><tr><th>User</th><th>Address</th><th>Meal</th><th>Details</th><th>Container</th></tr></thead><tbody>';
+            for (var m=0; m<sortedMixedOrders.length; m++) {
+              //console.log(m);
+              for (var i = 0; i < sortedMixedOrders[m].orderList.length; i++) {
+                if (sortedMixedOrders[m].orderList.length > 1 && !sortedMixedOrders[m].mixed) {
+                  if (i == 0) {
+                    addToTable += '<tr><td rowspan='+sortedMixedOrders[m].orderList.length+'>'+ sortedMixedOrders[m].orderList[0].customerName +'</td>';
+                    var formattedString = sortedMixedOrders[m].address.split(",").join(",<br />");
+                    addToTable += '<td rowspan='+sortedMixedOrders[m].orderList.length+'>'+ formattedString +'</td>';
+                  }
+                  addToTable += '<td>'+ sortedMixedOrders[m].orderList[i].Meal_Name +'</td>';
+                  addToTable += '<td>'
+                  if (sortedMixedOrders[m].orderList[i].subdetails) {
+                    var formattedString = sortedMixedOrders[m].orderList[i].subdetails.split(",").join(",<br />");
+                    addToTable += ''+ formattedString+',<br>';
+                  }
+                  addToTable += '<b>Total Quantity - '+sortedMixedOrders[m].orderList[i].qty+'</td>';
+                  addToTable += '<td><b>Container-'+sortedMixedOrders[m].orderList[i].containertype+'</b><br>';
+                  if (sortedMixedOrders[m].orderList[i].specialinstruction)
+                    addToTable += '<br /><b> Speacial Instruction - '+sortedMixedOrders[m].orderList[i].specialinstruction+'</td></tr>';
+                  else
+                    addToTable += '</td></tr>';
                   addToTable += '</td></tr>';
-                addToTable += '</td></tr>';
+                }
               }
             }
-          }
-          addToTable += '</tbody></table><br /><button id="" type="button" class="btn btn-info pull-left" onclick = "printDiv()">Print</button><button id="" type="button" class="btn btn-info pull-right">Next</button></div></div>';
-          //console.log(addToTable)
-          $('#displaySection').html('');
-          $('#displaySection').append(addToTable);
-          $('#example2').DataTable({
-          "paging": true,
-          "lengthChange": true,
-          "searching": false,
-          "ordering": false,
-          "info": true,
-          "autoWidth": true
-          });
-        })
-      });
+            addToTable += '</tbody></table><br /><button id="" type="button" class="btn btn-info pull-left" onclick = "printDiv()">Print</button><button id="" type="button" class="btn btn-info pull-right">Next</button></div></div>';
+            //console.log(addToTable)
+            $('#displaySection').append(addToTable);
+            $('#example3').DataTable({
+            "paging": true,
+            "lengthChange": true,
+            "searching": false,
+            "ordering": false,
+            "info": true,
+            "autoWidth": true
+            });
+            
+            
+            //displaying of listOfOrdersByAddress
+            var addToTable = '<div class="box box-success"><div class="box-header"><h3 class="box-title">Mixed Order List</h3></div><!-- /.box-header--><div id="displaySection" class="box-body"><table id="example2" class="table table-bordered table-hover"><thead><tr><th>User</th><th>Address</th><th>Meal</th><th>Details</th><th>Container</th></tr></thead><tbody>';
+            for (var m=0; m<listOfOrdersByAddress.length; m++) {
+              //console.log(m);
+              for (var i = 0; i < listOfOrdersByAddress[m].orderList.length; i++) {
+                if (listOfOrdersByAddress[m].orderList.length > 1 && !listOfOrdersByAddress[m].mixed && uniquePositions.indexOf(m) < 0) {
+                  if (i == 0) {
+                    addToTable += '<tr><td rowspan='+listOfOrdersByAddress[m].orderList.length+'>'+ listOfOrdersByAddress[m].orderList[0].customerName +'</td>';
+                    var formattedString = listOfOrdersByAddress[m].address.split(",").join(",<br />");
+                    addToTable += '<td rowspan='+listOfOrdersByAddress[m].orderList.length+'>'+ formattedString +'</td>';
+                  }
+                  addToTable += '<td>'+ listOfOrdersByAddress[m].orderList[i].Meal_Name +'</td>';
+                  addToTable += '<td>'
+                  if (listOfOrdersByAddress[m].orderList[i].subdetails) {
+                    var formattedString = listOfOrdersByAddress[m].orderList[i].subdetails.split(",").join(",<br />");
+                    addToTable += ''+ formattedString+',<br>';
+                  }
+                  addToTable += '<b>Total Quantity - '+listOfOrdersByAddress[m].orderList[i].qty+'</td>';
+                  addToTable += '<td><b>Container-'+listOfOrdersByAddress[m].orderList[i].containertype+'</b><br>';
+                  if (listOfOrdersByAddress[m].orderList[i].specialinstruction)
+                    addToTable += '<br /><b> Speacial Instruction - '+listOfOrdersByAddress[m].orderList[i].specialinstruction+'</td></tr>';
+                  else
+                    addToTable += '</td></tr>';
+                  addToTable += '</td></tr>';
+                }
+              }
+            }
+            addToTable += '</tbody></table><br /><button id="" type="button" class="btn btn-info pull-left" onclick = "printDiv()">Print</button><button id="" type="button" class="btn btn-info pull-right">Next</button></div></div>';
+            //console.log(addToTable)
+            $('#displaySection').append(addToTable);
+            $('#example2').DataTable({
+            "paging": true,
+            "lengthChange": true,
+            "searching": false,
+            "ordering": false,
+            "info": true,
+            "autoWidth": true
+            });
+          })
+        });
 
 
 
