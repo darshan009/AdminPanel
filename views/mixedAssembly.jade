@@ -190,6 +190,7 @@ html
                         option Lunch
                         option Dinner
                     button.btn.btn-info(type= 'button' id='displayMixed') Display today's Mixed Orders
+          .row#displaySimilar
           .row#displaySection
               // /.box-body
             // /.box
@@ -291,19 +292,20 @@ html
             for (var a=0; a<listOfOrdersByAddress.length; a++) {
               for (var b=a+1; b<listOfOrdersByAddress.length; b++) {
                 var foundCount = 0;
-                for (var c=0; c<listOfOrdersByAddress[a].orderList.length; c++) {
-                  for (var d=0; d<listOfOrdersByAddress[b].orderList.length; d++) {
-                    if (listOfOrdersByAddress[a].orderList.length == listOfOrdersByAddress[b].orderList.length) {
-                      if (listOfOrdersByAddress[a].orderList[c].Meal_Name == listOfOrdersByAddress[b].orderList[d].Meal_Name) {
-                        foundCount++;
-                      }
-                      if (foundCount == listOfOrdersByAddress[a].orderList.length) {
-                        positions.push(a);
-                        positions.push(b);
+                if (listOfOrdersByAddress[a].mixed)
+                  for (var c=0; c<listOfOrdersByAddress[a].orderList.length; c++) {
+                    for (var d=0; d<listOfOrdersByAddress[b].orderList.length; d++) {
+                      if (listOfOrdersByAddress[a].orderCount > 1 && listOfOrdersByAddress[a].orderList.length == listOfOrdersByAddress[b].orderList.length) {
+                        if (listOfOrdersByAddress[a].orderList[c].Meal_Name == listOfOrdersByAddress[b].orderList[d].Meal_Name) {
+                          foundCount++;
+                        }
+                        if (foundCount == listOfOrdersByAddress[a].orderList.length) {
+                          positions.push(a);
+                          positions.push(b);
+                        }
                       }
                     }
                   }
-                }
               }
             }
             //get unique positions
@@ -324,45 +326,56 @@ html
             
             $('#displaySection').html('');
             //displaying of sortedMixedOrders
-            var addToTableSimilar = '<div class="box box-success"><div class="box-header"><h3 class="box-title">Similar Mixed Order List</h3></div><!-- /.box-header--><div id="displaySection" class="box-body"><table id="example2" class="table table-bordered table-hover"><thead><tr><th>User</th><th>Address</th><th>Meal</th><th>Details</th><th>Container</th></tr></thead><tbody>';
+            var similarDivId = 0;
             for (var m=0; m<sortedMixedOrders.length; m++) {
               //console.log(sortedMixedOrders[m].mixed);
-              for (var i = 0; i < sortedMixedOrders[m].orderList.length; i++) {
-                if (i == 0) {
-                  addToTableSimilar += '<tr><td rowspan='+sortedMixedOrders[m].orderList.length+'>'+ sortedMixedOrders[m].orderList[0].customerName +'</td>';
-                  var formattedString = sortedMixedOrders[m].address.split(",").join(",<br />");
-                  addToTableSimilar += '<td rowspan='+sortedMixedOrders[m].orderList.length+'>'+ formattedString +'</td>';
-                }
-                addToTableSimilar += '<td>'+ sortedMixedOrders[m].orderList[i].Meal_Name +'</td>';
-                addToTableSimilar += '<td>'
-                if (sortedMixedOrders[m].orderList[i].subdetails) {
-                  var formattedString = sortedMixedOrders[m].orderList[i].subdetails.split(",").join(",<br />");
-                  addToTableSimilar += ''+ formattedString+',<br>';
-                }
-                addToTableSimilar += '<b>Total Quantity - '+sortedMixedOrders[m].orderList[i].qty+'</td>';
-                addToTableSimilar += '<td><b>'+sortedMixedOrders[m].orderList[i].containertype+'</b><br>';
-                if (sortedMixedOrders[m].orderList[i].specialinstruction)
-                  addToTableSimilar += '<br /><b> Speacial Instruction - '+sortedMixedOrders[m].orderList[i].specialinstruction+'</td></tr>';
-                else
-                  addToTableSimilar += '</td></tr>';
-                addToTableSimilar += '</td></tr>';
+              var similarCount = 0;
+              for (var z=m; z<sortedMixedOrders.length; z++) {
+                //console.log(sortedSimilarOrders[m]);
+                if (sortedMixedOrders[m].orderList[0].Meal_Name == sortedMixedOrders[z].orderList[0].Meal_Name && sortedMixedOrders[m].orderList[1].Meal_Name == sortedMixedOrders[z].orderList[1].Meal_Name || sortedMixedOrders[m].orderList[1].Meal_Name == sortedMixedOrders[z].orderList[0].Meal_Name && sortedMixedOrders[m].orderList[0].Meal_Name == sortedMixedOrders[z].orderList[1].Meal_Name)
+                  similarCount++;
               }
+              if (similarCount > 0) {
+                var addToTableSimilar = '<div id="'+similarDivId+'" class="box box-success"><div class="box-header"><h3 class="box-title">Orders with similar meal name</h3></div><!-- /.box-header--><div id="" class="box-body"><table id="example2" class="table table-bordered table-hover"><thead><tr><th>User</th><th>Address</th><th>Meal</th><th>Details</th><th>Container</th></tr></thead><tbody>';
+                for (var y=0; y<similarCount; y++) {
+                  for (var i = 0; i < sortedMixedOrders[m+y].orderList.length; i++) {
+                    if (i == 0) {
+                      addToTableSimilar += '<tr><td rowspan='+sortedMixedOrders[m+y].orderList.length+'>'+ sortedMixedOrders[m+y].orderList[0].customerName +'</td>';
+                      var formattedString = sortedMixedOrders[m+y].address.split(",").join(",<br />");
+                      addToTableSimilar += '<td rowspan='+sortedMixedOrders[m+y].orderList.length+'>'+ formattedString +'</td>';
+                    }
+                    addToTableSimilar += '<td>'+ sortedMixedOrders[m+y].orderList[i].Meal_Name +'</td>';
+                    addToTableSimilar += '<td>'
+                    if (sortedMixedOrders[m+y].orderList[i].subdetails) {
+                      var formattedString = sortedMixedOrders[m+y].orderList[i].subdetails.split(",").join(",<br />");
+                      addToTableSimilar += ''+ formattedString+',<br>';
+                    }
+                    addToTableSimilar += '<b>Total Quantity - '+sortedMixedOrders[m+y].orderList[i].qty+'</td>';
+                    addToTableSimilar += '<td><b>'+sortedMixedOrders[m+y].orderList[i].containertype+'</b><br>';
+                    if (sortedMixedOrders[m+y].orderList[i].specialinstruction)
+                      addToTableSimilar += '<br /><b> Speacial Instruction - '+sortedMixedOrders[m+y].orderList[i].specialinstruction+'</td></tr>';
+                    else
+                      addToTableSimilar += '</td></tr>';
+                    addToTableSimilar += '</td></tr>';
+                  }
+                }
+                m += similarCount - 1;
+                addToTableSimilar += '</tbody></table><br /><button id="" type="button" class="btn btn-info pull-left" onclick = "prinSimilartDiv('+similarDivId+')">Print</button><button id="" type="button" class="btn btn-info pull-right">Next</button></div></div>';
+                //console.log(addToTableSimilar)
+                $('#displaySimilar').append(addToTableSimilar);
+                $('#example2').DataTable({
+                "paging": false,
+                "lengthChange": true,
+                "searching": false,
+                "ordering": false,
+                "info": true,
+                "autoWidth": true
+                });
+              }
+              similarDivId++;
             }
-            addToTableSimilar += '</tbody></table><br /><button id="" type="button" class="btn btn-info pull-left" onclick = "printDiv()">Print</button><button id="" type="button" class="btn btn-info pull-right">Next</button></div></div>';
-            //console.log(addToTableSimilar)
-            $('#displaySection').append(addToTableSimilar);
-            $('#example2').DataTable({
-            "paging": true,
-            "lengthChange": true,
-            "searching": false,
-            "ordering": false,
-            "info": true,
-            "autoWidth": true
-            });
-            
-            
             //displaying of listOfOrdersByAddress
-            var addToTable = '<div class="box box-success"><div class="box-header"><h3 class="box-title">Mixed Order List</h3></div><!-- /.box-header--><div id="displaySection" class="box-body"><table id="example2" class="table table-bordered table-hover"><thead><tr><th>User</th><th>Address</th><th>Meal</th><th>Details</th><th>Container</th></tr></thead><tbody>';
+            var addToTable = '<div class="box box-success"><div class="box-header"><h3 class="box-title">Mixed Order List</h3></div><!-- /.box-header--><div id="displaySection" class="box-body"><table id="example3" class="table table-bordered table-hover"><thead><tr><th>User</th><th>Address</th><th>Meal</th><th>Details</th><th>Container</th></tr></thead><tbody>';
             for (var m=0; m<listOfOrdersByAddress.length; m++) {
               //console.log(listOfOrdersByAddress[m].mixed);
               for (var i = 0; i < listOfOrdersByAddress[m].orderList.length; i++) {
@@ -391,8 +404,8 @@ html
             addToTable += '</tbody></table><br /><button id="" type="button" class="btn btn-info pull-left" onclick = "printDiv()">Print</button><button id="" type="button" class="btn btn-info pull-right">Next</button></div></div>';
             //console.log(addToTable)
             $('#displaySection').append(addToTable);
-            $('#example2').DataTable({
-            "paging": true,
+            $('#example3').DataTable({
+            "paging": false,
             "lengthChange": true,
             "searching": false,
             "ordering": false,
@@ -411,6 +424,13 @@ html
           $(':button[data-getButton = '+CustomizedButton+']').attr('disabled', true);
         });
       });
+      function prinSimilartDiv(x){
+         var printContents = document.getElementById(x).innerHTML;
+         var originalContents = document.body.innerHTML;
+         document.body.innerHTML = printContents;
+         window.print();
+         document.body.innerHTML = originalContents;
+      }
       function printDiv(){
          var printContents = document.getElementById("displaySection").innerHTML;
          var originalContents = document.body.innerHTML;

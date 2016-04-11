@@ -255,133 +255,118 @@ html
           }
           var today = dd+'-'+mm+'-'+yyyy;
           console.log(today);
-          $.getJSON("http://os.foodees.in/Services/Services.svc/Gettodaysorderbycustomer/"+'07-04-2016'+','+$meal, {
+          $.getJSON("http://os.foodees.in/Services/Services.svc/Gettodaysorderbycustomer/"+'06-04-2016'+','+$meal, {
           category : $category,
           meal : $meal,
           ajax : true
           },function(j){
             //get all orders
-            var allOrders = [], sortedOrders = [], listOfOrdersByAddress = [];
+            var allOrders = [], allOrders = [], listOfOrdersByAddress = [];
             allOrders = allOrders.concat(j.GettodaysorderbycustomerResult.listnoncustomizeorder);
             allOrders = allOrders.concat(j.GettodaysorderbycustomerResult.listcustomizeorder);
             var listOfOrdersByAddressCounter = 0, listOfAddresses = [];
             console.log(allOrders.length);
 
+            //sort all orders into listOfOrdersByAddress
+            for (var i=0; i<allOrders.length; i++) {
+              //get all unique addresses
+              if (listOfAddresses.indexOf(allOrders[i].custaddress) < 0) {
+                listOfOrdersByAddress[listOfOrdersByAddressCounter] = {
+                  address : allOrders[i].custaddress
+                };
+                listOfAddresses.push(allOrders[i].custaddress);
+                listOfOrdersByAddressCounter++;
+              }
+            }
+
+            /*
+            *----- get orders by each user
+            *----- sort by category
+            */
+            for (var k=0; k<listOfOrdersByAddress.length; k++) {
+              listOfOrdersByAddress[k].orderList = [];
+              listOfOrdersByAddress[k].orderCount = 0;
+              for (var l=0; l<allOrders.length; l++) {
+                if (listOfOrdersByAddress[k].address == allOrders[l].custaddress) {
+                  listOfOrdersByAddress[k].orderCount++;
+
+                  //get all Orders by selected category & per address
+                  if (allOrders[l].catName == $category)
+                    listOfOrdersByAddress[k].orderList.push(allOrders[l]);
+                }
+              }
+            }
+            
+            //sort listOfOrdersByAddress by similar orders
             var positions = [];
-            //push similar orders into sortedOrders
-            for (var y=0; y<allOrders.length; y++) {
-              if (allOrders[y].subdetails && allOrders[y].subdetails.length > 0) {
-                var checker = true;
-                for (var z=allOrders.length - 1; z>y; z--) {
-                  if (allOrders[z].subdetails && allOrders[z].subdetails.length > 0) {
-                    if (allOrders[y].subdetails == allOrders[z].subdetails && y != z) {
-                      //if (positions.indexOf(y) < 0 && positions.indexOf(z) < 0) {
-                        positions.push(y);
-                        positions.push(z);
-                      //}
-                    }
+            for (var a=0; a<listOfOrdersByAddress.length; a++) {
+              for (var b=a+1; b<listOfOrdersByAddress.length; b++) {
+                if (listOfOrdersByAddress[b].orderCount == 1 && listOfOrdersByAddress[a].orderCount == 1 && listOfOrdersByAddress[a].orderList.length == 1 && listOfOrdersByAddress[b].orderList.length == 1 && listOfOrdersByAddress[a].orderList[0].subdetails.length > 0) {
+                  if (listOfOrdersByAddress[a].orderList[0].subdetails == listOfOrdersByAddress[b].orderList[0].subdetails) {
+                    positions.push(a);
+                    positions.push(b);
                   }
                 }
               }
             }
             //get unique positions
-            var uniquePositions = [];
+            var uniquePositions = [], sortedSimilarOrders = [];
             for (var a=0; a<positions.length; a++) {
               if (uniquePositions.indexOf(positions[a]) < 0)
                 uniquePositions.push(positions[a]);
             }
+            console.log(uniquePositions);
+            
             //now get sorted arrays
             for (var b=0; b<uniquePositions.length; b++) {
-              sortedOrders.push(allOrders[uniquePositions[b]]);
+              sortedSimilarOrders.push(listOfOrdersByAddress[uniquePositions[b]]);
             }
-            var similarOrdersLength = sortedOrders.length;
-            //console.log(sortedOrders)
-            //push the remaining arrays into sortedOrders
-            for (var y=0; y<allOrders.length; y++) {
-              if (uniquePositions.indexOf(y) < 0)
-                sortedOrders.push(allOrders[y]);
-            }
-            console.log(sortedOrders.length);
-
-
-            //sort all orders into listOfOrdersByAddress
-            for (var i=0; i<sortedOrders.length; i++) {
-              //get all unique addresses
-              if (listOfAddresses.indexOf(sortedOrders[i].custaddress) < 0) {
-                listOfOrdersByAddress[listOfOrdersByAddressCounter] = {
-                  address : sortedOrders[i].custaddress
-                };
-                listOfAddresses.push(sortedOrders[i].custaddress);
-                listOfOrdersByAddressCounter++;
-              }
-            }
-            //console.log(listOfOrdersByAddress.length);
-            /*
-            *----- get orders by each user
-            *----- sort by mealType && category
-            */
-            for (var k=0; k<listOfOrdersByAddress.length; k++) {
-              listOfOrdersByAddress[k].orderList = [];
-              listOfOrdersByAddress[k].orderCount = 0;
-              for (var l=0; l<sortedOrders.length; l++) {
-                if (listOfOrdersByAddress[k].address == sortedOrders[l].custaddress) {
-                  listOfOrdersByAddress[k].orderCount++;
-                  //
-                  if (l < similarOrdersLength)
-                    listOfOrdersByAddress[k].similar = true;
-                  //get all Orders by selected category & per address
-                  if (sortedOrders[l].catName == $category)
-                    listOfOrdersByAddress[k].orderList.push(sortedOrders[l]);
-                }
-              }
-            }
-
+            
+            console.log(sortedSimilarOrders);
             $('#displaySimilar').html('');
             //displaying similar orders first
-            for (var m=0; m<listOfOrdersByAddress.length; m++) {
-              //if (m < 14)
-                //console.log(listOfOrdersByAddress[m].similar);
-              if (listOfOrdersByAddress[m].orderCount == 1 && listOfOrdersByAddress[m].similar == true) {
+            var similarDivId = 0;
+            for (var m=0; m<sortedSimilarOrders.length; m++) {
+              
                 var similarCount = 0;
-                for (var z=m; z<listOfOrdersByAddress.length; z++) {
-                  //console.log(listOfOrdersByAddress[m]);
-                  if (listOfOrdersByAddress[z].orderCount == 1 && listOfOrdersByAddress[z].orderList.length > 0 && listOfOrdersByAddress[m].orderList[0].subdetails == listOfOrdersByAddress[z].orderList[0].subdetails) {
-                    listOfOrdersByAddress[z].orderCount;
+                for (var z=m; z<sortedSimilarOrders.length; z++) {
+                  //console.log(sortedSimilarOrders[m]);
+                  if (sortedSimilarOrders[z].orderList.length == 1 && sortedSimilarOrders[m].orderList[0].subdetails == sortedSimilarOrders[z].orderList[0].subdetails) {
                     similarCount++;
                   }else
                     break;
                 }
                 if (similarCount > 0) {
-                  var addToTableSimilar = '<div class="box box-success"><div class="box-header"><h3 class="box-title">Similar Order List - <b>'+$category+',  Details--'+listOfOrdersByAddress[m].orderList[0].subdetails+'</b></h3></div><!-- /.box-header--><div id="displaySimiliar" class="box-body"><table id="example3" class="table table-bordered table-hover"><thead><tr><th>User</th><th>Address</th><th>Meal</th><th>Details</th><th>Container</th></tr></thead><tbody>';
+                  var addToTableSimilar = '<div id="'+similarDivId+'" class="box box-success"><div class="box-header"><h3 class="box-title">Similar Order List - <b>'+$category+',  Details--'+sortedSimilarOrders[m].orderList[0].subdetails+'</b></h3></div><!-- /.box-header--><div id="" class="box-body"><table id="example3" class="table table-bordered table-hover"><thead><tr><th>User</th><th>Address</th><th>Meal</th><th>Details</th><th>Container</th></tr></thead><tbody>';
                   for (var y=0; y<similarCount; y++) {
-                    for (var i = 0; i < listOfOrdersByAddress[m+y].orderList.length; i++) {
+                    for (var i = 0; i < sortedSimilarOrders[m+y].orderList.length; i++) {
                       if (i == 0) {
-                        addToTableSimilar += '<tr><td rowspan='+listOfOrdersByAddress[m+y].orderList.length+'>'+ listOfOrdersByAddress[m+y].orderList[0].customerName +'</td>';
-                        var formattedString = listOfOrdersByAddress[m+y].address.split(",").join(",<br />");
-                        addToTableSimilar += '<td rowspan='+listOfOrdersByAddress[m+y].orderList.length+'>'+ formattedString +'</td>';
+                        addToTableSimilar += '<tr><td rowspan='+sortedSimilarOrders[m+y].orderList.length+'>'+ sortedSimilarOrders[m+y].orderList[0].customerName +'</td>';
+                        var formattedString = sortedSimilarOrders[m+y].address.split(",").join(",<br />");
+                        addToTableSimilar += '<td rowspan='+sortedSimilarOrders[m+y].orderList.length+'>'+ formattedString +'</td>';
                       }
-                      addToTableSimilar += '<td>'+ listOfOrdersByAddress[m+y].orderList[i].Meal_Name +'</td>';
+                      addToTableSimilar += '<td>'+ sortedSimilarOrders[m+y].orderList[i].Meal_Name +'</td>';
                       addToTableSimilar += '<td>'
-                      if (listOfOrdersByAddress[m+y].orderList[i].subdetails) {
-                        var formattedString = listOfOrdersByAddress[m+y].orderList[i].subdetails.split(",").join(",<br />");
+                      if (sortedSimilarOrders[m+y].orderList[i].subdetails) {
+                        var formattedString = sortedSimilarOrders[m+y].orderList[i].subdetails.split(",").join(",<br />");
                         addToTableSimilar += ''+ formattedString+',<br>';
                       }
-                      addToTableSimilar += '<b>Total Quantity - '+listOfOrdersByAddress[m+y].orderList[i].qty+'</td>';
-                      addToTableSimilar += '<td><b>'+listOfOrdersByAddress[m+y].orderList[i].containertype+'</b><br>';
-                      if (listOfOrdersByAddress[m+y].orderList[i].specialinstruction)
-                        addToTableSimilar += '<br /><b> Speacial Instruction - '+listOfOrdersByAddress[m+y].orderList[i].specialinstruction+'</td></tr>';
+                      addToTableSimilar += '<b>Total Quantity - '+sortedSimilarOrders[m+y].orderList[i].qty+'</td>';
+                      addToTableSimilar += '<td><b>'+sortedSimilarOrders[m+y].orderList[i].containertype+'</b><br>';
+                      if (sortedSimilarOrders[m+y].orderList[i].specialinstruction)
+                        addToTableSimilar += '<br /><b> Speacial Instruction - '+sortedSimilarOrders[m+y].orderList[i].specialinstruction+'</td></tr>';
                       else
                         addToTableSimilar += '</td></tr>';
                       addToTableSimilar += '</td></tr>';
                     }
                   }
-                  m += similarCount;
-                  addToTableSimilar += '</tbody></table><br /><button id="" type="button" class="btn btn-info pull-left" onclick = "printDiv()">Print</button><button id="" type="button" class="btn btn-info pull-right">Next</button></div></div>';
+                  m += similarCount - 1;
+                  addToTableSimilar += '</tbody></table><br /><button id="" type="button" class="btn btn-info pull-left" onclick = "prinSimilartDiv('+similarDivId+')">Print</button><button id="" type="button" class="btn btn-info pull-right">Next</button></div></div>';
                   //console.log(addToTableSimilar)
                   $('#displaySimilar').attr('data-CustomizedButton', $buttonDisablerId);
                   $('#displaySimilar').append(addToTableSimilar);
                   $('#example3').DataTable({
-                  "paging": true,
+                  "paging": false,
                   "lengthChange": true,
                   "searching": true,
                   "ordering": false,
@@ -389,14 +374,14 @@ html
                   "autoWidth": true
                   });
                 }
-              }
+                similarDivId++;
             }
 
             //console.log(listOfOrdersByAddress);
-            //displaying of listOfOrdersByAddress
+            //displaying of Non-Similar orders
             var addToTable = '<div class="box box-success"><div class="box-header"><h3 class="box-title"><b>Non-Similar Order List -'+$category+'</b></h3></div><!-- /.box-header--><div id="displaySection" class="box-body"><table id="example2" class="table table-bordered table-hover"><thead><tr><th>User</th><th>Address</th><th>Meal</th><th>Details</th><th>Container</th></tr></thead><tbody>';
             for (var m=0; m<listOfOrdersByAddress.length; m++) {
-              if (listOfOrdersByAddress[m].orderCount == 1 && listOfOrdersByAddress[m].similar == undefined) {
+              if (listOfOrdersByAddress[m].orderCount == 1 && uniquePositions.indexOf(m) < 0) {
                 for (var i = 0; i < listOfOrdersByAddress[m].orderList.length; i++) {
                   if (i == 0) {
                     addToTable += '<tr><td rowspan='+listOfOrdersByAddress[m].orderList.length+'>'+ listOfOrdersByAddress[m].orderList[0].customerName +'</td>';
@@ -425,7 +410,7 @@ html
             $('#displaySection').html('');
             $('#displaySection').append(addToTable);
             $('#example2').DataTable({
-            "paging": true,
+            "paging": false,
             "lengthChange": true,
             "searching": true,
             "ordering": false,
@@ -435,8 +420,6 @@ html
           });
         });
 
-
-
         $('button#disabler').click(function(){
           var dataTagetButton = $('#example2').attr('data-targetButton');
           var CustomizedButton = $('#example2').attr('data-CustomizedButton');
@@ -445,6 +428,13 @@ html
           $(':button[data-getButton = '+CustomizedButton+']').attr('disabled', true);
         });
       });
+      function prinSimilartDiv(x){
+         var printContents = document.getElementById(x).innerHTML;
+         var originalContents = document.body.innerHTML;
+         document.body.innerHTML = printContents;
+         window.print();
+         document.body.innerHTML = originalContents;
+      }
       function printDiv(){
          var printContents = document.getElementById("displaySection").innerHTML;
          var originalContents = document.body.innerHTML;
