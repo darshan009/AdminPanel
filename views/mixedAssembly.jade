@@ -151,24 +151,24 @@ html
                     a(href='/addOrder')
                       i.fa.fa-circle-o
                       |  Place an Order
-              li.active
-                a(href='/assembly')
-                  i.fa.fa-pie-chart
-                  span Assembly
-                  i.fa.fa-angle-left.pull-right
-                ul.treeview-menu
-                  li
-                    a(href='/assembly')
-                      i.fa.fa-circle-o
-                      |  Single orders
-                  li.active
-                    a(href='/mixedAssembly')
-                      i.fa.fa-circle-o
-                      |  Single orders with Extra
-                  li
-                    a(href='/multipleAssembly')
-                      i.fa.fa-circle-o
-                      |  Multiple Category Orders
+            li.active
+              a(href='/assembly')
+                i.fa.fa-pie-chart
+                span Assembly
+                i.fa.fa-angle-left.pull-right
+              ul.treeview-menu
+                li
+                  a(href='/assembly')
+                    i.fa.fa-circle-o
+                    |  Single orders
+                li.active
+                  a(href='/mixedAssembly')
+                    i.fa.fa-circle-o
+                    |  Single orders with Extra
+                li
+                  a(href='/multipleAssembly')
+                    i.fa.fa-circle-o
+                    |  Multiple Category Orders
         // /.sidebar
       // Content Wrapper. Contains page content
       .content-wrapper
@@ -239,7 +239,7 @@ html
           }
           var today = dd+'-'+mm+'-'+yyyy;
           console.log(today);
-          $.getJSON("http://os.foodees.in/Services/Services.svc/Gettodaysorderbycustomer/"+'07-04-2016'+','+$meal, {
+          $.getJSON("http://os.foodees.in/Services/Services.svc/Gettodaysorderbycustomer/"+'13-04-2016'+','+$meal, {
           },function(j){
             //get all orders
             var allOrders = [], listOfOrdersByAddress = [], sortedMixedOrders = [];

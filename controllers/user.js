@@ -8,14 +8,15 @@ exports.isAdmin = function(req, res, next){
     if((req.user.type).toLowerCase() == "admin")
       next();
     else if ((req.user.type).toLowerCase() == "chef") {
-      if (req.originalUrl == '/assembly')
+      if (req.originalUrl == "/assembly" || req.originalUrl == "/mixedAssembly" || req.originalUrl == "/multipleAssembly")
         next();
-      res.redirect('/assembly');
+      else
+        res.redirect('/assembly');
     }
     else res.end("Your not authorized");
   }
-  //else
-    //res.redirect('/');
+  else
+    res.redirect('/');
 };
 //login logout signup
 exports.getLogin = function(req, res, next){

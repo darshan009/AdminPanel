@@ -151,24 +151,24 @@ html
                     a(href='/addOrder')
                       i.fa.fa-circle-o
                       |  Place an Order
-              li.active
-                a(href='/assembly')
-                  i.fa.fa-pie-chart
-                  span Assembly
-                  i.fa.fa-angle-left.pull-right
-                ul.treeview-menu
-                  li.active
-                    a(href='/assembly')
-                      i.fa.fa-circle-o
-                      |  Single orders
-                  li
-                    a(href='/mixedAssembly')
-                      i.fa.fa-circle-o
-                      |  Mixed Orders
-                  li
-                    a(href='/multipleAssembly')
-                      i.fa.fa-circle-o
-                      |  Multiple Category Orders
+            li.active
+              a(href='/assembly')
+                i.fa.fa-pie-chart
+                span Assembly
+                i.fa.fa-angle-left.pull-right
+              ul.treeview-menu
+                li.active
+                  a(href='/assembly')
+                    i.fa.fa-circle-o
+                    |  Single orders
+                li
+                  a(href='/mixedAssembly')
+                    i.fa.fa-circle-o
+                    |  Single orders with Extra
+                li
+                  a(href='/multipleAssembly')
+                    i.fa.fa-circle-o
+                    |  Multiple Category Orders
         // /.sidebar
       // Content Wrapper. Contains page content
       .content-wrapper
@@ -206,6 +206,7 @@ html
                               | Extras
           .row#displaySimilar
           .row#displaySection
+          .row#bcTarget
               // /.box-body
             // /.box
           // /.row
@@ -230,6 +231,8 @@ html
     // DataTables
     script(src='../public/plugins/datatables/jquery.dataTables.min.js')
     script(src='../public/plugins/datatables/dataTables.bootstrap.min.js')
+    //barcode
+    script(type='text/javascript', src='../public/plugins/jQuery/jquery-barcode.js')
     // AdminLTE App
     script(src='../public/dist/js/app.min.js')
     // page script
@@ -255,7 +258,7 @@ html
           }
           var today = dd+'-'+mm+'-'+yyyy;
           console.log(today);
-          $.getJSON("http://os.foodees.in/Services/Services.svc/Gettodaysorderbycustomer/"+'06-04-2016'+','+$meal, {
+          $.getJSON("http://os.foodees.in/Services/Services.svc/Gettodaysorderbycustomer/"+'13-04-2016'+','+$meal, {
           category : $category,
           meal : $meal,
           ajax : true
@@ -379,9 +382,11 @@ html
 
             //console.log(listOfOrdersByAddress);
             //displaying of Non-Similar orders
-            var addToTable = '<div class="box box-success"><div class="box-header"><h3 class="box-title"><b>Non-Similar Order List -'+$category+'</b></h3></div><!-- /.box-header--><div id="displaySection" class="box-body"><table id="example2" class="table table-bordered table-hover"><thead><tr><th>User</th><th>Address</th><th>Meal</th><th>Details</th><th>Container</th></tr></thead><tbody>';
+            var thisDivData = [];
+            var addToTable = '<div class="box box-success" id="displaySectionNonSimilar"><div class="box-header"><h3 class="box-title"><b>Non-Similar Order List -'+$category+'</b></h3></div><!-- /.box-header--><div id="" class="box-body"><table id="example2" class="table table-bordered table-hover"><thead><tr><th>User</th><th>Address</th><th>Meal</th><th>Details</th><th>Container</th></tr></thead><tbody>';
             for (var m=0; m<listOfOrdersByAddress.length; m++) {
               if (listOfOrdersByAddress[m].orderCount == 1 && uniquePositions.indexOf(m) < 0) {
+                thisDivData.push(listOfOrdersByAddress[m]);
                 for (var i = 0; i < listOfOrdersByAddress[m].orderList.length; i++) {
                   if (i == 0) {
                     addToTable += '<tr><td rowspan='+listOfOrdersByAddress[m].orderList.length+'>'+ listOfOrdersByAddress[m].orderList[0].customerName +'</td>';
@@ -404,7 +409,7 @@ html
                 }
               }
             }
-            addToTable += '</tbody></table><br /><button id="" type="button" class="btn btn-info pull-left" onclick = "printDiv()">Print</button><button id="" type="button" class="btn btn-info pull-right">Next</button></div></div>';
+            addToTable += '</tbody></table><br /><button id="" type="button" class="btn btn-info pull-left" onclick = "printDiv()">Print order list</button><button type="button" class="btn btn-info pull-right" onclick="printBarcode()">Get Address Barcodes</button></div></div>';
             //console.log(addToTable)
             $('#displaySection').attr('data-CustomizedButton', $buttonDisablerId);
             $('#displaySection').html('');
@@ -442,3 +447,11 @@ html
          window.print();
          document.body.innerHTML = originalContents;
       }
+      //- function printBarcode() {
+      //-   console.log("barcode section");
+      //-   $('#displaySectionNonSimilar').remove();
+      //-   var newDivFloat = $(document.createElement('div'));
+      //-   var newDivFloatData = '<div class = "box box-info float-div"><div class = "box-header">Choose categroy</div><div class = "box-body"></div></div>';
+      //-   //$("#bcTarget").barcode("1234567", "int25",{barWidth:6, barHeight:90});
+      //-   $('#displaySection').append(newDivFloatData);
+      //- }
