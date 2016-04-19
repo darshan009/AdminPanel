@@ -190,19 +190,34 @@ html
                         option Lunch
                         option Dinner
                   .form-group
-                    label.col-sm-2.control-label Select Category
+                    label.col-sm-2.control-label Veg Categories
                     .col-sm-6
                       table
                         tr
                           each itemCategory in itemCategories
                             td
-                              button.btn.btn-app#selectedCategory(type='button' data-getButton='n-#{itemCategory._id}' value = '#{itemCategory.name}')
+                              button.btn.btn-app#selectedCategory(type='button' data-getButton='n-#{itemCategory._id}' data-mealType = 'Veg' value = '#{itemCategory.name}')
                                 | #{itemCategory.name}
                           td
-                            button.btn.btn-app#selectedCategory(type='button' data-getButton='int' value = 'International')
+                            button.btn.btn-app#selectedCategory(type='button' data-getButton='int' data-mealType = 'Veg' value = 'International')
                               | International
                           td
-                            button.btn.btn-app#selectedCategory(type='button' data-getButton='Extras' value = 'Extras')
+                            button.btn.btn-app#selectedCategory(type='button' data-getButton='Extras' data-mealType = 'Veg' value = 'Extras')
+                              | Extras
+                  .form-group
+                    label.col-sm-2.control-label Non-Veg Categories
+                    .col-sm-6
+                      table
+                        tr
+                          each itemCategory in itemCategories
+                            td
+                              button.btn.btn-app#selectedCategory(type='button' data-getButton='n-#{itemCategory._id}' data-mealType = 'Non Veg' value = '#{itemCategory.name}')
+                                | #{itemCategory.name}
+                          td
+                            button.btn.btn-app#selectedCategory(type='button' data-getButton='int' data-mealType = 'Non Veg' value = 'International')
+                              | International
+                          td
+                            button.btn.btn-app#selectedCategory(type='button' data-getButton='Extras' data-mealType = 'Non Veg' value = 'Extras')
                               | Extras
           .row#displaySimilar
           .row#displaySection
@@ -238,9 +253,12 @@ html
     // page script
     script.
       $(function () {
+        $.fn.dataTable.ext.errMode = 'none';
         //non-customized
         $('button#selectedCategory').click(function(){
           $category = $(this).val();
+          $mealType = $(this).attr('data-mealType');
+          console.log($mealType);
           $meal = $('#mealSelected').val();
           $buttonDisablerId = $(this).attr('data-getButton');
           if ( !$('#mealSelected').val() )
@@ -258,7 +276,7 @@ html
           }
           var today = dd+'-'+mm+'-'+yyyy;
           console.log(today);
-          $.getJSON("http://os.foodees.in/Services/Services.svc/Gettodaysorderbycustomer/"+'13-04-2016'+','+$meal, {
+          $.getJSON("http://os.foodees.in/Services/Services.svc/Gettodaysorderbycustomer/"+'14-04-2016'+','+$meal, {
           category : $category,
           meal : $meal,
           ajax : true
@@ -292,7 +310,13 @@ html
               for (var l=0; l<allOrders.length; l++) {
                 if (listOfOrdersByAddress[k].address == allOrders[l].custaddress) {
                   listOfOrdersByAddress[k].orderCount++;
-
+                  
+                  //veg non veg distinguishing
+                  if ((allOrders[l].Meal_Name).indexOf('Veg') > -1 && (allOrders[l].Meal_Name).indexOf('Non Veg') < 0)
+                    listOfOrdersByAddress[k].mealType = 'Veg';
+                  if ((allOrders[l].Meal_Name).indexOf('Non Veg') > -1)
+                    listOfOrdersByAddress[k].mealType = 'Non Veg';
+                    
                   //get all Orders by selected category & per address
                   if (allOrders[l].catName == $category)
                     listOfOrdersByAddress[k].orderList.push(allOrders[l]);
@@ -340,27 +364,29 @@ html
                     break;
                 }
                 if (similarCount > 0) {
-                  var addToTableSimilar = '<div id="'+similarDivId+'" class="box box-success"><div class="box-header"><h3 class="box-title">Similar Order List - <b>'+$category+',  Details--'+sortedSimilarOrders[m].orderList[0].subdetails+'</b></h3></div><!-- /.box-header--><div id="" class="box-body"><table id="example3" class="table table-bordered table-hover"><thead><tr><th>User</th><th>Address</th><th>Meal</th><th>Details</th><th>Container</th></tr></thead><tbody>';
+                  var addToTableSimilar = '<div id="'+similarDivId+'" class="box box-success"><div class="box-header"><h3 class="box-title">Similar Order List - <b>'+$category+'</b></h3></div><!-- /.box-header--><div id="" class="box-body"><table id="example3" class="table table-bordered table-hover"><thead><tr><th>User</th><th>Address</th><th>Meal</th><th>Details</th><th>Container</th></tr></thead><tbody>';
                   for (var y=0; y<similarCount; y++) {
-                    for (var i = 0; i < sortedSimilarOrders[m+y].orderList.length; i++) {
-                      if (i == 0) {
-                        addToTableSimilar += '<tr><td rowspan='+sortedSimilarOrders[m+y].orderList.length+'>'+ sortedSimilarOrders[m+y].orderList[0].customerName +'</td>';
-                        var formattedString = sortedSimilarOrders[m+y].address.split(",").join(",<br />");
-                        addToTableSimilar += '<td rowspan='+sortedSimilarOrders[m+y].orderList.length+'>'+ formattedString +'</td>';
-                      }
-                      addToTableSimilar += '<td>'+ sortedSimilarOrders[m+y].orderList[i].Meal_Name +'</td>';
-                      addToTableSimilar += '<td>'
-                      if (sortedSimilarOrders[m+y].orderList[i].subdetails) {
-                        var formattedString = sortedSimilarOrders[m+y].orderList[i].subdetails.split(",").join(",<br />");
-                        addToTableSimilar += ''+ formattedString+',<br>';
-                      }
-                      addToTableSimilar += '<b>Total Quantity - '+sortedSimilarOrders[m+y].orderList[i].qty+'</td>';
-                      addToTableSimilar += '<td><b>'+sortedSimilarOrders[m+y].orderList[i].containertype+'</b><br>';
-                      if (sortedSimilarOrders[m+y].orderList[i].specialinstruction)
-                        addToTableSimilar += '<br /><b> Speacial Instruction - '+sortedSimilarOrders[m+y].orderList[i].specialinstruction+'</td></tr>';
-                      else
+                    if (sortedSimilarOrders[m+y].mealType == $mealType) {
+                      for (var i = 0; i < sortedSimilarOrders[m+y].orderList.length; i++) {
+                        if (i == 0) {
+                          addToTableSimilar += '<tr><td rowspan='+sortedSimilarOrders[m+y].orderList.length+'>'+ sortedSimilarOrders[m+y].orderList[0].customerName +'</td>';
+                          var formattedString = sortedSimilarOrders[m+y].address.split(",").join(",<br />");
+                          addToTableSimilar += '<td rowspan='+sortedSimilarOrders[m+y].orderList.length+'>'+ formattedString +'</td>';
+                        }
+                        addToTableSimilar += '<td>'+ sortedSimilarOrders[m+y].orderList[i].Meal_Name +'</td>';
+                        addToTableSimilar += '<td>'
+                        if (sortedSimilarOrders[m+y].orderList[i].subdetails) {
+                          var formattedString = sortedSimilarOrders[m+y].orderList[i].subdetails.split(",").join(",<br />");
+                          addToTableSimilar += ''+ formattedString+',<br>';
+                        }
+                        addToTableSimilar += '<b>Total Quantity - '+sortedSimilarOrders[m+y].orderList[i].qty+'</td>';
+                        addToTableSimilar += '<td><b>'+sortedSimilarOrders[m+y].orderList[i].containertype+'</b><br>';
+                        if (sortedSimilarOrders[m+y].orderList[i].specialinstruction)
+                          addToTableSimilar += '<br /><b> Speacial Instruction - '+sortedSimilarOrders[m+y].orderList[i].specialinstruction+'</td></tr>';
+                        else
+                          addToTableSimilar += '</td></tr>';
                         addToTableSimilar += '</td></tr>';
-                      addToTableSimilar += '</td></tr>';
+                      }
                     }
                   }
                   m += similarCount - 1;
@@ -385,7 +411,7 @@ html
             var thisDivData = [];
             var addToTable = '<div class="box box-success" id="displaySectionNonSimilar"><div class="box-header"><h3 class="box-title"><b>Non-Similar Order List -'+$category+'</b></h3></div><!-- /.box-header--><div id="" class="box-body"><table id="example2" class="table table-bordered table-hover"><thead><tr><th>User</th><th>Address</th><th>Meal</th><th>Details</th><th>Container</th></tr></thead><tbody>';
             for (var m=0; m<listOfOrdersByAddress.length; m++) {
-              if (listOfOrdersByAddress[m].orderCount == 1 && uniquePositions.indexOf(m) < 0) {
+              if (listOfOrdersByAddress[m].orderCount == 1 && uniquePositions.indexOf(m) < 0 && listOfOrdersByAddress[m].mealType == $mealType) {
                 thisDivData.push(listOfOrdersByAddress[m]);
                 for (var i = 0; i < listOfOrdersByAddress[m].orderList.length; i++) {
                   if (i == 0) {

@@ -220,6 +220,7 @@ html
     // page script
     script.
       $(function () {
+        $.fn.dataTable.ext.errMode = 'none';
         //non-customized
         $('button#displayMixed').click(function(){
           $meal = $('#mealSelected').val();
@@ -238,7 +239,7 @@ html
           }
           var today = dd+'-'+mm+'-'+yyyy;
           console.log(today);
-          $.getJSON("http://os.foodees.in/Services/Services.svc/Gettodaysorderbycustomer/"+'13-04-2016'+','+$meal, {
+          $.getJSON("http://os.foodees.in/Services/Services.svc/Gettodaysorderbycustomer/"+'14-04-2016'+','+$meal, {
           },function(j){
             //get all orders
             var allOrders = [], listOfOrdersByAddress = [], sortedMultipleOrders = [];
