@@ -83,20 +83,21 @@ html
           // sidebar menu: : style can be found in sidebar.less
           ul.sidebar-menu
             li.header MAIN NAVIGATION
-            li
-              a(href='/user')
-                i.fa.fa-table
-                span User
-                i.fa.fa-angle-left.pull-right
-              ul.treeview-menu
-                li
-                  a(href='/userList')
-                    i.fa.fa-circle-o
-                    |  List of Users
-                li
-                  a(href='/addUser')
-                    i.fa.fa-circle-o
-                    |  Add a User
+            if (currentUser.type != 'Chef')
+              li
+                a(href='/user')
+                  i.fa.fa-table
+                  span User
+                  i.fa.fa-angle-left.pull-right
+                ul.treeview-menu
+                  li
+                    a(href='/userList')
+                      i.fa.fa-circle-o
+                      |  List of Users
+                  li
+                    a(href='/addUser')
+                      i.fa.fa-circle-o
+                      |  Add a User
             li
               a(href='/itemcategory')
                 i.fa.fa-envelope
@@ -133,24 +134,25 @@ html
                   a(href='/addMenu')
                     i.fa.fa-circle-o
                     |  Add a Menu
-            li
-              a(href='/order')
-                i.fa.fa-share
-                span Order
-                i.fa.fa-angle-left.pull-right
-              ul.treeview-menu
-                li
-                  a(href='/orderList')
-                    i.fa.fa-circle-o
-                    |  List of Orders
-                li
-                  a(href='/addOrder')
-                    i.fa.fa-circle-o
-                    |  Place an Order
-            li
-              a(href='/assembly')
-                i.fa.fa-pie-chart
-                | Assembly
+            if (currentUser.type != 'Chef')
+              li
+                a(href='/order')
+                  i.fa.fa-share
+                  span Order
+                  i.fa.fa-angle-left.pull-right
+                ul.treeview-menu
+                  li
+                    a(href='/orderList')
+                      i.fa.fa-circle-o
+                      |  List of Orders
+                  li
+                    a(href='/addOrder')
+                      i.fa.fa-circle-o
+                      |  Place an Order
+              li
+                a(href='/assembly')
+                  i.fa.fa-pie-chart
+                  | Assembly
         // /.sidebar
       // Content Wrapper. Contains page content
       .content-wrapper

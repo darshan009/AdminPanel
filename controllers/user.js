@@ -7,11 +7,16 @@ exports.isAdmin = function(req, res, next){
   if(req.user){
     if((req.user.type).toLowerCase() == "admin")
       next();
-    else if ((req.user.type).toLowerCase() == "chef") {
+    else if ((req.user.type).toLowerCase() == "staff") {
       if (req.originalUrl == "/assembly" || req.originalUrl == "/mixedAssembly" || req.originalUrl == "/multipleAssembly")
         next();
       else
         res.redirect('/assembly');
+    }else if ((req.user.type).toLowerCase() == "chef") {
+      if (req.originalUrl == "/itemList" || req.originalUrl == "/addItem" || req.originalUrl == "/menuList" || req.originalUrl == "/addMenu")
+        next();
+      else
+        res.redirect('/itemList');
     }
     else res.end("Your not authorized");
   }

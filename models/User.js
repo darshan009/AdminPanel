@@ -7,7 +7,7 @@ var userSchema = new mongoose.Schema({
   lastName: String,
   email: {type: String, unique: true},
   password: String,
-  type: { type: String, enum: ['Admin', 'Customer', 'Chef'], default: 'Customer'},
+  type: { type: String, enum: ['Admin', 'Customer', 'Chef', 'Staff'], default: 'Customer'},
   amount: Number,
   image: String,
   address: [{

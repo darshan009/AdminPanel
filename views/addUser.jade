@@ -177,11 +177,13 @@ html
                     label.col-sm-2.control-label Type
                     .col-sm-10
                       select.form-control(name='userType')
-                        option(selected='selected')
-                          | #{user?(user.type?user.type:''):''}
+                        if (user)
+                          option(selected='selected')
+                            | #{user?(user.type?user.type:''):''}
                         option Customer
                         option Admin
                         option Chef
+                        option Staff
                   .form-group
                     label.col-sm-2.control-label(for='exampleInputFile') Image
                     .col-sm-10
