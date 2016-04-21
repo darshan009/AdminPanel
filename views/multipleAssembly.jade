@@ -189,7 +189,7 @@ html
                         option(selected='selected')
                         option Lunch
                         option Dinner
-                    button.btn.btn-info(type= 'button' id='displayMixed') Display today's Mixed Orders
+                    button.btn.btn-info(type= 'button' id='displayMixed') Display today's Orders
           .row#displaySection
               // /.box-body
             // /.box
@@ -352,10 +352,14 @@ html
                 }
               }
               if (similarCount > 0) {
-                var addToTable = '<div id="'+similarDivId+'" class="box box-success"><div class="box-header"><h3 class="box-title">Multiple Similar Category Order List</h3></div><!-- /.box-header--><div id="" class="box-body"><table id="example3" class="table table-bordered table-hover"><thead><tr><th>User</th><th>Address</th><th>Meal</th><th>Details</th><th>Container</th></tr></thead><tbody>';
+                var displayDivOnce = true;
                 for (var y=0; y<similarCount; y++) {
                   for (var i = 0; i < sortedMultipleOrders[m+y].orderList.length; i++) {
                     if (sortedMultipleOrders[m+y].orderList.length > 1 && !sortedMultipleOrders[m+y].mixed) {
+                      if (displayDivOnce) {
+                        var addToTable = '<div id="'+similarDivId+'" class="box box-success"><div class="box-header"><h3 class="box-title">Multiple Similar Category Order List</h3></div><!-- /.box-header--><div id="" class="box-body"><table id="example3" class="table table-bordered table-hover"><thead><tr><th>User</th><th>Address</th><th>Meal</th><th>Details</th><th>Container</th></tr></thead><tbody>';
+                        displayDivOnce = false;
+                      }
                       if (i == 0) {
                         addToTable += '<tr><td rowspan='+sortedMultipleOrders[m+y].orderList.length+'>'+ sortedMultipleOrders[m+y].orderList[0].customerName +'</td>';
                         var formattedString = sortedMultipleOrders[m+y].address.split(",").join(",<br />");
@@ -374,21 +378,24 @@ html
                       else
                         addToTable += '</td></tr>';
                       addToTable += '</td></tr>';
+                      var displayLastDiv = true;
                     }
                   }
                 }
                 m += similarCount - 1;
-                addToTable += '</tbody></table><br /><button id="" type="button" class="btn btn-info pull-left" onclick = "prinSimilartDiv('+similarDivId+')">Print</button><button id="" type="button" class="btn btn-info pull-right">Next</button></div></div>';
-                //console.log(addToTable)
-                $('#displaySection').append(addToTable);
-                $('#example3').DataTable({
-                "paging": false,
-                "lengthChange": true,
-                "searching": false,
-                "ordering": false,
-                "info": true,
-                "autoWidth": true
-                });
+                if (y > 1 && displayLastDiv) {
+                  addToTable += '</tbody></table><br /><button id="" type="button" class="btn btn-info pull-left" onclick = "prinSimilartDiv('+similarDivId+')">Print</button><button id="" type="button" class="btn btn-info pull-right">Next</button></div></div>';
+                  $('#displaySection').append(addToTable);
+                  $('#example3').DataTable({
+                  "paging": false,
+                  "lengthChange": true,
+                  "searching": false,
+                  "ordering": false,
+                  "info": true,
+                  "autoWidth": true
+                  });
+                  displayLastDiv = false;
+                }
               }
               similarDivId++;
             }

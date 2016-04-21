@@ -155,20 +155,21 @@ exports.postAddUser = function(req, res, next){
     });
     user.address = [];
     var fullAddress = [];
-    for (var i=0; i<req.body.streetAddress.length; i++) {
-      var address = new Address({
-        user : user._id,
-        tag : req.body.tag[i],
-        flatNo : req.body.flatNo[i],
-        streetAddress : req.body.streetAddress[i],
-        landmark : req.body.landmark[i],
-        pincode : req.body.pincode[i]
-      });
-      user.address.push(address._id);
-      address.save(function (err) {
-          if (err) return err
-      });
-    }
+    if (req.body.streetAddress)
+      for (var i=0; i<req.body.streetAddress.length; i++) {
+        var address = new Address({
+          user : user._id,
+          tag : req.body.tag[i],
+          flatNo : req.body.flatNo[i],
+          streetAddress : req.body.streetAddress[i],
+          landmark : req.body.landmark[i],
+          pincode : req.body.pincode[i]
+        });
+        user.address.push(address._id);
+        address.save(function (err) {
+            if (err) return err
+        });
+      }
     console.log(user.address);
     user.save(function (err) {
         if (err) return err
