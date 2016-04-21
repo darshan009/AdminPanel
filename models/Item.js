@@ -6,12 +6,6 @@ var itemSchema = new mongoose.Schema({
   type: { type: String, enum: ['Veg', 'Non-Veg'], default: 'Veg' },
   description: { type: String, default: '' },
   category: { type: mongoose.Schema.Types.ObjectId, ref: 'ItemCategory' },
-  subItems: [{
-     "name" : { type: String },
-     "quantity" : {type: Number, default: '1'},
-     "cost" : { type: Number, default: '' },
-     "container": { type: Number , default: '1'}
-  }],
   attributes : [{
     "name" : String,
     "cost": Number

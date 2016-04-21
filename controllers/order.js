@@ -381,7 +381,8 @@ exports.postAddOrder = function(req, res){
                 _id : subItems._id
               },
               subTotal : subTotal * req.body.singleQuantity[i],
-              singleQuantity : req.body.singleQuantity[i]
+              singleQuantity : req.body.singleQuantity[i],
+              containerType: req.body.containerType[i]
             });
             totalCost += subTotal * req.body.singleQuantity[i];
             subItems.save(function (err) {
@@ -402,7 +403,8 @@ exports.postAddOrder = function(req, res){
                 //quantity : req.body.attributesQuantity[j]
               },
               subTotal : subTotal * req.body.singleQuantity[i],
-              singleQuantity : req.body.singleQuantity[i]
+              singleQuantity : req.body.singleQuantity[i],
+              containerType: req.body.containerType[i]
             })
             totalCost += subTotal * req.body.singleQuantity[i];
             j++;
@@ -411,7 +413,8 @@ exports.postAddOrder = function(req, res){
             order.menu.push({
               _id : allMenus[i],
               subTotal : Number(sortedMenus[i].item.totalCost) * req.body.singleQuantity[i],
-              singleQuantity : req.body.singleQuantity[i]
+              singleQuantity : req.body.singleQuantity[i],
+              containerType: req.body.containerType[i]
             })
             totalCost += Number(sortedMenus[i].item.totalCost) * req.body.singleQuantity[i];
           }
@@ -481,7 +484,7 @@ exports.getMenusFromOptions = function(req, res){
             id: menusList[i]._id,
             item: menusList[i].item.title
           }
-          if (menusList[i].item.subItems.length > 0)
+          if (menusList[i].subItems.length > 0)
             menusListJson[i].checked = false;
           else if (menusList[i].item.attributes.length > 0)
             menusListJson[i].checked = "hasAttributes";
@@ -526,17 +529,16 @@ exports.getCustomizedMenuToItem = function(req, res) {
     console.log("--------getCustomizedMenuToItem----------")
     console.log(menu);
     var subItemsAttributes = [];
-    if(menu.item.subItems.length != 0){
+    if(menu.subItems.length != 0){
       console.log("subItems found");
-      for (var i=0; i<menu.item.subItems.length; i++)
+      for (var i=0; i<menu.subItems.length; i++)
         subItemsAttributes[i] = {
-          name : menu.item.subItems[i].name,
-          quantity : menu.item.subItems[i].quantity,
-          cost : menu.item.subItems[i].cost,
-          container :menu.item.subItems[i].container
+          name : menu.subItems[i].name,
+          quantity : menu.subItems[i].quantity,
+          cost : menu.subItems[i].cost,
+          container :menu.subItems[i].container
         }
-    }
-    if(menu.item.attributes.length != 0){
+    }else if(menu.item.attributes.length != 0){
       console.log("attributes found")
       for (var i=0; i<menu.item.attributes.length; i++)
         subItemsAttributes[i] = {

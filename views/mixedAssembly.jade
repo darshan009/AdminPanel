@@ -96,23 +96,9 @@ html
                       i.fa.fa-circle-o
                       |  Add a User
               li
-                a(href='/item')
-                  i.fa.fa-calendar
-                  span Item
-                  i.fa.fa-angle-left.pull-right
-                ul.treeview-menu
-                  li
-                    a(href='/itemList')
-                      i.fa.fa-circle-o
-                      |  List of Items
-                  li
-                    a(href='/addItem')
-                      i.fa.fa-circle-o
-                      |  Add an Item
-              li
                 a(href='#')
                   i.fa.fa-envelope
-                  span ItemCategory
+                  span Categories
                   i.fa.fa-angle-left.pull-right
                 ul.treeview-menu
                   li
@@ -123,12 +109,20 @@ html
                     a(href='/addCategory')
                       i.fa.fa-circle-o
                       |  Add a category
-              li.treeview
+              li
                 a(href='#')
-                  i.fa.fa-folder
-                  span Menu
+                  i.fa.fa-calendar
+                  span Recipe
                   i.fa.fa-angle-left.pull-right
                 ul.treeview-menu
+                  li
+                    a(href='/itemList')
+                      i.fa.fa-circle-o
+                      |  List of Recipes
+                  li
+                    a(href='/addItem')
+                      i.fa.fa-circle-o
+                      |  Add a Recipe
                   li
                     a(href='/menuList')
                       i.fa.fa-circle-o

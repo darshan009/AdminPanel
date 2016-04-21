@@ -13,6 +13,7 @@ var orderSchema = new mongoose.Schema({
       "quantity" : Number,
       "cost" : Number
     },
+    containerType: String,
     subTotal: Number,
     singleQuantity: { type: Number, default : '1' }
   }],

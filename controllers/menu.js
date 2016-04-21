@@ -38,6 +38,23 @@ exports.postAddMenu = function(req, res){
         menu.meal= req.body.meal;
         menu.category= req.body.category;
         menu.item= item._id;
+        menu.subItems = [];
+        var locals = req.body;
+        var totalCost = 0;
+        if (locals.name)
+          for(var i=0; i<locals.name.length; i++) {
+            if (locals.cost[i] != ''){
+              menu.subItems.push({
+                name : locals.name[i],
+                cost : locals.cost[i],
+                quantity : locals.quantity[i],
+                container : locals.container[i]
+              })
+              totalCost += Number(locals.cost[i]) * Number(locals.quantity[i]);
+            }
+          }
+        menu.totalCost = 0;
+        menu.totalCost += totalCost;
         menu.save(function (err) {
             if (err) return err
         });
@@ -53,6 +70,23 @@ exports.postAddMenu = function(req, res){
         category: req.body.category,
         item: item._id
       })
+      menu.subItems = [];
+      var locals = req.body;
+      var totalCost = 0;
+      if (locals.name)
+        for(var i=0; i<locals.name.length; i++) {
+          if (locals.cost[i] != ''){
+            menu.subItems.push({
+              name : locals.name[i],
+              cost : locals.cost[i],
+              quantity : locals.quantity[i],
+              container : locals.container[i]
+            })
+            totalCost += Number(locals.cost[i]) * Number(locals.quantity[i]);
+          }
+        }
+      menu.totalCost = 0;
+      menu.totalCost += totalCost;
       menu.save(function (err) {
         if (err) return err;
       })

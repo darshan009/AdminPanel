@@ -94,24 +94,10 @@ html
                   a(href='/addUser')
                     i.fa.fa-circle-o
                     |  Add a User
-            li.active
-              a(href='/item')
-                i.fa.fa-calendar
-                span Item
-                i.fa.fa-angle-left.pull-right
-              ul.treeview-menu
-                li
-                  a(href='/itemList')
-                    i.fa.fa-circle-o
-                    |  List of Items
-                li.active
-                  a(href='/addItem')
-                    i.fa.fa-circle-o
-                    |  Add an Item
             li
               a(href='/itemcategory')
                 i.fa.fa-envelope
-                span ItemCategory
+                span Categories
                 i.fa.fa-angle-left.pull-right
               ul.treeview-menu
                 li
@@ -122,12 +108,20 @@ html
                   a(href='/addCategory')
                     i.fa.fa-circle-o
                     |  Add a category
-            li.treeview
-              a(href='/menu')
-                i.fa.fa-folder
-                span Menu
+            li.active
+              a(href='#')
+                i.fa.fa-calendar
+                span Recipe
                 i.fa.fa-angle-left.pull-right
               ul.treeview-menu
+                li
+                  a(href='/itemList')
+                    i.fa.fa-circle-o
+                    |  List of Recipes
+                li.active
+                  a(href='/addItem')
+                    i.fa.fa-circle-o
+                    |  Add a Recipe
                 li
                   a(href='/menuList')
                     i.fa.fa-circle-o
@@ -214,29 +208,6 @@ html
                       each itemCategory in itemCategories
                         option #{itemCategory.name}
                 .form-group
-                  label.col-sm-2.control-label Add Sub-Items
-                  .col-sm-10
-                    table#hi.table.table-bordered.table-hover
-                      thead
-                        tr
-                          th Name
-                          th Cost for 1
-                          th Default quantity
-                          th Container
-                      tbody
-                        if item
-                          each items in item.subItems
-                            tr
-                              td
-                                input(type='text' name='name[]' placeholder='Sub-Item name' value=(items?(items.name?items.name:''):''))
-                              td
-                                input(type='Number' name='cost[]' placeholder='Cost for 1' value=(items?(items.cost?items.cost:''):''))
-                              td
-                                input(type='Number' name='quantity[]' placeholder='Quantity' value=(items?(items.quantity?items.quantity:''):''))
-                              td
-                                input(type='Number' name='container[]' placeholder='Container Number' value=(items?(items.container?items.container:''):''))
-                    button.btn.btn-info.pull-right(onclick='addTableRow()', type='button') Add a row
-                .form-group
                   label.col-sm-2.control-label Attributes
                   .col-sm-10
                     table#attributesTable.table.table-bordered.table-hover
@@ -293,39 +264,6 @@ html
     script(src='../public/dist/js/app.min.js')
     // page script
     script.
-      function addTableRow() {
-        document.getElementById("singleCost").setAttribute('disabled', true)
-        var table = document.getElementById("hi");
-        var row = table.insertRow(1);
-        var cell1 = row.insertCell(0);
-        var cell1Data = document.createElement("input");
-        cell1Data.type = "text";
-        cell1Data.name = "name[]";
-        cell1Data.placeholder = "Sub-Item Name";
-        cell1.appendChild(cell1Data);
-
-        var cell2 = row.insertCell(1);
-        var cell2Data = document.createElement("input");
-        cell2Data.type = "Number";
-        cell2Data.name = "cost[]";
-        cell2Data.placeholder = "Cost"
-        cell2.appendChild(cell2Data);
-
-        var cell3 = row.insertCell(2);
-        var cell3Data = document.createElement("input");
-        cell3Data.type = "Number";
-        cell3Data.name = "quantity[]";
-        cell3Data.placeholder = "Quantity";
-        cell3.appendChild(cell3Data);
-
-        var cell4 = row.insertCell(3);
-        var cell4Data = document.createElement("input");
-        cell4Data.type = "Number";
-        cell4Data.name = "container[]";
-        cell4Data.value = "1";
-        cell4Data.placeholder = "Container Number";
-        cell4.appendChild(cell4Data);
-      }
       function addTableRowPartTwo() {
         document.getElementById("singleCost").setAttribute('disabled', true)
         var table = document.getElementById("attributesTable");
