@@ -49,8 +49,8 @@ exports.getOrderList = function(req, res) {
                 nonCustomizedResult[z].quantityAtt = results[i].menu[j].singleQuantity;
               }
               else{
-                for (var l=0; l<results[i].menu[j]._id.item.subItems.length; l++)
-                  nonCustomizedResult[z].details.push(results[i].menu[j]._id.item.subItems[l]);
+                for (var l=0; l<results[i].menu[j]._id.subItems.length; l++)
+                  nonCustomizedResult[z].details.push(results[i].menu[j]._id.subItems[l]);
               }
               z++;
             }

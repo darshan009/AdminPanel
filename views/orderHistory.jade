@@ -5,7 +5,7 @@ html
     meta(http-equiv='X-UA-Compatible', content='IE=edge')
     title OrderCMS
     // Tell the browser to be responsive to screen width
-    meta(content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no', name='viewport')
+    meta(content='width=device-width, initial-scale=1, maximum-scale=1, `user`-scalable=no', name='viewport')
     // Bootstrap 3.3.5
     link(rel='stylesheet', href='../public/bootstrap/css/bootstrap.min.css')
     // Font Awesome
@@ -86,7 +86,7 @@ html
                 span User
                 i.fa.fa-angle-left.pull-right
               ul.treeview-menu
-                li.active
+                li
                   a(href='/userList')
                     i.fa.fa-circle-o
                     |  List of Users
@@ -94,7 +94,7 @@ html
                   a(href='/addUser')
                     i.fa.fa-circle-o
                     |  Add a User
-                li
+                li.active
                   a(href='/orderHistory')
                     i.fa.fa-circle-o
                     |  User Order history
@@ -166,21 +166,34 @@ html
                 table#example2.table.table-bordered.table-hover
                   thead
                     tr
-                      th Name
-                      th Email
-                      th Type
-                      th Amount
+                      th Menu
+                      th Date
+                      th Meal
+                      th Details
+                      th State
                   tbody
-                    if users
-                      each user in users
+                    if fullResult
+                      each fullResults in fullResult
                         tr
-                          td
-                            a(href='/editUser/#{user._id}')
-                              | #{user.firstName}
-                              | #{user.lastName}
-                          td #{user.email}
-                          td #{user.type}
-                          td #{user.amount}
+                          td #{fullResults.title}
+                          td #{fullResults.date}
+                          td #{fullResults.mealType}
+                          if (fullResults.details.length > 0)
+                            td
+                              each details in fullResults.details
+                                | #{details.quantity}-#{details.name}, #{details.container}-container
+                                br
+                              b
+                                | Total Quantity - #{fullResults.quantity}
+                          else if (fullResults.nameAtt)
+                            td
+                              | #{fullResults.quantityAtt}-#{fullResults.nameAtt}
+                              br
+                          else
+                            td
+                              b
+                                | Quantity - #{fullResults.quantity}
+                            
               // /.box-body
             // /.box
           // /.row

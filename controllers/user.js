@@ -1,5 +1,7 @@
 var passport = require('passport');
 var User = require('../models/User');
+var Order = require('../models/Order');
+var Item = require('../models/Item');
 var Address = require('../models/Address');
 
 //check if user is admin
@@ -53,6 +55,49 @@ exports.getUsers = function(req, res, next){
     res.render('userList', {users: users});
   });
 };
+
+exports.getUsersForHistory = function(req, res, next){
+  User.find().exec(function(err, users){
+    if(err) return next(err);
+    res.render('userListHistory', {users: users});
+  });
+};
+exports.getUserHistory = function(req, res, next){
+  Order.find({user: req.params.email})
+  .populate('menu._id')
+  .populate('menu.subItems._id')
+  .exec(function(err, orders) {
+    Item.populate(orders, 'menu._id.item', function(err, results){
+      if(err) return next(err);
+      var fullResult = [], y = 0;
+      for (var i=0; i<results.length; i++) {
+        for (var j=0; j<results[i].menu.length; j++) {
+          fullResult[y] = {
+              title : results[i].menu[j]._id.item.title,
+              date : results[i].menu[j]._id.date,
+              user : results[i].user,
+              quantity : results[i].menu[j].singleQuantity,
+              mealType : results[i].menu[j]._id.meal,
+              details : []
+          }
+          if (results[i].menu[j].subItems && results[i].menu[j].subItems._id != null)
+            for (var k=0; k<results[i].menu[j].subItems._id.subItemsArray.length; k++)
+              fullResult[y].details.push(results[i].menu[j].subItems._id.subItemsArray[k]);
+          else if (results[i].menu[j].attributes.name) {
+            fullResult[y].nameAtt = results[i].menu[j].attributes.name;
+            fullResult[y].quantityAtt = results[i].menu[j].singleQuantity;
+          }
+          else
+            for (var l=0; l<results[i].menu[j]._id.subItems.length; l++)
+              fullResult[y].details.push(results[i].menu[j]._id.subItems[l]);
+          y++;
+        }
+      }
+      res.render('orderHistory', {fullResult: fullResult});
+    });
+  });
+};
+
 exports.getAddUser = function(req, res, next){
   if(req.params.id){
     User.findById(req.params.id)

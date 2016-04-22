@@ -86,7 +86,7 @@ html
                 span User
                 i.fa.fa-angle-left.pull-right
               ul.treeview-menu
-                li.active
+                li
                   a(href='/userList')
                     i.fa.fa-circle-o
                     |  List of Users
@@ -94,7 +94,7 @@ html
                   a(href='/addUser')
                     i.fa.fa-circle-o
                     |  Add a User
-                li
+                li.active
                   a(href='/orderHistory')
                     i.fa.fa-circle-o
                     |  User Order history
@@ -169,18 +169,16 @@ html
                       th Name
                       th Email
                       th Type
-                      th Amount
                   tbody
                     if users
                       each user in users
                         tr
                           td
-                            a(href='/editUser/#{user._id}')
+                            a(href='/orderHistory/#{user.email}')
                               | #{user.firstName}
                               | #{user.lastName}
                           td #{user.email}
                           td #{user.type}
-                          td #{user.amount}
               // /.box-body
             // /.box
           // /.row

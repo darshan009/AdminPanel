@@ -56,6 +56,8 @@ app.post('/addUser', userController.isAdmin, userController.postAddUser);
 app.post('/editUser/:id', userController.isAdmin, userController.postAddUser);
 app.get('/addUser', userController.isAdmin, userController.getAddUser);
 app.get('/editUser/:id', userController.isAdmin, userController.getAddUser);
+app.get('/orderHistory', userController.isAdmin, userController.getUsersForHistory);
+app.get('/orderHistory/:email', userController.isAdmin, userController.getUserHistory);
 app.get('/logout', userController.getLogout);
 //item category
 app.get('/categoryList', userController.isAdmin, itemController.getItemCategories);
