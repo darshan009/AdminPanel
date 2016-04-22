@@ -14,6 +14,8 @@ html
     link(rel='stylesheet', href='https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css')
     // DataTables
     link(rel='stylesheet', href='../public/plugins/datatables/dataTables.bootstrap.css')
+    // datepicker
+    link(rel='stylesheet', href='../public/bootstrap/css/datepicker.css')
     // Theme style
     link(rel='stylesheet', href='../public/dist/css/AdminLTE.min.css')
     //
@@ -181,8 +183,15 @@ html
               .box-body
                 form.form-horizontal
                   .form-group
+                    label.col-sm-2.control-label Pick a date
+                    .col-sm-3
+                      .input-group
+                        .input-group-addon
+                          i.fa.fa-calendar
+                        input.form-control.datepicker#dateSelected(type='text', name='date' value=(menu?(menu.date?menu.date:''):''))
+                  .form-group
                     label.col-sm-2.control-label Meal type
-                    .col-sm-6
+                    .col-sm-3
                       select.form-control(name = 'meal' id='mealSelected')
                         option(selected='selected')
                         option Lunch
@@ -244,6 +253,8 @@ html
     // DataTables
     script(src='../public/plugins/datatables/jquery.dataTables.min.js')
     script(src='../public/plugins/datatables/dataTables.bootstrap.min.js')
+    // date-picker
+    script(src='../public/bootstrap/js/bootstrap-datepicker.js')
     //barcode
     script(type='text/javascript', src='../public/plugins/jQuery/jquery-barcode.js')
     // AdminLTE App
@@ -252,29 +263,22 @@ html
     script.
       $(function () {
         $.fn.dataTable.ext.errMode = 'none';
+        $('.datepicker').datepicker({
+          "format": "dd-mm-yyyy"
+        });
         //non-customized
         $('button#selectedCategory').click(function(){
           $category = $(this).val();
+          $date = $('#dateSelected').val();
           $mealType = $(this).attr('data-mealType');
           console.log($mealType);
           $meal = $('#mealSelected').val();
           $buttonDisablerId = $(this).attr('data-getButton');
           if ( !$('#mealSelected').val() )
           alert("Please Select Lunch or Dinner");
-          //get todays date
-          var today = new Date();
-          var dd = today.getDate();
-          var mm = today.getMonth()+1; //January is 0!
-          var yyyy = today.getFullYear();
-          if(dd<10){
-              dd='0'+dd
-          }
-          if(mm<10){
-              mm='0'+mm
-          }
-          var today = dd+'-'+mm+'-'+yyyy;
-          console.log(today);
-          $.getJSON("http://os.foodees.in/Services/Services.svc/Gettodaysorderbycustomer/"+'14-04-2016'+','+$meal, {
+          if ( !$('#dateSelected').val() )
+            alert("Please Select Date");
+          $.getJSON("http://os.foodees.in/Services/Services.svc/Gettodaysorderbycustomer/"+$date+','+$meal, {
           category : $category,
           meal : $meal,
           ajax : true
