@@ -155,3 +155,80 @@ exports.getCustomizedOrderByCategory = function(req, res){
     });
   });
 };
+
+
+// ---- Single items list --------
+exports.getSingleItemsPage = function(req, res) {
+  res.render('singleItems');
+};
+
+exports.getSingleItems = function(req, res) {
+  var orderOptions = {}
+  if(req.query.date)
+    orderOptions.date = req.query.date;
+  if(req.query.meal)
+    orderOptions.meal = req.query.meal;
+    console.log(orderOptions);
+  Order.find()
+  .populate('menu._id', null, orderOptions)
+  .populate('menu.subItems._id')
+  .exec(function(err, orders) {
+    Item.populate(orders, 'menu._id.item', function(err, results){
+      //console.log(results);
+      if (err) return err;
+      var singleItems = [], z = 0;
+      for (var i=0; i<orders.length; i++) {
+        for (var j=0; j<orders[i].menu.length; j++) {
+          if (orders[i].menu[j].subItems._id) {
+            for (var k=0; k<orders[i].menu[j].subItems._id.subItemsArray.length; k++) {
+              singleItems[z] = {
+                title: orders[i].menu[j].subItems._id.subItemsArray[k].name,
+                quantity: orders[i].menu[j].singleQuantity * orders[i].menu[j].subItems._id.subItemsArray[k].quantity
+              }
+              z++;
+            }
+          }else if (orders[i].menu[j]._id && orders[i].menu[j]._id.subItems.length > 0) {
+            for (var k=0; k<orders[i].menu[j]._id.subItems.length; k++) {
+              singleItems[z] = {
+                title: orders[i].menu[j]._id.subItems[k].name,
+                quantity: orders[i].menu[j].singleQuantity * orders[i].menu[j]._id.subItems[k].quantity
+              }
+              z++;
+            }
+          }
+          else {
+            if (orders[i].menu[j]._id) {
+              singleItems[z] = {
+                title: orders[i].menu[j]._id.item.title,
+                quantity: orders[i].menu[j].singleQuantity
+              }
+              z++
+            }
+          }
+        }
+      }
+      console.log(singleItems);
+      //sorting singleItems by name
+      var uniqueItems = [], uniqueTitles = [], count = 0;
+      for (var i=0; i<singleItems.length; i++)
+        if (uniqueTitles.indexOf(singleItems[i].title) < 0)
+          uniqueTitles.push(singleItems[i].title);
+
+      for (var j=0; j<uniqueTitles.length; j++) {
+        var quantityCount = 0;
+        for (var k=0; k<singleItems.length; k++) {
+          if (singleItems[k].title == uniqueTitles[j]) {
+            quantityCount += singleItems[k].quantity;
+            uniqueItems[count] = {
+              title: singleItems[k].title,
+              quantity: quantityCount
+            }
+          }
+        }
+        count++;
+      }
+      console.log(uniqueItems);
+      res.send(uniqueItems)
+    });
+  });
+};

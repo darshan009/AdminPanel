@@ -14,6 +14,8 @@ html
     link(rel='stylesheet', href='https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css')
     // DataTables
     link(rel='stylesheet', href='../public/plugins/datatables/dataTables.bootstrap.css')
+    // datepicker
+    link(rel='stylesheet', href='../public/bootstrap/css/datepicker.css')
     // Theme style
     link(rel='stylesheet', href='../public/dist/css/AdminLTE.min.css')
     //
@@ -80,8 +82,8 @@ html
           // sidebar menu: : style can be found in sidebar.less
           ul.sidebar-menu
             li.header MAIN NAVIGATION
-            li
-              a(href='#')
+            li.active
+              a(href='/user')
                 i.fa.fa-table
                 span User
                 i.fa.fa-angle-left.pull-right
@@ -98,7 +100,7 @@ html
                   a(href='/orderHistory')
                     i.fa.fa-circle-o
                     |  User Order history
-            li.active
+            li
               a(href='#')
                 i.fa.fa-envelope
                 span Categories
@@ -108,7 +110,7 @@ html
                   a(href='/categoryList')
                     i.fa.fa-circle-o
                     |  List of Categories
-                li.active
+                li
                   a(href='/addCategory')
                     i.fa.fa-circle-o
                     |  Add a category
@@ -135,7 +137,7 @@ html
                     i.fa.fa-circle-o
                     |  Add a Menu
             li.treeview
-              a(href='/order')
+              a(href='#')
                 i.fa.fa-share
                 span Order
                 i.fa.fa-angle-left.pull-right
@@ -148,6 +150,10 @@ html
                   a(href='/addOrder')
                     i.fa.fa-circle-o
                     |  Place an Order
+            li.active
+              a(href='/singleItems')
+                i.fa.fa-pie-chart
+                | Item List
             li
               a(href='/assembly')
                 i.fa.fa-pie-chart
@@ -158,25 +164,28 @@ html
         // Main content
         section.content
           .row
-            .box.box-info
-              .box-header.with-border
-                h3.box-title Add a Category
-              // /.box-header
-              // form start
-              form.form-horizontal(method='POST')
-                .box-body
+            .box
+              .box-body
+                form.form-horizontal
                   .form-group
-                    label.col-sm-2.control-label Name
-                    .col-sm-10
-                      input.form-control(type='name', id='', name='name' required='true' placeholder='Name' value=(itemCategory?(itemCategory.name?itemCategory.name:''):''))
-                  .box-footer
-                    if(itemCategory)
-                      a(href='/addCategory/delete/#{itemCategory._id}')
-                        button.btn.btn-info.pull-left(type='button') Delete
-                      button.btn.btn-info.pull-right(type='submit') Edit
-                    else
-                      button.btn.btn-info.pull-right(type='submit') Save
-                  // /.box-footer
+                    label.col-sm-2.control-label Meal type
+                    .col-sm-3
+                      select.form-control(name = 'meal' id='mealSelected')
+                        option(selected='selected')
+                        option Lunch
+                        option Dinner
+                  .form-group
+                    label.col-sm-2.control-label Pick a date
+                    .col-sm-3
+                      .input-group
+                        .input-group-addon
+                          i.fa.fa-calendar
+                        input.form-control.datepicker#dateSelected(type='text', name='date' value=(menu?(menu.date?menu.date:''):''))
+                    .col-md-3
+                      .input-group
+                        button.btn.btn-info#getItemList(type = "button") Submit
+          .row#itemList
+              // /.box-body
             // /.box
           // /.row
         // /.content
@@ -200,18 +209,39 @@ html
     // DataTables
     script(src='../public/plugins/datatables/jquery.dataTables.min.js')
     script(src='../public/plugins/datatables/dataTables.bootstrap.min.js')
+    // date-picker
+    script(src='../public/bootstrap/js/bootstrap-datepicker.js')
     // AdminLTE App
     script(src='../public/dist/js/app.min.js')
     // page script
     script.
       $(function () {
-      $("#example1").DataTable();
-      $('#example2').DataTable({
-      "paging": true,
-      "lengthChange": false,
-      "searching": false,
-      "ordering": true,
-      "info": true,
-      "autoWidth": false
-      });
+        //Date picker
+        $('.datepicker').datepicker();
+        $('#getItemList').click(function() {
+          $mealType = $('#mealSelected').val();
+          $date = $('#dateSelected').val();
+          console.log($mealType+$date);
+          $.getJSON('/singleItemsList',{
+            date : $date,
+            meal: $mealType,
+            ajax : true
+          }, function(results){
+            var addToTable = '<div class="box box-success"><div class="box-header"><h3 class="box-title"><b>Non-Item List</b></h3></div><!-- /.box-header--><div id="" class="box-body"><table id="example2" class="table table-bordered table-hover"><thead><tr><th>Item</th><th>Quantity</th></tr></thead><tbody>';
+            for (var i=0; i<results.length; i++) {
+              addToTable += '<tr><td>'+results[i].title+'</td><td>'+results[i].quantity+'</td></tr>'
+            }
+            addToTable += '</tbody></table></div></div>';
+            $('#itemList').html('');
+            $('#itemList').append(addToTable);
+            $('#example2').DataTable({
+              "paging": false,
+              "lengthChange": true,
+              "searching": true,
+              "ordering": false,
+              "info": true,
+              "autoWidth": true
+            });
+          });
+        });
       });

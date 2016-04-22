@@ -118,3 +118,18 @@ exports.getItemsFromCategory = function(req, res){
     })
   })
 };
+
+exports.getItemListForMenu = function(req, res, next){
+  Item.find()
+  .exec(function(err, items){
+     res.send(items);
+   })
+};
+
+exports.getItemCost = function(req, res, next){
+  Item.findOne({title: req.query.title})
+  .exec(function(err, item){
+    console.log(item.cost);
+     res.send(item.cost);
+   })
+};

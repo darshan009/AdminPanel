@@ -98,6 +98,10 @@ html
                     a(href='/addUser')
                       i.fa.fa-circle-o
                       |  Add a User
+                  li
+                    a(href='/orderHistory')
+                      i.fa.fa-circle-o
+                      |  User Order history
             li
               a(href='/itemcategory')
                 i.fa.fa-envelope
@@ -199,7 +203,7 @@ html
                   .form-group
                     label.col-sm-2.control-label Add Sub-Items
                     .col-sm-10
-                      table#hi.table.table-bordered.table-hover
+                      table#menuSubItems.table.table-bordered.table-hover
                         thead
                           tr
                             th Name
@@ -218,7 +222,7 @@ html
                                   input(type='Number' name='quantity[]' placeholder='Quantity' value=(menus?(menus.quantity?menus.quantity:''):''))
                                 td
                                   input(type='Number' name='container[]' placeholder='Container Number' value=(menus?(menus.container?menus.container:''):''))
-                      button.btn.btn-info.pull-right(onclick='addTableRow()', type='button') Add a row
+                      button.btn.btn-info.pull-right#addRow(type='button') Add a row
                   // /.form group
                 // /.box-body
                 .box-footer
@@ -282,37 +286,24 @@ html
             $("select#itemList").html(options);
           })
         })
+        $("button#addRow").click(function(){
+          $.getJSON("/getItemListForMenu",{
+            ajax: true
+          }, function(j){
+            var addedRows = '<tr><td><select name = "name[]" id="itemSelected">';
+            for (var i=0; i<j.length; i++) {
+              addedRows += '<option>'+j[i].title+'</option>';
+            }
+            addedRows += '</select></td><td><input type="text" id="itemSelectedCost" name = "cost[]" placeholder="Cost for 1"></td><td><input type="text" name = "quantity[]" placeholder="Quantity"></td><td><input type="text" name = "container[]" placeholder="Container"></td></tr>';
+            $("#menuSubItems tbody").append(addedRows);
+          })
+        })
+        //- $("select#itemSelected").change(function(){
+        //-   console.log("hi");
+        //-   $title = $(this).val();
+        //-   $.getJSON("/getItemCost",{title: $title, ajax: 'true'}, function(cost){
+        //-     console.log(cost);
+        //-     $("#itemSelectedCost").val(cost);
+        //-   })
+        //- })
       })
-      function addTableRow() {
-        //document.getElementById("singleCost").setAttribute('disabled', true)
-        var table = document.getElementById("hi");
-        var row = table.insertRow(1);
-        var cell1 = row.insertCell(0);
-        var cell1Data = document.createElement("input");
-        cell1Data.type = "text";
-        cell1Data.name = "name[]";
-        cell1Data.placeholder = "Sub-Item Name";
-        cell1.appendChild(cell1Data);
-        
-        var cell2 = row.insertCell(1);
-        var cell2Data = document.createElement("input");
-        cell2Data.type = "Number";
-        cell2Data.name = "cost[]";
-        cell2Data.placeholder = "Cost"
-        cell2.appendChild(cell2Data);
-        
-        var cell3 = row.insertCell(2);
-        var cell3Data = document.createElement("input");
-        cell3Data.type = "Number";
-        cell3Data.name = "quantity[]";
-        cell3Data.placeholder = "Quantity";
-        cell3.appendChild(cell3Data);
-        
-        var cell4 = row.insertCell(3);
-        var cell4Data = document.createElement("input");
-        cell4Data.type = "Number";
-        cell4Data.name = "container[]";
-        cell4Data.value = "1";
-        cell4Data.placeholder = "Container Number";
-        cell4.appendChild(cell4Data);
-      }

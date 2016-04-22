@@ -75,7 +75,7 @@ exports.deleteItemCategory = function(req,res){
            ItemCategory.findById(paramsItemCategory).exec(function(err, itemCategory){
              if(err) return next(err);
              if (item)
-               if ((item.subItems.length == 0) && (item.attributes.length == 0))
+               if (item.attributes.length == 0)
                 var singleCost = true;
                else
                 var singleCost = false;
