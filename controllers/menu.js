@@ -127,9 +127,8 @@ exports.getItemListForMenu = function(req, res, next){
 };
 
 exports.getItemCost = function(req, res, next){
-  Item.findOne({title: req.query.title})
+  Item.findById(req.query.id)
   .exec(function(err, item){
-    console.log(item.cost);
-     res.send(item.cost);
+    res.send(item);
    })
 };

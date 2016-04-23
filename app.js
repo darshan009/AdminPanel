@@ -93,6 +93,13 @@ app.post('/editOrder/:id', userController.isAdmin, orderController.postAddOrder)
 app.get('/addOrder/delete/:id/:userEmail', userController.isAdmin, orderController.deleteOrder);
 //datePickedOrderList
 app.get('/getOrdersByDate', orderController.getOrdersByDate);
+//new assembly
+app.get('/nassembly', assemblyController.getnAssemblyList);
+app.get('/getSingleOrders', assemblyController.getSingleOrders);
+app.get('/singleOrdersWithExtras', assemblyController.getSingleOrdersWithExtrasPage);
+app.get('/getSingleOrdersWithExtras', assemblyController.getSingleOrdersWithExtras);
+app.get('/multipleCategoryOrders', assemblyController.getMultipleCategoryOrdersPage);
+app.get('/getMultipleCategoryOrders', assemblyController.getMultipleCategoryOrders);
 //assembly
 app.get('/assembly', assemblyController.getAssemblyList);
 app.get('/mixedAssembly', assemblyController.getMixedAssemblyList);

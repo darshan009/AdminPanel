@@ -153,6 +153,24 @@ html
                     a(href='/addOrder')
                       i.fa.fa-circle-o
                       |  Place an Order
+            li
+              a(href='#')
+                i.fa.fa-pie-chart
+                span New Assembly
+                i.fa.fa-angle-left.pull-right
+              ul.treeview-menu
+                li
+                  a(href='/nassembly')
+                    i.fa.fa-circle-o
+                    |  Single orders
+                li
+                  a(href='/singleOrdersWithExtras')
+                    i.fa.fa-circle-o
+                    |  Single orders with Extra
+                li
+                  a(href='/multipleCategoryOrders')
+                    i.fa.fa-circle-o
+                    |  Multiple Category Orders
               li
                 a(href='/assembly')
                   i.fa.fa-pie-chart
@@ -207,9 +225,9 @@ html
                         thead
                           tr
                             th Name
-                            th Cost for 1
                             th Default quantity
                             th Container
+                            th Cost for 1
                         tbody
                           if menu
                             each menus in menu.subItems
@@ -277,6 +295,7 @@ html
       });
       //populate
       $(function(){
+        var count = 0;
         $("select#categorySelected").change(function(){
           $.getJSON("/getItemsFromCategory",{q: $(this).val(), ajax: 'true'}, function(j){
             var options = '';
@@ -290,20 +309,22 @@ html
           $.getJSON("/getItemListForMenu",{
             ajax: true
           }, function(j){
-            var addedRows = '<tr><td><select name = "name[]" id="itemSelected">';
+            var addedRows = '<tr><td><select name = "name[]" onChange = "getItemCost('+count+')" id="itemSelected'+count+'"><option>Select</option>';
             for (var i=0; i<j.length; i++) {
-              addedRows += '<option>'+j[i].title+'</option>';
+              addedRows += '<option data-id="'+j[i]._id+'">'+j[i].title+'</option>';
             }
-            addedRows += '</select></td><td><input type="text" id="itemSelectedCost" name = "cost[]" placeholder="Cost for 1"></td><td><input type="text" name = "quantity[]" placeholder="Quantity"></td><td><input type="text" name = "container[]" placeholder="Container"></td></tr>';
+            addedRows += '</select></td><td><input type="text" name = "quantity[]" placeholder="Quantity"></td><td><input type="text" name = "container[]" placeholder="Container"></td><td><input type="text" id="itemSelectedCost'+count+'" name = "cost[]" placeholder="Cost for 1"></td></tr>';
             $("#menuSubItems tbody").append(addedRows);
+            count++;
           })
         })
-        //- $("select#itemSelected").change(function(){
-        //-   console.log("hi");
-        //-   $title = $(this).val();
-        //-   $.getJSON("/getItemCost",{title: $title, ajax: 'true'}, function(cost){
-        //-     console.log(cost);
-        //-     $("#itemSelectedCost").val(cost);
-        //-   })
-        //- })
       })
+      function getItemCost(count) {
+        console.log(count);
+        var id = $('option:selected', '#itemSelected'+count+'').attr('data-id');
+        console.log(id);
+        $.getJSON("/getItemCost",{id: id, ajax: true}, function(item){
+          console.log(item.totalCost);
+          $("#itemSelectedCost"+count+"").val(item.totalCost);
+        })
+      }

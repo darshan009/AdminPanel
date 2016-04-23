@@ -232,3 +232,192 @@ exports.getSingleItems = function(req, res) {
     });
   });
 };
+
+
+/* ------------------------------
+------- new assembly seciton ----
+---------------------------- */
+exports.getnAssemblyList = function(req, res) {
+  ItemCategory.find().exec(function(err, itemCategories) {
+    Item.find()
+    .populate('category')
+    .exec(function(err, items) {
+      if (err) return next(err);
+      res.render('./newAssembly/singleOrders', {
+        itemCategories : itemCategories
+      });
+    })
+  });
+};
+
+exports.getSingleOrders = function(req, res) {
+  var category = req.query.category;
+  if (category.indexOf("-") > -1) {
+    var newCategory = category.replace("-", " ");
+    category = newCategory;
+  }
+  var orderOptions = {
+    category : category,
+    meal : req.query.meal,
+    date : req.query.date
+  };
+  var mealType = req.query.mealType;
+  Order.find()
+  .populate('menu._id', null, orderOptions)
+  .populate('address._id')
+  .populate('menu.subItems._id')
+  .exec(function(err, orders) {
+    Item.populate(orders, 'menu._id.item', function(err, results) {
+      if (results && results.state != 'Archieved') {
+        var listOfOrdersByAddress = [], k = 0, testArray = [];
+        for (var i=0; i<results.length; i++) {
+          //single orders by users
+          var orderList = [];
+          for (var j = 0; j < results[i].menu.length; j++) {
+            if (results[i].menu[j]._id != null) {
+              orderList.push(results[i].menu[j]);
+            }
+          }
+          if (orderList.length == 1 && orderList[0]._id.item.type == mealType) {
+            listOfOrdersByAddress[k] = {
+              user: results[i].user,
+              orderList: results[i].menu,
+              address : results[i].address
+            }
+            k++;
+          }
+        }
+        console.log(listOfOrdersByAddress);
+        res.send(listOfOrdersByAddress);
+      }
+    });
+  });
+};
+
+exports.getSingleOrdersWithExtrasPage = function(req, res) {
+  ItemCategory.find().exec(function(err, itemCategories) {
+    Item.find()
+    .populate('category')
+    .exec(function(err, items) {
+      if (err) return next(err);
+      res.render('./newAssembly/mixedOrders', {
+        itemCategories : itemCategories
+      });
+    })
+  });
+};
+exports.getSingleOrdersWithExtras = function(req, res) {
+  var orderOptions = {
+    meal : req.query.meal,
+    date : req.query.date
+  };
+  Order.find()
+  .populate('menu._id', null, orderOptions)
+  .populate('address._id')
+  .populate('menu.subItems._id')
+  .exec(function(err, orders) {
+    Item.populate(orders, 'menu._id.item', function(err, resultsForCategory) {
+      ItemCategory.populate(resultsForCategory, 'menu._id.item.category', function(err, results) {
+        if (results && results.state != 'Archieved') {
+          var listOfOrdersByAddresses = [], listOfOrdersByAddress = [], k = 0, testArray = [];
+          for (var i=0; i<results.length; i++) {
+            //single orders by users
+            if (results[i].menu.length > 1) {
+              var extrasCount = 1;
+              for (var j = 0; j < results[i].menu.length; j++) {
+                //check for extra values
+                if (results[i].menu[j]._id != null && results[i].menu[j]._id.item.category.name == 'Extras') {
+                  extrasCount++;
+                  if (extrasCount == results[i].menu.length)
+                    var extrasFound = true;
+                }
+              }
+              if (extrasFound) {
+                var orderList = [];
+                for (var j = 0; j < results[i].menu.length; j++) {
+                  if (results[i].menu[j]._id != null) {
+                    orderList.push(results[i].menu[j]);
+                  }
+                }
+                listOfOrdersByAddresses[k] = {
+                  user: results[i].user,
+                  address : results[i].address,
+                  orderList: orderList
+                }
+                k++;
+                extrasFound = false;
+              }
+            }
+          }
+          console.log(listOfOrdersByAddresses);
+          res.send(listOfOrdersByAddresses);
+        }
+      });
+    });
+  });
+};
+
+exports.getMultipleCategoryOrdersPage = function(req, res) {
+  ItemCategory.find().exec(function(err, itemCategories) {
+    Item.find()
+    .populate('category')
+    .exec(function(err, items) {
+      if (err) return next(err);
+      res.render('./newAssembly/multipleOrders', {
+        itemCategories : itemCategories
+      });
+    })
+  });
+};
+exports.getMultipleCategoryOrders = function(req, res) {
+  var orderOptions = {
+    meal : req.query.meal,
+    date : req.query.date
+  };
+  Order.find()
+  .populate('menu._id', null, orderOptions)
+  .populate('address._id')
+  .populate('menu.subItems._id')
+  .exec(function(err, orders) {
+    Item.populate(orders, 'menu._id.item', function(err, resultsForCategory) {
+      ItemCategory.populate(resultsForCategory, 'menu._id.item.category', function(err, results) {
+        if (results && results.state != 'Archieved') {
+          var listOfOrdersByAddresses = [], listOfOrdersByAddress = [], k = 0, testArray = [];
+          for (var i=0; i<results.length; i++) {
+            //single orders by users
+            if (results[i].menu.length > 1) {
+              var extrasCount = 1, extrasFound = false;
+              for (var j = 0; j < results[i].menu.length; j++) {
+                //check for extra values
+                if (results[i].menu[j]._id != null && results[i].menu[j]._id.item.category.name == 'Extras') {
+                  extrasCount++;
+                  if (extrasCount == results[i].menu.length)
+                    var extrasFound = true;
+                }
+              }
+              if (!extrasFound) {
+                var orderList = [];
+                for (var j = 0; j < results[i].menu.length; j++) {
+                  if (results[i].menu[j]._id != null) {
+                    orderList.push(results[i].menu[j]);
+                  }
+                }
+                if (orderList.length > 1) {
+                  listOfOrdersByAddresses[k] = {
+                    user: results[i].user,
+                    address : results[i].address,
+                    orderList: orderList
+                  }
+                  k++;
+                }
+                extrasFound = false;
+              }
+            }
+          }
+          console.log(listOfOrdersByAddresses);
+          res.send(listOfOrdersByAddresses);
+        }
+      });
+    });
+  });
+};

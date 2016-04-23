@@ -151,35 +151,35 @@ html
                     a(href='/addOrder')
                       i.fa.fa-circle-o
                       |  Place an Order
-            li
-              a(href='#')
-                i.fa.fa-pie-chart
-                span New Assembly
-                i.fa.fa-angle-left.pull-right
-              ul.treeview-menu
-                li
-                  a(href='/nassembly')
-                    i.fa.fa-circle-o
-                    |  Single orders
-                li
-                  a(href='/singleOrdersWithExtras')
-                    i.fa.fa-circle-o
-                    |  Single orders with Extra
-                li
-                  a(href='/multipleCategoryOrders')
-                    i.fa.fa-circle-o
-                    |  Multiple Category Orders
+              li.active
+                a(href='#')
+                  i.fa.fa-pie-chart
+                  span New Assembly
+                  i.fa.fa-angle-left.pull-right
+                ul.treeview-menu
+                  li
+                    a(href='/nassembly')
+                      i.fa.fa-circle-o
+                      |  Single orders
+                  li.active
+                    a(href='/singleOrdersWithExtras')
+                      i.fa.fa-circle-o
+                      |  Single orders with Extra
+                  li
+                    a(href='/multipleCategoryOrders')
+                      i.fa.fa-circle-o
+                      |  Multiple Category Orders
             li.active
               a(href='/assembly')
                 i.fa.fa-pie-chart
                 span Assembly
                 i.fa.fa-angle-left.pull-right
               ul.treeview-menu
-                li.active
+                li
                   a(href='/assembly')
                     i.fa.fa-circle-o
                     |  Single orders
-                li
+                li.active
                   a(href='/mixedAssembly')
                     i.fa.fa-circle-o
                     |  Single orders with Extra
@@ -226,9 +226,6 @@ html
                           td
                             button.btn.btn-app#selectedCategory(type='button' data-getButton='int' data-mealType = 'Veg' value = 'International')
                               | International
-                          td
-                            button.btn.btn-app#selectedCategory(type='button' data-getButton='Extras' data-mealType = 'Veg' value = 'Extras')
-                              | Extras
                   .form-group
                     label.col-sm-2.control-label Non-Veg Categories
                     .col-sm-6
@@ -236,17 +233,13 @@ html
                         tr
                           each itemCategory in itemCategories
                             td
-                              button.btn.btn-app#selectedCategory(type='button' data-getButton='n-#{itemCategory._id}' data-mealType = 'Non Veg' value = '#{itemCategory.name}')
+                              button.btn.btn-app#selectedCategory(type='button' data-getButton='n-#{itemCategory._id}' data-mealType = 'Non-Veg' value = '#{itemCategory.name}')
                                 | #{itemCategory.name}
                           td
-                            button.btn.btn-app#selectedCategory(type='button' data-getButton='int' data-mealType = 'Non Veg' value = 'International')
+                            button.btn.btn-app#selectedCategory(type='button' data-getButton='int' data-mealType = 'Non-Veg' value = 'International')
                               | International
-                          td
-                            button.btn.btn-app#selectedCategory(type='button' data-getButton='Extras' data-mealType = 'Non Veg' value = 'Extras')
-                              | Extras
           .row#displaySimilar
           .row#displaySection
-          .row#bcTarget
               // /.box-body
             // /.box
           // /.row
@@ -273,189 +266,154 @@ html
     script(src='../public/plugins/datatables/dataTables.bootstrap.min.js')
     // date-picker
     script(src='../public/bootstrap/js/bootstrap-datepicker.js')
-    //barcode
-    script(type='text/javascript', src='../public/plugins/jQuery/jquery-barcode.js')
     // AdminLTE App
     script(src='../public/dist/js/app.min.js')
     // page script
     script.
       $(function () {
         $.fn.dataTable.ext.errMode = 'none';
-        $('.datepicker').datepicker({
-          "format": "dd-mm-yyyy"
-        });
+        $('.datepicker').datepicker();
         //non-customized
         $('button#selectedCategory').click(function(){
           $category = $(this).val();
           $date = $('#dateSelected').val();
           $mealType = $(this).attr('data-mealType');
-          console.log($mealType);
           $meal = $('#mealSelected').val();
-          $buttonDisablerId = $(this).attr('data-getButton');
           if ( !$('#mealSelected').val() )
-          alert("Please Select Lunch or Dinner");
+            alert("Please Select Lunch or Dinner");
           if ( !$('#dateSelected').val() )
             alert("Please Select Date");
-          $.getJSON("http://os.foodees.in/Services/Services.svc/Gettodaysorderbycustomer/"+$date+','+$meal, {
-          category : $category,
-          meal : $meal,
-          ajax : true
-          },function(j){
-            //get all orders
-            var allOrders = [], allOrders = [], listOfOrdersByAddress = [];
-            allOrders = allOrders.concat(j.GettodaysorderbycustomerResult.listnoncustomizeorder);
-            allOrders = allOrders.concat(j.GettodaysorderbycustomerResult.listcustomizeorder);
-            var listOfOrdersByAddressCounter = 0, listOfAddresses = [];
-            console.log(allOrders.length);
-
-            //sort all orders into listOfOrdersByAddress
-            for (var i=0; i<allOrders.length; i++) {
-              //get all unique addresses
-              if (listOfAddresses.indexOf(allOrders[i].custaddress) < 0) {
-                listOfOrdersByAddress[listOfOrdersByAddressCounter] = {
-                  address : allOrders[i].custaddress
-                };
-                listOfAddresses.push(allOrders[i].custaddress);
-                listOfOrdersByAddressCounter++;
-              }
-            }
-
-            /*
-            *----- get orders by each user
-            *----- sort by category
-            */
-            for (var k=0; k<listOfOrdersByAddress.length; k++) {
-              listOfOrdersByAddress[k].orderList = [];
-              listOfOrdersByAddress[k].orderCount = 0;
-              for (var l=0; l<allOrders.length; l++) {
-                if (listOfOrdersByAddress[k].address == allOrders[l].custaddress) {
-                  listOfOrdersByAddress[k].orderCount++;
-                  
-                  //veg non veg distinguishing
-                  if ((allOrders[l].Meal_Name).indexOf('Veg') > -1 && (allOrders[l].Meal_Name).indexOf('Non Veg') < 0)
-                    listOfOrdersByAddress[k].mealType = 'Veg';
-                  if ((allOrders[l].Meal_Name).indexOf('Non Veg') > -1)
-                    listOfOrdersByAddress[k].mealType = 'Non Veg';
-                    
-                  //get all Orders by selected category & per address
-                  if (allOrders[l].catName == $category)
-                    listOfOrdersByAddress[k].orderList.push(allOrders[l]);
-                }
-              }
-            }
+          $.getJSON("/getSingleOrdersWithExtras", {
+            meal : $meal,
+            date: $date,
+            ajax : true
+          },function(listOfOrdersByAddresses){
+            
+            //get by category and mealType
+            var listOfOrdersByAddress = [];
+            for (var m=0; m<listOfOrdersByAddresses.length; m++)
+              for (l=0; l<listOfOrdersByAddresses[m].orderList.length; l++)
+                if (listOfOrdersByAddresses[m].orderList[l]._id.item.category.name != 'Extras')
+                  if (listOfOrdersByAddresses[m].orderList[l]._id.item.category.name == $category && listOfOrdersByAddresses[m].orderList[l]._id.item.type == $mealType)
+                    listOfOrdersByAddress.push(listOfOrdersByAddresses[m]);
+            console.log(listOfOrdersByAddress);
             
             //sort listOfOrdersByAddress by similar orders
-            var positions = [];
+            var positions = [], sortedMixedOrders = [];
             for (var a=0; a<listOfOrdersByAddress.length; a++) {
               for (var b=a+1; b<listOfOrdersByAddress.length; b++) {
-                if (listOfOrdersByAddress[b].orderCount == 1 && listOfOrdersByAddress[a].orderCount == 1 && listOfOrdersByAddress[a].orderList.length == 1 && listOfOrdersByAddress[b].orderList.length == 1 && listOfOrdersByAddress[a].orderList[0].subdetails.length > 0) {
-                  if (listOfOrdersByAddress[a].orderList[0].subdetails == listOfOrdersByAddress[b].orderList[0].subdetails) {
-                    positions.push(a);
-                    positions.push(b);
+                var foundCount = 0;
+                for (var c=0; c<listOfOrdersByAddress[a].orderList.length; c++) {
+                  for (var d=0; d<listOfOrdersByAddress[b].orderList.length; d++) {
+                    if (listOfOrdersByAddress[a].orderList.length == listOfOrdersByAddress[b].orderList.length) {
+                      if (listOfOrdersByAddress[a].orderList[c]._id.item.title == listOfOrdersByAddress[b].orderList[d]._id.item.title) {
+                        foundCount++;
+                      }
+                      if (foundCount == listOfOrdersByAddress[a].orderList.length) {
+                        positions.push(a);
+                        positions.push(b);
+                      }
+                    }
                   }
                 }
               }
             }
             //get unique positions
-            var uniquePositions = [], sortedSimilarOrders = [];
+            var uniquePositions = [];
             for (var a=0; a<positions.length; a++) {
               if (uniquePositions.indexOf(positions[a]) < 0)
                 uniquePositions.push(positions[a]);
             }
             console.log(uniquePositions);
-            
             //now get sorted arrays
             for (var b=0; b<uniquePositions.length; b++) {
-              sortedSimilarOrders.push(listOfOrdersByAddress[uniquePositions[b]]);
+              sortedMixedOrders.push(listOfOrdersByAddress[uniquePositions[b]]);
             }
             
-            console.log(sortedSimilarOrders);
+            console.log(sortedMixedOrders.length);
+            
+            //displaying of sortedMixedOrders
             $('#displaySimilar').html('');
-            //displaying similar orders first
             var similarDivId = 0;
-            for (var m=0; m<sortedSimilarOrders.length; m++) {
-              
-                var similarCount = 0;
-                for (var z=m; z<sortedSimilarOrders.length; z++) {
-                  //console.log(sortedSimilarOrders[m]);
-                  if (sortedSimilarOrders[z].orderList.length == 1 && sortedSimilarOrders[m].orderList[0].subdetails == sortedSimilarOrders[z].orderList[0].subdetails) {
-                    similarCount++;
-                  }else
-                    break;
-                }
-                if (similarCount > 0) {
-                  var displayDivOnce = true;
-                  for (var y=0; y<similarCount; y++) {
-                    if (sortedSimilarOrders[m+y].mealType == $mealType) {
-                      for (var i = 0; i < sortedSimilarOrders[m+y].orderList.length; i++) {
-                        if (displayDivOnce) {
-                          var addToTableSimilar = '<div id="'+similarDivId+'" class="box box-success"><div class="box-header"><h3 class="box-title">Similar Order List - <b>'+$category+'</b></h3></div><!-- /.box-header--><div id="" class="box-body"><table id="example3" class="table table-bordered table-hover"><thead><tr><th>User</th><th>Address</th><th>Meal</th><th>Details</th><th>Container</th></tr></thead><tbody>';
-                          displayDivOnce = false;
-                        }
-                        if (i == 0) {
-                          addToTableSimilar += '<tr><td rowspan='+sortedSimilarOrders[m+y].orderList.length+'>'+ sortedSimilarOrders[m+y].orderList[0].customerName +'</td>';
-                          var formattedString = sortedSimilarOrders[m+y].address.split(",").join(",<br />");
-                          addToTableSimilar += '<td rowspan='+sortedSimilarOrders[m+y].orderList.length+'>'+ formattedString +'</td>';
-                        }
-                        addToTableSimilar += '<td>'+ sortedSimilarOrders[m+y].orderList[i].Meal_Name +'</td>';
-                        addToTableSimilar += '<td>'
-                        if (sortedSimilarOrders[m+y].orderList[i].subdetails) {
-                          var formattedString = sortedSimilarOrders[m+y].orderList[i].subdetails.split(",").join(",<br />");
-                          addToTableSimilar += ''+ formattedString+',<br>';
-                        }
-                        addToTableSimilar += '<b>Total Quantity - '+sortedSimilarOrders[m+y].orderList[i].qty+'</td>';
-                        addToTableSimilar += '<td><b>'+sortedSimilarOrders[m+y].orderList[i].containertype+'</b><br>';
-                        if (sortedSimilarOrders[m+y].orderList[i].specialinstruction)
-                          addToTableSimilar += '<br /><b> Speacial Instruction - '+sortedSimilarOrders[m+y].orderList[i].specialinstruction+'</td></tr>';
-                        else
-                          addToTableSimilar += '</td></tr>';
-                        addToTableSimilar += '</td></tr>';
-                      }
-                      var displayLastDiv = true;
+            for (var m=0; m<sortedMixedOrders.length; m++) {
+              //console.log(sortedMixedOrders[m].mixed);
+              var similarCount = 0;
+              for (var z=m; z<sortedMixedOrders.length; z++) {
+                //console.log(sortedSimilarOrders[m]);
+                if (sortedMixedOrders[m].orderList[0]._id.item.title == sortedMixedOrders[z].orderList[0]._id.item.title && sortedMixedOrders[m].orderList[1]._id.item.title == sortedMixedOrders[z].orderList[1]._id.item.title || sortedMixedOrders[m].orderList[1]._id.item.title == sortedMixedOrders[z].orderList[0]._id.item.title && sortedMixedOrders[m].orderList[0]._id.item.title == sortedMixedOrders[z].orderList[1]._id.item.title)
+                  similarCount++;
+              }
+              if (similarCount > 0) {
+                var drawOnce = true;
+                for (var y=0; y<similarCount; y++) {                  
+                  for (var i = 0; i < sortedMixedOrders[m+y].orderList.length; i++) {
+                    if (drawOnce) {
+                      var addToTable = '<div id="'+similarDivId+'" class="box box-success"><div class="box-header"><h3 class="box-title">Similar Order List - <b>'+$category+' -- '+$mealType+'</b></h3></div><!-- /.box-header--><div id="" class="box-body"><table id="example3" class="table table-bordered table-hover"><thead><tr><th>User</th><th>Address</th><th>Meal</th><th>Details</th><th>Container</th></tr></thead><tbody>';
+                      drawOnce = false;
                     }
-                  }
-                  console.log(y);
-                  m += similarCount - 1;
-                  if (y > 1 && displayLastDiv) {
-                    console.log("y is greater than 1");
-                    addToTableSimilar += '</tbody></table><br /><button id="" type="button" class="btn btn-info pull-left" onclick = "prinSimilartDiv('+similarDivId+')">Print</button><button id="" type="button" class="btn btn-info pull-right">Next</button></div></div>';
-                    $('#displaySimilar').attr('data-CustomizedButton', $buttonDisablerId);
-                    $('#displaySimilar').append(addToTableSimilar);
-                    $('#example3').DataTable({
-                    "paging": false,
-                    "lengthChange": true,
-                    "searching": true,
-                    "ordering": false,
-                    "info": true,
-                    "autoWidth": true
-                    });
-                    displayLastDiv = false;
+                    if (i == 0) {
+                      addToTable += '<tr><td rowspan='+sortedMixedOrders[m+y].orderList.length+'>'+ sortedMixedOrders[m+y].user +'</td>';
+                      addToTable += '<td rowspan='+sortedMixedOrders[m+y].orderList.length+'>'+ sortedMixedOrders[m+y].address._id.tag +',</br>'+sortedMixedOrders[m+y].address._id.flatNo+',</br>'+sortedMixedOrders[m+y].address._id.streetAddress+',</br>'+sortedMixedOrders[m+y].address._id.landmark+',</br>'+sortedMixedOrders[m+y].address._id.pincode+'</td>';
+                    }
+                    addToTable += '<td>'+ sortedMixedOrders[m+y].orderList[i]._id.item.title +'</td>';
+                    addToTable += '<td>';
+                    if (sortedMixedOrders[m+y].orderList[i].subItems) {
+                      for (var p=0; p<sortedMixedOrders[m+y].orderList[i].subItems._id.subItemsArray.length; p++)
+                        addToTable += ''+sortedMixedOrders[m+y].orderList[i].subItems._id.subItemsArray[p].quantity+'-'+sortedMixedOrders[m+y].orderList[i].subItems._id.subItemsArray[p].name+',</br>';
+                    }else if (sortedMixedOrders[m+y].orderList[i]._id.subItems.length > 0) {
+                      for (var p=0; p<sortedMixedOrders[m+y].orderList[i]._id.subItems.length; p++)
+                        addToTable += ''+sortedMixedOrders[m+y].orderList[i]._id.subItems[p].quantity+'-'+sortedMixedOrders[m+y].orderList[i]._id.subItems[p].name+',</br>';
+                    }
+                    addToTable += '<b>Total Quantity - '+sortedMixedOrders[m+y].orderList[i].singleQuantity+'</td>';
+                    addToTable += '<td><b>'+sortedMixedOrders[m+y].orderList[i].containerType+'</b><br>';
+                    if (sortedMixedOrders[m+y].orderList[i].specialinstruction)
+                      addToTable += '<br /><b> Speacial Instruction - '+sortedMixedOrders[m+y].orderList[i].specialinstruction+'</td></tr>';
+                    else
+                      addToTable += '</td></tr>';
+                    addToTable += '</td></tr>';
+                    var displayLastDiv = true;
                   }
                 }
-                similarDivId++;
+                m += similarCount - 1;
+                if (y > 1 && displayLastDiv) {
+                  addToTable += '</tbody></table><br /><button id="" type="button" class="btn btn-info pull-left" onclick = "prinSimilartDiv('+similarDivId+')">Print</button><button id="" type="button" class="btn btn-info pull-right">Next</button></div></div>';
+                  $('#displaySimilar').append(addToTable);
+                  $('#example2').DataTable({
+                  "paging": false,
+                  "lengthChange": true,
+                  "searching": false,
+                  "ordering": false,
+                  "info": true,
+                  "autoWidth": true
+                  });
+                  displayLastDiv = false;
+                }
+              }
+              similarDivId++;
             }
-
+            //displaying of Non-Similar Orders
             //console.log(listOfOrdersByAddress);
-            //displaying of Non-Similar orders
-            var thisDivData = [];
-            var addToTable = '<div class="box box-success" id="displaySectionNonSimilar"><div class="box-header"><h3 class="box-title"><b>Non-Similar Order List -'+$category+'</b></h3></div><!-- /.box-header--><div id="" class="box-body"><table id="example2" class="table table-bordered table-hover"><thead><tr><th>User</th><th>Address</th><th>Meal</th><th>Details</th><th>Container</th></tr></thead><tbody>';
+            $('#displaySection').html('');
+            var addToTable = '<div class="box box-success"><div class="box-header"><h3 class="box-title">Mixed Order List - <b>'+$category+'</b></h3></div><!-- /.box-header--><div id="displaySection" class="box-body"><table id="example3" class="table table-bordered table-hover"><thead><tr><th>User</th><th>Address</th><th>Meal</th><th>Details</th><th>Container</th></tr></thead><tbody>';
             for (var m=0; m<listOfOrdersByAddress.length; m++) {
-              if (listOfOrdersByAddress[m].orderCount == 1 && uniquePositions.indexOf(m) < 0 && listOfOrdersByAddress[m].mealType == $mealType) {
-                thisDivData.push(listOfOrdersByAddress[m].address);
-                for (var i = 0; i < listOfOrdersByAddress[m].orderList.length; i++) {
+              //console.log(listOfOrdersByAddress[m].mixed);
+              for (var i = 0; i < listOfOrdersByAddress[m].orderList.length; i++) {
+                if (uniquePositions.indexOf(m) < 0) {
                   if (i == 0) {
-                    addToTable += '<tr><td rowspan='+listOfOrdersByAddress[m].orderList.length+'>'+ listOfOrdersByAddress[m].orderList[0].customerName +'</td>';
-                    var formattedString = listOfOrdersByAddress[m].address.split(",").join(",<br />");
-                    addToTable += '<td rowspan='+listOfOrdersByAddress[m].orderList.length+'>'+ formattedString +'</td>';
+                    addToTable += '<tr><td rowspan='+listOfOrdersByAddress[m].orderList.length+'>'+ listOfOrdersByAddress[m].user +'</td>';
+                    addToTable += '<td rowspan='+listOfOrdersByAddress[m].orderList.length+'>'+ listOfOrdersByAddress[m].address._id.tag +',</br>'+listOfOrdersByAddress[m].address._id.flatNo+',</br>'+listOfOrdersByAddress[m].address._id.streetAddress+',</br>'+listOfOrdersByAddress[m].address._id.landmark+',</br>'+listOfOrdersByAddress[m].address._id.pincode+'</td>';
                   }
-                  addToTable += '<td>'+ listOfOrdersByAddress[m].orderList[i].Meal_Name +'</td>';
-                  addToTable += '<td>'
-                  if (listOfOrdersByAddress[m].orderList[i].subdetails) {
-                    var formattedString = listOfOrdersByAddress[m].orderList[i].subdetails.split(",").join(",<br />");
-                    addToTable += ''+ formattedString+',<br>';
+                  addToTable += '<td>'+ listOfOrdersByAddress[m].orderList[i]._id.item.title +'</td>';
+                  addToTable += '<td>';
+                  if (listOfOrdersByAddress[m].orderList[i].subItems) {
+                    for (var p=0; p<listOfOrdersByAddress[m].orderList[i].subItems._id.subItemsArray.length; p++)
+                      addToTable += ''+listOfOrdersByAddress[m].orderList[i].subItems._id.subItemsArray[p].quantity+'-'+listOfOrdersByAddress[m].orderList[i].subItems._id.subItemsArray[p].name+',</br>';
+                  }else if (listOfOrdersByAddress[m].orderList[i]._id.subItems.length > 0) {
+                    for (var p=0; p<listOfOrdersByAddress[m].orderList[i]._id.subItems.length; p++)
+                      addToTable += ''+listOfOrdersByAddress[m].orderList[i]._id.subItems[p].quantity+'-'+listOfOrdersByAddress[m].orderList[i]._id.subItems[p].name+',</br>';
                   }
-                  addToTable += '<b>Total Quantity - '+listOfOrdersByAddress[m].orderList[i].qty+'</td>';
-                  addToTable += '<td><b>'+listOfOrdersByAddress[m].orderList[i].containertype+'</b><br>';
+                  addToTable += '<b>Total Quantity - '+listOfOrdersByAddress[m].orderList[i].singleQuantity+'</td>';
+                  addToTable += '<td><b>'+listOfOrdersByAddress[m].orderList[i].containerType+'</b><br>';
                   if (listOfOrdersByAddress[m].orderList[i].specialinstruction)
                     addToTable += '<br /><b> Speacial Instruction - '+listOfOrdersByAddress[m].orderList[i].specialinstruction+'</td></tr>';
                   else
@@ -464,21 +422,20 @@ html
                 }
               }
             }
-            addToTable += '</tbody></table><br /><button id="" type="button" class="btn btn-info pull-left" onclick = "printDiv()">Print order list</button><button type="button" class="btn btn-info pull-right" onclick="printBarcode()">Get Address Barcodes</button></div></div>';
-            //console.log(thisDivData)
-            $('#displaySection').attr('data-CustomizedButton', $buttonDisablerId);
-            $('#displaySection').html('');
+            addToTable += '</tbody></table><br /><button id="" type="button" class="btn btn-info pull-left" onclick = "printDiv()">Print</button><button id="" type="button" class="btn btn-info pull-right">Next</button></div></div>';
+            //console.log(addToTable)
             $('#displaySection').append(addToTable);
-            $('#example2').DataTable({
+            $('#example3').DataTable({
             "paging": false,
             "lengthChange": true,
-            "searching": true,
+            "searching": false,
             "ordering": false,
             "info": true,
             "autoWidth": true
             });
-          });
+          })
         });
+
 
         $('button#disabler').click(function(){
           var dataTagetButton = $('#example2').attr('data-targetButton');
@@ -501,14 +458,4 @@ html
          document.body.innerHTML = printContents;
          window.print();
          document.body.innerHTML = originalContents;
-      }
-      function printBarcode() {
-        console.log("barcode section");
-        //console.log(x);
-        $('#displaySectionNonSimilar').remove();
-        var newDivData = '<div class = "box box-info float-div"><div class = "box-header">Choose categroy</div><div class = "box-body">';
-        newDivData += '<br /><button id="" type="button" class="btn btn-info pull-left" onclick = "printDiv()">Print order list</button>';
-        newDivData += '</div></div>';
-        //$("#bcTarget").barcode("1234567", "int25",{barWidth:6, barHeight:90});
-        $('#displaySection').append(newDivData);
       }

@@ -192,7 +192,7 @@ html
                         each customizedResults in customizedResult
                           tr
                             td
-                              a(href='/viewOrder/#{customizedResults.id}')
+                              a(href='/viewOrder/#{customizedResults.id}' target='_blank')
                                 | #{customizedResults.title}
                             td #{customizedResults.date}
                             td #{customizedResults.user}
@@ -216,7 +216,7 @@ html
                         each nonCustomizedResults in nonCustomizedResult
                           tr
                             td
-                              a(href='/viewOrder/#{nonCustomizedResults.id}')
+                              a(href='/viewOrder/#{nonCustomizedResults.id}' target='_blank')
                                 | #{nonCustomizedResults.title}
                             td #{nonCustomizedResults.date}
                             td #{nonCustomizedResults.user}
@@ -266,6 +266,7 @@ html
     // page script
     script.
       $(function () {
+      $.fn.dataTable.ext.errMode = 'none';        
       $("#example1").DataTable();
       $('#example2').DataTable({
       "paging": true,
@@ -298,7 +299,7 @@ html
               if (results[i].menu[j].subItems) {
                 console.log("customized")
                 var date = new Date(results[i].menu[j]._id.date).toDateString();
-                addToCustomizedTable += '<tr><td><a href='+results[i].id+'>'+results[i].menu[j]._id.item.title+'</a></td><td>'+date+'</td><td>'+results[i].user+'</td><td>';
+                addToCustomizedTable += '<tr><td><a href=/viewOrder/'+results[i].id+' target="_blank">'+results[i].menu[j]._id.item.title+'</a></td><td>'+date+'</td><td>'+results[i].user+'</td><td>';
                 for (var k=0; k<results[i].menu[j].subItems._id.subItemsArray.length; k++){
                   addToCustomizedTable += ''+results[i].menu[j].subItems._id.subItemsArray[k].quantity+'-'+results[i].menu[j].subItems._id.subItemsArray[k].name+','+results[i].menu[j].subItems._id.subItemsArray[k].container+'-container<br>';
                 }
@@ -307,7 +308,7 @@ html
               else{
                 console.log("non-customized")
                 var date = new Date(results[i].menu[j]._id.date).toDateString();
-                addToNonCustomizedTable += '<tr><td><a href='+results[i].id+'>'+results[i].menu[j]._id.item.title+'</a></td><td>'+date+'</td><td>'+results[i].user+'</td>';
+                addToNonCustomizedTable += '<tr><td><a href=/viewOrder/'+results[i].id+' target="_blank">'+results[i].menu[j]._id.item.title+'</a></td><td>'+date+'</td><td>'+results[i].user+'</td>';
                 if (results[i].menu[j].attributes != null)
                   addToNonCustomizedTable += '<td>'+ results[i].menu[j].attributes.name +'</td></tr>';
                 else if (results[i].menu[j]._id.subItems.length > 0) {

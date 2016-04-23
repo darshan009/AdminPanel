@@ -225,6 +225,7 @@ exports.postAddOrder = function(req, res){
              for (var i=0; i<req.body.getPosition.length; i++){
                //customized
                if (req.body.getPosition[i] == 'true') {
+                 var subTotal = 0;
                  var subItems = new SubItems({
                    order : {
                      _id : order._id
@@ -232,19 +233,22 @@ exports.postAddOrder = function(req, res){
                    subItemsArray : []
                  });
                  console.log("---------subItems check-----------");
-                 for (var k=0; k<req.body.subItemsName[subItemsCounter].length; k++)
+                 for (var k=0; k<req.body.subItemsName[subItemsCounter].length; k++) {
                    subItems.subItemsArray.push({
                      name : req.body.subItemsName[subItemsCounter][k],
                      quantity : Number(req.body.subItemsQuantity[subItemsCounter][k]),
                      container : Number(req.body.subItemsContainer[subItemsCounter][k])
                    })
+                   subTotal += req.body.subItemsQuantity[subItemsCounter][k] * req.body.subItemsCost[subItemsCounter][k];
+                 }
                  order.menu.push({
                    _id : allMenus[i],
                    subItems : {
                      _id : subItems._id
                    },
                    subTotal : subTotal,
-                   singleQuantity : req.body.singleQuantity[i]
+                   singleQuantity : req.body.singleQuantity[i],
+                   containerType: req.body.containerType[i]
                  });
                  subItems.save(function (err) {
                    if (err) return err;
@@ -255,16 +259,19 @@ exports.postAddOrder = function(req, res){
                else if (req.body.getPosition[i] == 'hasAttributes') {
                  console.log("---------cost check-----------");
                  for (var k=0; k<sortedMenus[i].item.attributes.length; k++)
-                   if (sortedMenus[i].item.attributes[k].name == req.body.attributesName[j])
+                   if (sortedMenus[i].item.attributes[k].name == req.body.attributesName[j]) {
                      totalCost += sortedMenus[i].item.attributes[k].cost * req.body.singleQuantity[i];
+                     var subTotal = sortedMenus[i].item.attributes[k].cost * req.body.singleQuantity[i];
+                   }
                  order.menu.push({
                    _id : allMenus[i],
                    attributes : {
                      name : req.body.attributesName[j],
-                     quantity : req.body.attributesQuantity[j]
+                     quantity : req.body.singleQuantity[i]
                    },
                    subTotal : subTotal,
-                   singleQuantity : req.body.singleQuantity[i]
+                   singleQuantity : req.body.singleQuantity[i],
+                   containerType: req.body.containerType[i]
                  })
                  j++;
                }//this is the non-customized part
@@ -272,7 +279,8 @@ exports.postAddOrder = function(req, res){
                  order.menu.push({
                    _id : allMenus[i],
                    subTotal : Number(sortedMenus[i].item.totalCost) * req.body.singleQuantity[i],
-                   singleQuantity : req.body.singleQuantity[i]
+                   singleQuantity : req.body.singleQuantity[i],
+                   containerType: req.body.containerType[i]
                  })
                  totalCost += sortedMenus[i].item.totalCost;
                }
@@ -514,7 +522,12 @@ exports.getUserAddress = function(req, res){
           pincode : user.address[i]._id.pincode,
           contactNo : user.contactNo
         }
-    userJson[0].amount = user.amount;
+    if (userJson.length == 0)
+      userJson[0] = {
+        amount: 0
+      }
+    else
+      userJson[0].amount = user.amount;
     console.log(userJson)
     res.send(userJson);
   })
