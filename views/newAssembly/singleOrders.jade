@@ -151,6 +151,10 @@ html
                     a(href='/addOrder')
                       i.fa.fa-circle-o
                       |  Place an Order
+              li
+                a(href='/singleItems')
+                  i.fa.fa-pie-chart
+                  | Item List
               li.active
                 a(href='#')
                   i.fa.fa-pie-chart
@@ -233,8 +237,9 @@ html
                               button.btn.btn-app#selectedCategory(type='button' data-getButton='n-#{itemCategory._id}' data-mealType = 'Non-Veg' value = '#{itemCategory.name}')
                                 | #{itemCategory.name}
           .row#displaySimilar
+          .row#displaySimilarBarcode
           .row#displaySection
-          .row#bcTarget
+          .row#displaySectionBarcode
               // /.box-body
             // /.box
           // /.row
@@ -326,6 +331,7 @@ html
             
             console.log(sortedSimilarOrders);
             $('#displaySimilar').html('');
+            $('#displaySimilarBarcode').html('');
             //displaying similar orders first
             var similarDivId = 0;
             for (var m=0; m<sortedSimilarOrders.length; m++) {
@@ -346,14 +352,15 @@ html
                 }
                 console.log(similarCount);
                 if (similarCount > 0) {
-                  var displayDivOnce = true;
+                  var displayDivOnce = true, similarDivData = [], addressArraySimilar = [];
                   for (var y=0; y<similarCount; y++) {
+                    addressArraySimilar.push(sortedSimilarOrders[m+y].address._id._id);
                     if (displayDivOnce) {
                       var addToTable = '<div id="'+similarDivId+'" class="box box-success"><div class="box-header"><h3 class="box-title">Similar Order List - <b>'+$category+' -- '+$mealType+'</b></h3></div><!-- /.box-header--><div id="" class="box-body"><table id="example3" class="table table-bordered table-hover"><thead><tr><th>User</th><th>Address</th><th>Meal</th><th>Details</th><th>Container</th></tr></thead><tbody>';
                       displayDivOnce = false;
                     }
-                    addToTable += '<tr><td rowspan='+sortedSimilarOrders[m+y].orderList.length+'>'+ sortedSimilarOrders[m+y].user +'</td>';
-                    addToTable += '<td rowspan='+sortedSimilarOrders[m+y].orderList.length+'>'+ sortedSimilarOrders[m+y].address._id.tag +',</br>'+sortedSimilarOrders[m+y].address._id.flatNo+',</br>'+sortedSimilarOrders[m+y].address._id.streetAddress+',</br>'+sortedSimilarOrders[m+y].address._id.landmark+',</br>'+sortedSimilarOrders[m+y].address._id.pincode+'</td>';
+                    addToTable += '<tr><td>'+ sortedSimilarOrders[m+y].user +'</td>';
+                    addToTable += '<td>'+ sortedSimilarOrders[m+y].address._id.tag +',</br>'+sortedSimilarOrders[m+y].address._id.flatNo+',</br>'+sortedSimilarOrders[m+y].address._id.streetAddress+',</br>'+sortedSimilarOrders[m+y].address._id.landmark+',</br>'+sortedSimilarOrders[m+y].address._id.pincode+'</td>';
                     addToTable += '<td>'+ sortedSimilarOrders[m+y].orderList[0]._id.item.title +'</td>';
                     addToTable += '<td>';
                     if (sortedSimilarOrders[m+y].orderList[0].subItems) {
@@ -371,12 +378,13 @@ html
                       addToTable += '</td></tr>';
                     addToTable += '</td></tr>';
                     var displayLastDiv = true;
+                    similarDivData.push(sortedSimilarOrders[m+y]);
                   }
                   console.log(y);
                   m += similarCount - 1;
                   if (y > 1 && displayLastDiv) {
                     console.log("y is greater than 1");
-                    addToTable += '</tbody></table><br /><button id="" type="button" class="btn btn-info pull-left" onclick = "prinSimilartDiv('+similarDivId+')">Print</button><button id="" type="button" class="btn btn-info pull-right">Next</button></div></div>';
+                    addToTable += '</tbody></table><br /><button type="button" id="getBarcodeSimilar'+similarDivId+'" class="btn btn-info pull-right" data-address="'+addressArraySimilar+'" onclick="printBarcodeSimilar('+similarDivId+')">Get Address Barcodes</button></div></div>';
                     $('#displaySimilar').attr('data-CustomizedButton', $buttonDisablerId);
                     $('#displaySimilar').append(addToTable);
                     $('#example3').DataTable({
@@ -389,17 +397,30 @@ html
                     });
                     displayLastDiv = false;
                   }
+                  //barcode Section
+                  var newDivData = '<div id="displaySimilarBarcode'+similarDivId+'" class = "box box-info"><div class = "box-header">Choose categroy</div><div class = "box-body">';
+                  for (var i=0; i < similarDivData.length; i++) {
+                    newDivData += '<h3><div class="invoice-info"><div class="invoice-col"><strong>'+similarDivData[i].orderList[0]._id.item.title+'<br/><br/>'+similarDivData[i].user+'</br><p align="center">';
+                    newDivData += '<address>'+similarDivData[i].address._id.user+'</p><br>'+similarDivData[i].address._id.tag +',</br>'+similarDivData[i].address._id.flatNo+',</br>'+similarDivData[i].address._id.streetAddress+',</br>'+similarDivData[i].address._id.landmark+',</br>'+similarDivData[i].address._id.pincode+'</address>';
+                    newDivData += '<div id="bcTarget'+i+'"></div></div></strong></div><br></h3><hr>';
+                  }
+                  newDivData += '<br /><button id="" type="button" class="btn btn-info pull-left" onclick = "printSimilarDiv('+similarDivId+')">Print order list</button>';
+                  newDivData += '</div></div>';
+                  $('#displaySimilarBarcode').append(newDivData);
+                  $('#displaySimilarBarcode'+similarDivId+'').hide();
                 }
                 similarDivId++;
             }
 
             //console.log(listOfOrdersByAddress);
             //displaying of Non-Similar orders
-            var thisDivData = [];
+            var nonSimilarDivData = [], addressArray = [], addressCount = 0;
             var addToTable = '<div class="box box-success" id="displaySectionNonSimilar"><div class="box-header"><h3 class="box-title"><b>Non-Similar Order List -'+$category+'--'+$mealType+'</b></h3></div><!-- /.box-header--><div id="" class="box-body"><table id="example2" class="table table-bordered table-hover"><thead><tr><th>User</th><th>Address</th><th>Meal</th><th>Details</th><th>Container</th></tr></thead><tbody>';
             for (var m=0; m<listOfOrdersByAddress.length; m++) {
               if (uniquePositions.indexOf(m) < 0) {
-                thisDivData.push(listOfOrdersByAddress[m].address);
+                nonSimilarDivData.push(listOfOrdersByAddress[m]);
+                addressArray[addressCount] = listOfOrdersByAddress[m].address._id._id;
+                addressCount++;
                 for (var i = 0; i < listOfOrdersByAddress[m].orderList.length; i++) {
                   if (i == 0) {
                     addToTable += '<tr><td rowspan='+listOfOrdersByAddress[m].orderList.length+'>'+ listOfOrdersByAddress[m].user +'</td>';
@@ -424,7 +445,8 @@ html
                 }
               }
             }
-            addToTable += '</tbody></table><br /><button id="" type="button" class="btn btn-info pull-left" onclick = "printDiv()">Print order list</button><button type="button" class="btn btn-info pull-right" onclick="printBarcode()">Get Address Barcodes</button></div></div>';
+            console.log(addressArray);
+            addToTable += '</tbody></table><br /><button type="button" id="getBarcode" class="btn btn-info pull-right" data-address='+[addressArray]+' onclick="printBarcode()" ">Get Address Barcodes</button></div></div>';
             //console.log(thisDivData)
             $('#displaySection').attr('data-CustomizedButton', $buttonDisablerId);
             $('#displaySection').html('');
@@ -437,6 +459,19 @@ html
             "info": true,
             "autoWidth": true
             });
+            
+            //barcode Section
+            $('#displaySectionBarcode').html('');
+            var newDivData = '<div class = "box box-info"><div class = "box-header">Choose categroy</div><div class = "box-body">';
+            for (var i=0; i < nonSimilarDivData.length; i++) {
+              newDivData += '<h3><div class="invoice-info"><div class="invoice-col"><strong>'+nonSimilarDivData[i].orderList[0]._id.item.title+'<br/><br/>'+nonSimilarDivData[i].user+'</br><p align="center">';
+              newDivData += '<address>'+nonSimilarDivData[i].address._id.user+'</p><br>'+nonSimilarDivData[i].address._id.tag +',</br>'+nonSimilarDivData[i].address._id.flatNo+',</br>'+nonSimilarDivData[i].address._id.streetAddress+',</br>'+nonSimilarDivData[i].address._id.landmark+',</br>'+nonSimilarDivData[i].address._id.pincode+'</address>';
+              newDivData += '<div id="bcTarget'+i+'"></div></div></strong></div><br></h3><hr>';
+            }
+            newDivData += '<br /><button id="" type="button" class="btn btn-info pull-left" onclick = "printDiv()">Print order list</button>';
+            newDivData += '</div></div>';
+            $('#displaySectionBarcode').append(newDivData);
+            $('#displaySectionBarcode').hide();
           });
         });
 
@@ -447,28 +482,41 @@ html
           $(':button[data-getButton = '+dataTagetButton+']').attr('disabled', true);
           $(':button[data-getButton = '+CustomizedButton+']').attr('disabled', true);
         });
+        
       });
-      function prinSimilartDiv(x){
-         var printContents = document.getElementById(x).innerHTML;
+      function printSimilarDiv(x){
+         var printContents = document.getElementById("displaySimilarBarcode"+x+"").innerHTML;
          var originalContents = document.body.innerHTML;
          document.body.innerHTML = printContents;
          window.print();
          document.body.innerHTML = originalContents;
       }
       function printDiv(){
-         var printContents = document.getElementById("displaySection").innerHTML;
+         var printContents = document.getElementById("displaySectionBarcode").innerHTML;
          var originalContents = document.body.innerHTML;
          document.body.innerHTML = printContents;
          window.print();
          document.body.innerHTML = originalContents;
       }
       function printBarcode() {
-        console.log("barcode section");
-        //console.log(x);
-        $('#displaySectionNonSimilar').remove();
-        var newDivData = '<div class = "box box-info float-div"><div class = "box-header">Choose categroy</div><div class = "box-body">';
-        newDivData += '<br /><button id="" type="button" class="btn btn-info pull-left" onclick = "printDiv()">Print order list</button>';
-        newDivData += '</div></div>';
-        //$("#bcTarget").barcode("1234567", "int25",{barWidth:6, barHeight:90});
-        $('#displaySection').append(newDivData);
+        var addressArray = $('#getBarcode').data('address').split(',');
+        console.log(addressArray);
+        console.log(addressArray.length);
+        console.log(addressArray[0]);
+        for (var i=0; i<addressArray.length; i++) {
+          $("#bcTarget"+i+"").barcode(addressArray[i], "code128", {barWidth:3, barHeight:60});
+        }
+        $('#displaySection').hide();
+        $('#displaySectionBarcode').show();
+      }
+      function printBarcodeSimilar(position) {
+        var addressArray = $('#getBarcodeSimilar'+position+'').data('address').split(',');
+        console.log(addressArray);
+        console.log(addressArray.length);
+        console.log(addressArray[0]);
+        for (var i=0; i<addressArray.length; i++) {
+          $("#bcTarget"+i+"").barcode(addressArray[i], "code128", {barWidth:3, barHeight:60});
+        }
+        $('#'+position).hide();
+        $('#displaySimilarBarcode'+position+'').show();
       }

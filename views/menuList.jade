@@ -151,6 +151,10 @@ html
                       i.fa.fa-circle-o
                       |  Place an Order
               li
+                a(href='/singleItems')
+                  i.fa.fa-pie-chart
+                  | Item List
+              li
                 a(href='#')
                   i.fa.fa-pie-chart
                   span New Assembly
@@ -231,7 +235,7 @@ html
       $('#example2').DataTable({
       "paging": true,
       "lengthChange": false,
-      "searching": false,
+      "searching": true,
       "ordering": true,
       "info": true,
       "autoWidth": false

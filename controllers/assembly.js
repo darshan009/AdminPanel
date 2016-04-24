@@ -172,14 +172,13 @@ exports.getSingleItems = function(req, res) {
   Order.find()
   .populate('menu._id', null, orderOptions)
   .populate('menu.subItems._id')
-  .exec(function(err, orders) {
-    Item.populate(orders, 'menu._id.item', function(err, results){
-      //console.log(results);
+  .exec(function(err, results) {
+    Item.populate(results, 'menu._id.item', function(err, orders){
       if (err) return err;
       var singleItems = [], z = 0;
       for (var i=0; i<orders.length; i++) {
         for (var j=0; j<orders[i].menu.length; j++) {
-          if (orders[i].menu[j].subItems._id) {
+          if (orders[i].menu[j].subItems._id && orders[i].menu[j]._id) {
             for (var k=0; k<orders[i].menu[j].subItems._id.subItemsArray.length; k++) {
               singleItems[z] = {
                 title: orders[i].menu[j].subItems._id.subItemsArray[k].name,
@@ -207,7 +206,7 @@ exports.getSingleItems = function(req, res) {
           }
         }
       }
-      console.log(singleItems);
+      //console.log(singleItems);
       //sorting singleItems by name
       var uniqueItems = [], uniqueTitles = [], count = 0;
       for (var i=0; i<singleItems.length; i++)
@@ -268,28 +267,31 @@ exports.getSingleOrders = function(req, res) {
   .populate('menu.subItems._id')
   .exec(function(err, orders) {
     Item.populate(orders, 'menu._id.item', function(err, results) {
-      if (results && results.state != 'Archieved') {
-        var listOfOrdersByAddress = [], k = 0, testArray = [];
-        for (var i=0; i<results.length; i++) {
-          //single orders by users
-          var orderList = [];
-          for (var j = 0; j < results[i].menu.length; j++) {
-            if (results[i].menu[j]._id != null) {
-              orderList.push(results[i].menu[j]);
+      //User.populate(resultsuser, 'address._id.user', function(err, results) {
+        if (results && results.state != 'Archieved') {
+          var listOfOrdersByAddress = [], k = 0, testArray = [];
+          for (var i=0; i<results.length; i++) {
+            //single orders by users
+            var orderList = [];
+            for (var j = 0; j < results[i].menu.length; j++) {
+              if (results[i].menu[j]._id != null) {
+                orderList.push(results[i].menu[j]);
+              }
+            }
+            if (orderList.length == 1 && orderList[0]._id.item.type == mealType) {
+              listOfOrdersByAddress[k] = {
+                user: results[i].user,
+                orderList: results[i].menu,
+                address : results[i].address
+              }
+              k++;
             }
           }
-          if (orderList.length == 1 && orderList[0]._id.item.type == mealType) {
-            listOfOrdersByAddress[k] = {
-              user: results[i].user,
-              orderList: results[i].menu,
-              address : results[i].address
-            }
-            k++;
-          }
+          console.log(listOfOrdersByAddress[0].address._id);
+          console.log(listOfOrdersByAddress[1].address._id);
+          res.send(listOfOrdersByAddress);
         }
-        console.log(listOfOrdersByAddress);
-        res.send(listOfOrdersByAddress);
-      }
+      //});
     });
   });
 };

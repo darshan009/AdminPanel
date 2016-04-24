@@ -154,6 +154,10 @@ html
                       i.fa.fa-circle-o
                       |  Place an Order
             li
+              a(href='/singleItems')
+                i.fa.fa-pie-chart
+                | Item List
+            li
               a(href='#')
                 i.fa.fa-pie-chart
                 span New Assembly
@@ -235,11 +239,11 @@ html
                                 td
                                   input(type='text' name='name[]' placeholder='Sub-Item name' value=(menus?(menus.name?menus.name:''):''))
                                 td
-                                  input(type='Number' name='cost[]' placeholder='Cost for 1' value=(menus?(menus.cost?menus.cost:''):''))
-                                td
                                   input(type='Number' name='quantity[]' placeholder='Quantity' value=(menus?(menus.quantity?menus.quantity:''):''))
                                 td
                                   input(type='Number' name='container[]' placeholder='Container Number' value=(menus?(menus.container?menus.container:''):''))
+                                td
+                                  input(type='Number' name='cost[]' placeholder='Cost for 1' value=(menus?(menus.cost?menus.cost:''):''))
                       button.btn.btn-info.pull-right#addRow(type='button') Add a row
                   // /.form group
                 // /.box-body

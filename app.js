@@ -46,6 +46,7 @@ var itemController = require('./controllers/item');
 var menuController = require('./controllers/menu');
 var orderController = require('./controllers/order');
 var assemblyController = require('./controllers/assembly');
+var tiffinController = require('./controllers/tiffin');
 
 //routes
 app.get('/', userController.getLogin);
@@ -105,7 +106,10 @@ app.get('/assembly', assemblyController.getAssemblyList);
 app.get('/mixedAssembly', assemblyController.getMixedAssemblyList);
 app.get('/multipleAssembly', assemblyController.getMultipleAssemblyList);
 app.get('/getOrderByCategory', assemblyController.getOrderByCategory);
-app.get('/getCustomizedOrderByCategory', assemblyController.getCustomizedOrderByCategory)
+app.get('/getCustomizedOrderByCategory', assemblyController.getCustomizedOrderByCategory);
+//tiffin service
+app.get('/tiffinInNOut', userController.isAdmin, tiffinController.getTiffinInNOut);
+app.get('/tiffinReport', userController.isAdmin, tiffinController.getTiffinReport);
 //items list in assembly
 app.get('/singleItems', assemblyController.getSingleItemsPage);
 app.get('/singleItemsList', assemblyController.getSingleItems);
