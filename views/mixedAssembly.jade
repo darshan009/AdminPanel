@@ -215,7 +215,6 @@ html
                     label.col-sm-2.control-label Meal type
                     .col-sm-3
                       select.form-control(name = 'meal' id='mealSelected')
-                        option(selected='selected')
                         option Lunch
                         option Dinner
                   .form-group
@@ -276,6 +275,20 @@ html
     script.
       $(function () {
         $.fn.dataTable.ext.errMode = 'none';
+        //get todays date
+        var today = new Date();
+        var dd = today.getDate();
+        var mm = today.getMonth()+1; //January is 0!
+        var yyyy = today.getFullYear();
+        if(dd<10){
+        dd='0'+dd
+        }
+        if(mm<10){
+        mm='0'+mm
+        }
+        var today = dd+'-'+mm+'-'+yyyy;
+        console.log(today);
+        $('#dateSelected').val(today);
         $('.datepicker').datepicker({
           "format": "dd-mm-yyyy"
         });
@@ -348,7 +361,7 @@ html
             for (var a=0; a<listOfOrdersByAddress.length; a++) {
               for (var b=a+1; b<listOfOrdersByAddress.length; b++) {
                 var foundCount = 0;
-                if (listOfOrdersByAddress[a].mixed)
+                if (listOfOrdersByAddress[a].mixed && listOfOrdersByAddress[b].mixed)
                   for (var c=0; c<listOfOrdersByAddress[a].orderList.length; c++) {
                     for (var d=0; d<listOfOrdersByAddress[b].orderList.length; d++) {
                       if (listOfOrdersByAddress[a].orderCount > 1 && listOfOrdersByAddress[a].orderList.length == listOfOrdersByAddress[b].orderList.length) {
