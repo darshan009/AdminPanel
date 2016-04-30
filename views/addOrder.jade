@@ -205,13 +205,17 @@ html
                       .input-group
                         .input-group-addon
                           i.fa.fa-calendar
-                        input.form-control.datepicker(type='text', id='dateSelected' name='date')
+                        if (result)
+                          -var date = result.date.toDateString();
+                          input.form-control.datepicker(type='text', id='dateSelected' name='date' disabled value=date)
+                        else
+                          input.form-control.datepicker(type='text', id='dateSelected' name='date')
                   .form-group
                     label.col-sm-2.control-label Meal type
                     .col-sm-10
                       select.form-control(name = 'meal' id='mealSelected' )
                         option(selected='selected')
-                          | #{order?(order.meal?order.meal:''):''}
+                          | #{result?(result.meal?result.meal:''):''}
                         option Lunch
                         option Dinner
                   .form-group
@@ -335,27 +339,25 @@ html
     // page script
     script.
       $(function () {
-      $("#example1").DataTable();
-      $('#example2').DataTable({
-      "paging": true,
-      "lengthChange": false,
-      "searching": false,
-      "ordering": true,
-      "info": true,
-      "autoWidth": false
-      });
-      //Date picker
-      $('.datepicker').datepicker();
-      });
-      $('#mealSelected').attr('disabled', true);
-      $('#categorySelected').attr('disabled', true);
-      //$('#submitButton').attr('disabled', true);
-      //populate
-      $(function(){
-        $("input#dateSelected").focusout(function(){
-          $('#mealSelected').attr('disabled', false);
-          $date = $(this).val();
-          $meal = $("#mealSelected").val();
+        $("#example1").DataTable();
+        $('#example2').DataTable({
+          "paging": true,
+          "lengthChange": false,
+          "searching": false,
+          "ordering": true,
+          "info": true,
+          "autoWidth": false
+        });
+        //Date picker
+        $('.datepicker').datepicker();
+        
+        $('#mealSelected').attr('disabled', true);
+        //check if edit order
+        var url = window.location.pathname;
+        if (url.indexOf('editOrder') > -1) {
+          $date = $("#dateSelected").val();
+          console.log($date);
+          $meal = $("#categorySelected").val();
           $category = $("#categorySelected").val();
           $.getJSON("/getMenusFromOptions",{
             date: $date,
@@ -376,12 +378,43 @@ html
               $("select#getMenuList").html(options);
             }
           })
+        }
+        
+        //populate
+        $("#dateSelected").focusout(function(){
+          $('#mealSelected').attr('disabled', false);
+          //remove meal type
+          $('#mealSelected').val('');
+          $date = $("#dateSelected").val();
+          $('#getMenuList').attr('disabled', true);
+          //- $meal = $("#mealSelected").val();
+          //- $category = $("#categorySelected").val();
+          //- $.getJSON("/getMenusFromOptions",{
+          //-   date: $date,
+          //-   meal: $meal,
+          //-   category: $category,
+          //-   ajax: 'true'
+          //- }, function(j){
+          //-   if( j.length == 0 ){
+          //-     var options = '';
+          //-     options += '<option>'+ "No Menus available" +'</option>'
+          //-     $("select#getMenuList").html(options);
+          //-   }
+          //-   else{
+          //-     var options = '<option> Select a menu </option>';
+          //-     for (var i = 0; i < j.length; i++) {
+          //-       options += '<option data-checked='+ j[i].checked +' value="'+ j[i].id +'" data-menuName="' + j[i].item + '">' + j[i].item + '</option>';
+          //-     }
+          //-     $("select#getMenuList").html(options);
+          //-   }
+          //- })
         })
         //mealSelected
         $("select#mealSelected").change(function(){
           $('#categorySelected').attr('disabled', false);
           $('#getMenuList').attr('disabled', false);
           $date = $("#dateSelected").val();
+          console.log($date);
           $meal = $(this).val();
           $category = $("#categorySelected").val();
           $.getJSON("/getMenusFromOptions",{
@@ -460,9 +493,13 @@ html
           var check = $("option:selected", this).attr("data-checked");
           var generatedMenu = '';
           generatedMenu += '<div data-removeId="'+count+'"><label class="col-sm-2 control-label">Selected</label><div class="col-sm-10"><input type="hidden" data-getPosition='+count+' name="getPosition[]" value="'+check+'"><input type = "hidden" data-customizeOrderId="'+count+'"  name="allMenus[]" value="'+$(this).val()+'"><table class="table table-bordered table-hover"><tbody><td>'+ menuData +'</td>';
-          generatedMenu += '<td>Select container Type: <select name="containerType[]"><option>Steel</option><option>Disposable</option></select></td><td>Quantity : <input type = "text" class="" name = "singleQuantity[]" value = "1"></td></tbody></table>';
+          generatedMenu += '<td>Select container Type: <select name="containerType[]"><option></option><option>Steel</option><option>Disposable</option></select></td><td>Quantity : <input type = "text" class="" name = "singleQuantity[]" value = "1"></td></tbody></table>';
           if (check != 'normal')
             generatedMenu += '<div class="btn-tools"><div data-customizeDivTag="'+ count +'"></div><button class="btn btn-box-tool pull-left" data-removeBtn='+count+' type="button" onclick="customizeMenu('+count+','+check+')">Customize</button>';
+          if (check == 'normal' || check == 'hasAttributes')
+            generatedMenu += '<input type="hidden" name="subItemsName['+count+']"><input type="hidden" name="subItemsQuantity['+count+']"><input type="hidden" name="subItemsCost['+count+']"><input type="hidden" name="subItemsContainer['+count+']">';
+          if (check == 'normal' || check == 'true')
+            generatedMenu += '<input type="hidden" name="attributesName['+count+']">';
           generatedMenu += '<button class="btn btn-box-tool  pull-right" type="button" onclick="deleteSelectBox('+count+')"><i class="fa fa-times"></i></button></div></div>';
           newTextField.after().html(generatedMenu);
           newTextField.appendTo('#selectedMenu');

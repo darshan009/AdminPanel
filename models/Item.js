@@ -12,6 +12,7 @@ var itemSchema = new mongoose.Schema({
   }],
   image: String,
   chef: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  container: Number,
   totalCost : Number
 });
 

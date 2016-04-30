@@ -315,7 +315,7 @@ html
           }, function(j){
             var addedRows = '<tr><td><select name = "name[]" onChange = "getItemCost('+count+')" id="itemSelected'+count+'"><option>Select</option>';
             for (var i=0; i<j.length; i++) {
-              addedRows += '<option data-id="'+j[i]._id+'">'+j[i].title+'</option>';
+              addedRows += '<option data-id="'+j[i]._id+'" data-container="'+j[i].container+'" data-cost="'+j[i].totalCost+'">'+j[i].title+'</option>';
             }
             addedRows += '</select></td><td><input type="text" name = "quantity[]" placeholder="Quantity"></td><td><input type="text" name = "container[]" placeholder="Container"></td><td><input type="text" id="itemSelectedCost'+count+'" name = "cost[]" placeholder="Cost for 1"></td></tr>';
             $("#menuSubItems tbody").append(addedRows);
@@ -324,11 +324,6 @@ html
         })
       })
       function getItemCost(count) {
-        console.log(count);
-        var id = $('option:selected', '#itemSelected'+count+'').attr('data-id');
-        console.log(id);
-        $.getJSON("/getItemCost",{id: id, ajax: true}, function(item){
-          console.log(item.totalCost);
-          $("#itemSelectedCost"+count+"").val(item.totalCost);
-        })
+        var id = $('option:selected', '#itemSelected'+count+'').attr('data-cost');
+        $("#itemSelectedCost"+count+"").val(id);
       }

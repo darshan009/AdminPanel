@@ -186,19 +186,18 @@ html
               .box-body
                 form.form-horizontal
                   .form-group
-                    label.col-sm-2.control-label Meal type
-                    .col-sm-3
-                      select.form-control(name = 'meal' id='mealSelected')
-                        option(selected='selected')
-                        option Lunch
-                        option Dinner
-                  .form-group
                     label.col-sm-2.control-label Pick a date
                     .col-sm-3
                       .input-group
                         .input-group-addon
                           i.fa.fa-calendar
                         input.form-control.datepicker#dateSelected(type='text', name='date' value=(menu?(menu.date?menu.date:''):''))
+                  .form-group
+                    label.col-sm-2.control-label Meal type
+                    .col-sm-3
+                      select.form-control(name = 'meal' id='mealSelected')
+                        option Lunch
+                        option Dinner
                     .col-md-3
                       .input-group
                         button.btn.btn-info#getItemList(type = "button") Submit
@@ -234,6 +233,20 @@ html
     // page script
     script.
       $(function () {
+        //get todays date
+        var today = new Date();
+        var dd = today.getDate();
+        var mm = today.getMonth()+1; //January is 0!
+        var yyyy = today.getFullYear();
+        if(dd<10){
+        dd='0'+dd
+        }
+        if(mm<10){
+        mm='0'+mm
+        }
+        var today = mm+'/'+dd+'/'+yyyy;
+        console.log(today);
+        $('#dateSelected').val(today);
         //Date picker
         $('.datepicker').datepicker();
         $('#getItemList').click(function() {
@@ -245,9 +258,14 @@ html
             meal: $mealType,
             ajax : true
           }, function(results){
-            var addToTable = '<div class="box box-success"><div class="box-header"><h3 class="box-title"><b>Non-Item List</b></h3></div><!-- /.box-header--><div id="" class="box-body"><table id="example2" class="table table-bordered table-hover"><thead><tr><th>Item</th><th>Quantity</th></tr></thead><tbody>';
+            var addToTable = '<div class="box box-success"><div class="box-header"><h3 class="box-title"><b>Non-Item List</b></h3></div><!-- /.box-header--><div id="" class="box-body"><table id="example2" class="table table-bordered table-hover"><thead><tr><th>Item</th><th>Quantity</th><th>Container Type</th></tr></thead><tbody>';
             for (var i=0; i<results.length; i++) {
-              addToTable += '<tr><td>'+results[i].title+'</td><td>'+results[i].quantity+'</td></tr>'
+              addToTable += '<tr><td>'+results[i].title+'</td><td>'+results[i].quantity+'</td>';
+              if (results[i].steel || results[i].disposable)
+                addToTable += '<td><b>'+results[i].steel+'-Steel, '+results[i].disposable+'-Diposable</b></td>';
+              else
+                addToTable += '<td></td>';
+              addToTable += '</tr>';
             }
             addToTable += '</tbody></table></div></div>';
             $('#itemList').html('');
@@ -258,7 +276,7 @@ html
               "searching": true,
               "ordering": false,
               "info": true,
-              "autoWidth": true
+              "autoWidth": false
             });
           });
         });

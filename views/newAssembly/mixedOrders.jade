@@ -215,7 +215,6 @@ html
                     label.col-sm-2.control-label Meal type
                     .col-sm-3
                       select.form-control(name = 'meal' id='mealSelected')
-                        option(selected='selected')
                         option Lunch
                         option Dinner
                   .form-group
@@ -280,6 +279,21 @@ html
     script.
       $(function () {
         $.fn.dataTable.ext.errMode = 'none';
+        //get todays date
+        var today = new Date();
+        var dd = today.getDate();
+        var mm = today.getMonth()+1; //January is 0!
+        var yyyy = today.getFullYear();
+        if(dd<10){
+        dd='0'+dd
+        }
+        if(mm<10){
+        mm='0'+mm
+        }
+        var today = mm+'/'+dd+'/'+yyyy;
+        console.log(today);
+        $('#dateSelected').val(today);
+        
         $('.datepicker').datepicker();
         //non-customized
         $('button#selectedCategory').click(function(){
@@ -409,7 +423,7 @@ html
                     newDivData += '<div id="bcTarget'+i+'"></div></div></strong></div><br></h3><hr>';
                   }
                 }
-                newDivData += '<br /><button id="" type="button" class="btn btn-info pull-left" onclick = "printSimilarDiv('+similarDivId+')">Print order list</button>';
+                newDivData += '<br /><button id="" type="button" class="btn btn-info pull-left" onclick = "printSimilarDiv('+similarDivId+')">Print Address Barcodes list</button><button class="btn btn-info pull-right" data-orderids="" onclick="changeOrderStatus()">Done</button>';
                 newDivData += '</div></div>';
                 $('#displaySimilarBarcode').append(newDivData);
                 $('#displaySimilarBarcode'+similarDivId+'').hide();
@@ -473,7 +487,7 @@ html
                 newDivData += '<div id="bcTarget'+i+'"></div></div></strong></div><br></h3><hr>';
               }
             }
-            newDivData += '<br /><button id="" type="button" class="btn btn-info pull-left" onclick = "printDiv()">Print order list</button>';
+            newDivData += '<br /><button id="" type="button" class="btn btn-info pull-left" onclick = "printDiv()">Print order list</button><button class="btn btn-info pull-right" data-orderids="" onclick="changeOrderStatus()">Done</button>';
             newDivData += '</div></div>';
             $('#displaySectionBarcode').append(newDivData);
             $('#displaySectionBarcode').hide();
@@ -525,3 +539,6 @@ html
         $('#'+position).hide();
         $('#displaySimilarBarcode'+position+'').show();
       }
+      //- function changeOrderStatus() {
+      //-   
+      //- }

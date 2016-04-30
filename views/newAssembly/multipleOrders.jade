@@ -215,10 +215,14 @@ html
                     label.col-sm-2.control-label Meal type
                     .col-sm-3
                       select.form-control(name = 'meal' id='mealSelected')
-                        option(selected='selected')
                         option Lunch
                         option Dinner
-                    button.btn.btn-info(type= 'button' id='displayMultiple') Get Orders
+                    // -/button.btn.btn-info(type= 'button' id='displayMultiple') Get Orders
+                  .form-group
+                    label.col-sm-2.control-label
+                    .col-sm-6
+                      button.btn.btn-app(type= 'button' id='displayMultiple' category='Veg') Veg
+                      button.btn.btn-app(type= 'button' id='displayMultiple' category='Non-Veg') Non-Veg
           .row#displaySimilar
           .row#displaySimilarBarcode
           .row#displaySection
@@ -257,9 +261,25 @@ html
     script.
       $(function () {
         $.fn.dataTable.ext.errMode = 'none';
+        //get todays date
+        var today = new Date();
+        var dd = today.getDate();
+        var mm = today.getMonth()+1; //January is 0!
+        var yyyy = today.getFullYear();
+        if(dd<10){
+        dd='0'+dd
+        }
+        if(mm<10){
+        mm='0'+mm
+        }
+        var today = mm+'/'+dd+'/'+yyyy;
+        console.log(today);
+        $('#dateSelected').val(today);
+        
         $('.datepicker').datepicker();
         //non-customized
         $('button#displayMultiple').click(function(){
+          $mealType = $(this).attr('category');
           $date = $('#dateSelected').val();
           $meal = $('#mealSelected').val();
           if ( !$('#mealSelected').val() )
@@ -270,10 +290,21 @@ html
             meal : $meal,
             date: $date,
             ajax : true
-          },function(listOfOrdersByAddress){
+          },function(listOfOrdersByAddresses){
 
+            console.log(listOfOrdersByAddresses);
+            //sort for veg or non-veg
+            var listOfOrdersByAddress = [];
+            for (var z=0; z<listOfOrdersByAddresses.length; z++) {
+              var categoryCount = 0;
+              for (var y=0; y<listOfOrdersByAddresses[z].orderList.length; y++) {
+                if (listOfOrdersByAddresses[z].orderList[y]._id.item.type == $mealType)
+                  categoryCount++;
+              }
+              if (categoryCount == listOfOrdersByAddresses[z].orderList.length)
+                listOfOrdersByAddress.push(listOfOrdersByAddresses[z]);
+            }
             console.log(listOfOrdersByAddress);
-            
             //sort listOfOrdersByAddress by similar orders
             var positions = [], sortedMultipleOrders = [];
             for (var a=0; a<listOfOrdersByAddress.length; a++) {
@@ -282,7 +313,7 @@ html
                 if (listOfOrdersByAddress[a].orderList.length > 1 && listOfOrdersByAddress[a].orderList.length == listOfOrdersByAddress[b].orderList.length) {
                   for (var c=0; c<listOfOrdersByAddress[a].orderList.length; c++) {
                     for (var d=0; d<listOfOrdersByAddress[b].orderList.length; d++) {
-                      if (similarOrderPosition.indexOf(d) < 0 && listOfOrdersByAddress[a].orderList[c].Meal_Name === listOfOrdersByAddress[b].orderList[d].Meal_Name) {
+                      if (similarOrderPosition.indexOf(d) < 0 && listOfOrdersByAddress[a].orderList[c]._id.item.title === listOfOrdersByAddress[b].orderList[d]._id.item.title) {
                         foundCount++;
                         similarOrderPosition.push(d);
                         break;
@@ -311,8 +342,7 @@ html
               sortedMultipleOrders.push(listOfOrdersByAddress[uniquePositions[b]]);
             }
             
-            //console.log(sortedMultipleOrders);
-            //console.log(sortedMultipleOrders);
+            console.log(sortedMultipleOrders);
             
             $('#displaySimilar').html('');
             $('#displaySimilarBarcode').html('');
@@ -396,7 +426,7 @@ html
                     newDivData += '<div id="bcTarget'+i+'"></div></div></strong></div><br></h3><hr>';
                   }
                 }
-                newDivData += '<br /><button id="" type="button" class="btn btn-info pull-left" onclick = "printSimilarDiv('+similarDivId+')">Print order list</button>';
+                newDivData += '<br /><button id="" type="button" class="btn btn-info pull-left" onclick = "printSimilarDiv('+similarDivId+')">Print Address Barcodes list</button><button data-orderids="'++'">Done</button>';
                 newDivData += '</div></div>';
                 $('#displaySimilarBarcode').append(newDivData);
                 $('#displaySimilarBarcode'+similarDivId+'').hide();
@@ -460,7 +490,7 @@ html
                 newDivData += '<div id="bcTarget'+i+'"></div></div></strong></div><br></h3><hr>';
               }
             }
-            newDivData += '<br /><button id="" type="button" class="btn btn-info pull-left" onclick = "printDiv()">Print order list</button>';
+            newDivData += '<br /><button id="" type="button" class="btn btn-info pull-left" onclick = "printDiv()">Print order list</button><button class="btn btn-info pull-right" data-orderids="" onclick="changeOrderStatus()">Done</button>';
             newDivData += '</div></div>';
             $('#displaySectionBarcode').append(newDivData);
             $('#displaySectionBarcode').hide();

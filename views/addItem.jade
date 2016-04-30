@@ -252,6 +252,10 @@ html
                                 td
                                   input(type='Number' name='costAtt[]' placeholder='Cost' value=(items?(items.cost?items.cost:''):''))
                     button.btn.btn-info.pull-right(onclick='addTableRowPartTwo()', type='button') Add a row
+                .form-group
+                  label.col-sm-2.control-label Container Number
+                  .col-sm-10
+                    input.form-control#container(type='Number' name='container' placeholder='Number of Containers' value=(item?(item.container?item.container:''):''))
                 if (!item || singleCost)
                   .form-group
                     label.col-sm-2.control-label Single Cost

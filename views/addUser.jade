@@ -225,16 +225,16 @@ html
                       input.form-control(type='Number', id='', name='contactNo' required='true' placeholder='Add you Contact Number' value=(user?(user.contactNo?user.contactNo:''):''))
                   .form-group
                     if user && user.amount
-                        label.col-sm-2.control-label Recharge
+                        label.col-sm-2.control-label Recharge/Deduct
                     else
                       label.col-sm-2.control-label Add amount
                     .col-sm-10
                       input.form-control(type='Number', id='', name='amount' placeholder='Enter your recharge amount')
                     if user
                       br
-                      label.col-sm-2.control-label Amount in acccount
+                      label.col-sm-2.control-label Balance Amount
                       .col-sm-10
-                        p #{user.amount}
+                        p.form-control #{user.amount}
                   if(addressList)
                     .form-group
                       label.col-sm-2.control-label Address

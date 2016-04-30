@@ -176,31 +176,60 @@ exports.getSingleItems = function(req, res) {
     Item.populate(results, 'menu._id.item', function(err, orders){
       if (err) return err;
       var singleItems = [], z = 0;
+      if (!orders)
+        res.send("No orders found");
       for (var i=0; i<orders.length; i++) {
         for (var j=0; j<orders[i].menu.length; j++) {
           if (orders[i].menu[j].subItems._id && orders[i].menu[j]._id) {
             for (var k=0; k<orders[i].menu[j].subItems._id.subItemsArray.length; k++) {
+              var steel = 0, disposable = 0;
+              if (orders[i].menu[j].containerType == 'Steel')
+                steel = orders[i].menu[j].subItems._id.subItemsArray[k].container;
+              else
+                disposable = orders[i].menu[j].subItems._id.subItemsArray[k].container;
               singleItems[z] = {
                 title: orders[i].menu[j].subItems._id.subItemsArray[k].name,
-                quantity: orders[i].menu[j].singleQuantity * orders[i].menu[j].subItems._id.subItemsArray[k].quantity
+                quantity: orders[i].menu[j].singleQuantity * orders[i].menu[j].subItems._id.subItemsArray[k].quantity,
+                steel: steel,
+                disposable: disposable
               }
               z++;
             }
           }else if (orders[i].menu[j]._id && orders[i].menu[j]._id.subItems.length > 0) {
             for (var k=0; k<orders[i].menu[j]._id.subItems.length; k++) {
+              var steel = 0, disposable = 0;
+              if (orders[i].menu[j].containerType == 'Steel')
+                steel = orders[i].menu[j]._id.subItems[k].container;
+              else
+                disposable = orders[i].menu[j]._id.subItems[k].container;
               singleItems[z] = {
                 title: orders[i].menu[j]._id.subItems[k].name,
-                quantity: orders[i].menu[j].singleQuantity * orders[i].menu[j]._id.subItems[k].quantity
+                quantity: orders[i].menu[j].singleQuantity * orders[i].menu[j]._id.subItems[k].quantity,
+                steel: steel,
+                disposable: disposable
               }
               z++;
             }
           }
           else {
             if (orders[i].menu[j]._id) {
-              singleItems[z] = {
-                title: orders[i].menu[j]._id.item.title,
-                quantity: orders[i].menu[j].singleQuantity
-              }
+              var steel = 0, disposable = 0;
+              if (orders[i].menu[j].containerType == 'Steel')
+                steel = orders[i].menu[j]._id.item.container;
+              else
+                disposable = orders[i].menu[j]._id.item.container;
+              if (steel > 0 || disposable > 0)
+                singleItems[z] = {
+                  title: orders[i].menu[j]._id.item.title,
+                  quantity: orders[i].menu[j].singleQuantity,
+                  steel: steel,
+                  disposable: disposable
+                }
+              else
+                singleItems[z] = {
+                  title: orders[i].menu[j]._id.item.title,
+                  quantity: orders[i].menu[j].singleQuantity
+                }
               z++
             }
           }
@@ -214,13 +243,17 @@ exports.getSingleItems = function(req, res) {
           uniqueTitles.push(singleItems[i].title);
 
       for (var j=0; j<uniqueTitles.length; j++) {
-        var quantityCount = 0;
+        var quantityCount = 0, steel = 0, disposable = 0;
         for (var k=0; k<singleItems.length; k++) {
           if (singleItems[k].title == uniqueTitles[j]) {
             quantityCount += singleItems[k].quantity;
+            steel += singleItems[k].steel;
+            disposable += singleItems[k].disposable;
             uniqueItems[count] = {
               title: singleItems[k].title,
-              quantity: quantityCount
+              quantity: quantityCount,
+              steel: steel,
+              disposable: disposable
             }
           }
         }
@@ -268,27 +301,30 @@ exports.getSingleOrders = function(req, res) {
   .exec(function(err, orders) {
     Item.populate(orders, 'menu._id.item', function(err, results) {
       //User.populate(resultsuser, 'address._id.user', function(err, results) {
+      console.log(results);
         if (results && results.state != 'Archieved') {
           var listOfOrdersByAddress = [], k = 0, testArray = [];
           for (var i=0; i<results.length; i++) {
-            //single orders by users
-            var orderList = [];
-            for (var j = 0; j < results[i].menu.length; j++) {
-              if (results[i].menu[j]._id != null) {
-                orderList.push(results[i].menu[j]);
+              //single orders by users
+            if (results[i].menu.length == 1) {
+              var orderList = [];
+              for (var j = 0; j < results[i].menu.length; j++) {
+                if (results[i].menu[j]._id != null) {
+                  console.log(results[i].menu[j]);
+                  orderList.push(results[i].menu[j]);
+                }
               }
-            }
-            if (orderList.length == 1 && orderList[0]._id.item.type == mealType) {
-              listOfOrdersByAddress[k] = {
-                user: results[i].user,
-                orderList: results[i].menu,
-                address : results[i].address
+              if (orderList.length > 0 && orderList[0]._id.item.type == mealType) {
+                listOfOrdersByAddress[k] = {
+                  user: results[i].user,
+                  orderList: results[i].menu,
+                  address : results[i].address
+                }
+                k++;
               }
-              k++;
             }
           }
-          console.log(listOfOrdersByAddress[0].address._id);
-          console.log(listOfOrdersByAddress[1].address._id);
+          console.log(listOfOrdersByAddress);
           res.send(listOfOrdersByAddress);
         }
       //});
@@ -416,6 +452,7 @@ exports.getMultipleCategoryOrders = function(req, res) {
               }
             }
           }
+          console.log("--------multipleCategoryOrders--------");
           console.log(listOfOrdersByAddresses);
           res.send(listOfOrdersByAddresses);
         }

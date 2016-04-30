@@ -79,7 +79,6 @@ app.get('/editMenu/:id', userController.isAdmin, menuController.getAddMenu);
 app.post('/addMenu', userController.isAdmin, menuController.postAddMenu);
 app.post('/editMenu/:id', userController.isAdmin, menuController.postAddMenu);
 app.get('/getItemListForMenu', userController.isAdmin, menuController.getItemListForMenu);
-app.get('/getItemCost', userController.isAdmin, menuController.getItemCost);
 //ajax populate
 app.get('/getItemsFromCategory', menuController.getItemsFromCategory);
 app.get('/addMenu/delete/:id', userController.isAdmin, menuController.deleteMenu);

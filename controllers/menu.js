@@ -125,10 +125,3 @@ exports.getItemListForMenu = function(req, res, next){
      res.send(items);
    })
 };
-
-exports.getItemCost = function(req, res, next){
-  Item.findById(req.query.id)
-  .exec(function(err, item){
-    res.send(item);
-   })
-};

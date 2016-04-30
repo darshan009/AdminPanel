@@ -233,9 +233,9 @@ exports.postAddOrder = function(req, res){
                    subItemsArray : []
                  });
                  console.log("---------subItems check-----------");
-                 for (var k=0; k<req.body.subItemsName[subItemsCounter].length; k++) {
+                 for (var k=0; k<subItemsName[subItemsCounter].length; k++) {
                    subItems.subItemsArray.push({
-                     name : req.body.subItemsName[subItemsCounter][k],
+                     name : subItemsName[subItemsCounter][k],
                      quantity : Number(req.body.subItemsQuantity[subItemsCounter][k]),
                      container : Number(req.body.subItemsContainer[subItemsCounter][k])
                    })
@@ -331,6 +331,19 @@ exports.postAddOrder = function(req, res){
    }
   else {
     console.log(req.body);
+    var subItemsName = req.body.subItemsName;
+    var subItemsQuantity = req.body.subItemsQuantity;
+    var subItemsCost = req.body.subItemsCost;
+    var subItemsContainer = req.body.subItemsContainer
+    for (var i=0; i < req.body.getPosition.length; i++) {
+      if (req.body.getPosition[i] == 'false') {
+        subItemsName.splice(i, 0, '');
+        subItemsQuantity.splice(i, 0, '');
+        subItemsCost.splice(i, 0, '');
+        subItemsContainer.splice(i, 0, '');
+      }
+    }
+    console.log(subItemsName);
     var allMenus = [];
     console.log(req.body.allMenus)
     for (var i=0; i<req.body.allMenus.length; i++){
@@ -344,9 +357,7 @@ exports.postAddOrder = function(req, res){
       User.findOne({email: req.body.user})
       .populate('address._id')
       .exec(function(err, user){
-        var order = new Order({
-          user: req.body.user
-        })
+
         console.log(menus)
         console.log("-------------get position started------------")
         //sorting of menus
@@ -357,100 +368,140 @@ exports.postAddOrder = function(req, res){
               sortedMenus.push(menus[j]);
           }
         }
-        console.log(sortedMenus);
+        //console.log(sortedMenus);
         console.log(req.body.getPosition);
-        console.log(order._id);
+        //console.log(order._id);
         console.log("-------subItems------");
-        var j = 0, subItemsCounter = 0;
-        var totalCost = 0, subItems = [];
-        for (var i=0; i<req.body.getPosition.length; i++){
-          //customized
-          var subTotal = 0;
-          if (req.body.getPosition[i] == 'true') {
-            var subItems = new SubItems({
-              order : {
-                _id : order._id
-              },
-              subItemsArray : []
-            });
-            console.log("---------subItems check-----------");
-            for (var k=0; k<req.body.subItemsName[subItemsCounter].length; k++) {
-              subItems.subItemsArray.push({
-                name : req.body.subItemsName[subItemsCounter][k],
-                quantity : Number(req.body.subItemsQuantity[subItemsCounter][k]),
-                container : Number(req.body.subItemsContainer[subItemsCounter][k])
-              })
-              subTotal += req.body.subItemsQuantity[subItemsCounter][k] * req.body.subItemsCost[subItemsCounter][k];
-            }
-            console.log(subItems);
-            order.menu.push({
-              _id : allMenus[i],
-              subItems : {
-                _id : subItems._id
-              },
-              subTotal : subTotal * req.body.singleQuantity[i],
-              singleQuantity : req.body.singleQuantity[i],
-              containerType: req.body.containerType[i]
-            });
-            totalCost += subTotal * req.body.singleQuantity[i];
-            subItems.save(function (err) {
-              if (err) return err;
-            });
-            subItemsCounter++;
-            console.log(order.menu[i])
-          }// this part has attributes - half, full
-          else if (req.body.getPosition[i] == 'hasAttributes') {
-            console.log("---------cost check-----------");
-            for (var k=0; k<sortedMenus[i].item.attributes.length; k++)
-              if (sortedMenus[i].item.attributes[k].name == req.body.attributesName[j])
-                subTotal += sortedMenus[i].item.attributes[k].cost * req.body.singleQuantity[i];
-            order.menu.push({
-              _id : allMenus[i],
-              attributes : {
-                name : req.body.attributesName[j],
-                //quantity : req.body.attributesQuantity[j]
-              },
-              subTotal : subTotal * req.body.singleQuantity[i],
-              singleQuantity : req.body.singleQuantity[i],
-              containerType: req.body.containerType[i]
-            })
-            totalCost += subTotal * req.body.singleQuantity[i];
-            j++;
-          }//this is the non-customized part
-          else {
-            order.menu.push({
-              _id : allMenus[i],
-              subTotal : Number(sortedMenus[i].item.totalCost) * req.body.singleQuantity[i],
-              singleQuantity : req.body.singleQuantity[i],
-              containerType: req.body.containerType[i]
-            })
-            totalCost += Number(sortedMenus[i].item.totalCost) * req.body.singleQuantity[i];
+        console.log(req.body.containerType[0]);
+
+        //for different dates & meal
+        var positions = [], outerArrayCount = 0, uniquePositions = [];
+        loop1:
+        for (var q=0; q<sortedMenus.length; q++) {
+          var addOnce = true, eql = false;
+          if (uniquePositions.indexOf(q) > -1) {
+            continue loop1;
           }
+          loop2:
+          for (var p=q+1; p<sortedMenus.length; p++) {
+            if (sortedMenus[q].date.toDateString() == sortedMenus[p].date.toDateString() && sortedMenus[q].meal == sortedMenus[p].meal) {
+              if (addOnce) {
+                positions[outerArrayCount] = [];
+                positions[outerArrayCount].push(q);
+                addOnce = false;
+                var eql = true;
+                uniquePositions.push(q);
+              }
+              positions[outerArrayCount].push(p);
+              uniquePositions.push(p);
+            }
+            // if (positions.length == sortedMenus.length)
+            //   break loop1;
+          }
+          if (!eql) {
+            positions[outerArrayCount] = [];
+            positions[outerArrayCount].push(q);
+          }
+          outerArrayCount++;
         }
-        console.log(totalCost);
-        console.log(order.menu)
-        console.log(order.menu.subItems)
-        order.grandTotal = 0;
-        order.grandTotal += totalCost;
-        //order address
-        order.address = {};
-        if (user.address)
-          for (var i=0; i<user.address.length; i++)
-            if (user.address[i]._id.tag == req.body.address)
-              order.address = user.address[i]._id;
-        order.save(function (err) {
-          if (err) return err;
-        });
-        var newAmount = Number(user.amount);
-        user.amount = 0;
-        newAmount -= totalCost;
-        user.amount = newAmount;
-        user.save(function (err) {
-          if (err) return err;
-        });
-        res.redirect('/orderList');
-      });
+        console.log(uniquePositions);
+        console.log(positions);
+        for (var s=0; s<positions.length; s++) {
+          //creating new order for every loop
+          var order = new Order({
+            user: req.body.user,
+            date: sortedMenus[positions[s][0]].date,
+            meal: sortedMenus[positions[s][0]].meal
+          })
+          for (var t=0; t<positions[s].length; t++) {
+            var j = 0, subItemsCounter = 0, totalCost = 0, subItems = [], subTotal = 0;
+            //customized
+            if (req.body.getPosition[positions[s][t]] == 'true') {
+              var subItems = new SubItems({
+                order : {
+                  _id : order._id
+                },
+                subItemsArray : []
+              });
+              console.log("---------subItems check-----------");
+              for (var k=0; k<subItemsName[positions[s][t]].length; k++) {
+                subItems.subItemsArray.push({
+                  name : subItemsName[positions[s][t]][k],
+                  quantity : Number(subItemsQuantity[positions[s][t]][k]),
+                  container : Number(subItemsContainer[positions[s][t]][k])
+                })
+                subTotal += subItemsQuantity[positions[s][t]][k] * subItemsCost[positions[s][t]][k];
+              }
+              console.log(subItems);
+              order.menu.push({
+                _id : allMenus[positions[s][t]],
+                subItems : {
+                  _id : subItems._id
+                },
+                subTotal : subTotal * req.body.singleQuantity[positions[s][t]],
+                singleQuantity : req.body.singleQuantity[positions[s][t]],
+                containerType: req.body.containerType[positions[s][t]]
+              });
+              totalCost += subTotal * req.body.singleQuantity[positions[s][t]];
+              subItems.save(function (err) {
+                if (err) return err;
+              });
+              subItemsCounter++;
+              console.log(order.menu[positions[s][t]])
+            }// this part has attributes - half, full
+            else if (req.body.getPosition[positions[s][t]] == 'hasAttributes') {
+              console.log("---------cost check-----------");
+              for (var k=0; k<sortedMenus[positions[s][t]].item.attributes.length; k++)
+                if (sortedMenus[positions[s][t]].item.attributes[k].name == req.body.attributesName[j])
+                  subTotal += sortedMenus[positions[s][t]].item.attributes[k].cost * req.body.singleQuantity[positions[s][t]];
+              order.menu.push({
+                _id : allMenus[positions[s][t]],
+                attributes : {
+                  name : req.body.attributesName[j],
+                  //quantity : req.body.attributesQuantity[j]
+                },
+                subTotal : subTotal * req.body.singleQuantity[positions[s][t]],
+                singleQuantity : req.body.singleQuantity[positions[s][t]],
+                containerType: req.body.containerType[positions[s][t]]
+              })
+              totalCost += subTotal * req.body.singleQuantity[positions[s][t]];
+              j++;
+            }//this is the non-customized part
+            else {
+              order.menu.push({
+                _id : allMenus[positions[s][t]],
+                subTotal : Number(sortedMenus[positions[s][t]].item.totalCost) * req.body.singleQuantity[positions[s][t]],
+                singleQuantity : req.body.singleQuantity[positions[s][t]],
+                containerType: req.body.containerType[positions[s][t]]
+              })
+              totalCost += Number(sortedMenus[positions[s][t]].item.totalCost) * req.body.singleQuantity[positions[s][t]];
+            }
+          }
+          console.log(totalCost);
+          console.log(order.menu)
+          console.log(order.menu.subItems)
+          order.grandTotal = 0;
+          order.grandTotal += totalCost;
+          //order address
+          order.address = {};
+          if (user.address)
+            for (var z=0; z<user.address.length; z++)
+              if (user.address[z]._id.tag == req.body.address)
+                order.address = user.address[z]._id;
+          var newAmount = Number(user.amount);
+          user.amount = 0;
+          newAmount -= totalCost;
+          user.amount = newAmount;
+          user.save(function (err) {
+            if (err) return err;
+          });
+          order.save(function (err) {
+            if (err) return err;
+          });
+        }
+      res.redirect('/orderList');
     });
+  });
   }
 };
 
