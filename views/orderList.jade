@@ -329,19 +329,18 @@ html
               }
               else{
                 console.log("non-customized")
-                var date = new Date(results[i].menu[j]._id.date).toDateString();
-                addToNonCustomizedTable += '<tr><td><a href=/viewOrder/'+results[i].id+' target="_blank">'+results[i].menu[j]._id.item.title+'</a></td><td>'+date+'</td><td>'+results[i].user+'</td>';
+                addToNonCustomizedTable += '<tr><td><a href=/viewOrder/'+results[i].id+' target="_blank">'+results[i].menu[j]._id.title+'</a></td><td>'+ results[i].date +'</td><td>'+results[i].user+'</td>';
                 if (results[i].menu[j].attributes != null)
-                  addToNonCustomizedTable += '<td>'+ results[i].menu[j].attributes.name +'</td></tr>';
-                else if (results[i].menu[j]._id.subItems.length > 0) {
-                  addToNonCustomizedTable += '<td>';
-                  for (var l = 0; l < results[i].menu[j]._id.subItems.length; l++) {
-                    addToNonCustomizedTable += ''+ results[i].menu[j]._id.subItems[l].quantity+'-'+results[i].menu[j]._id.subItems[l].name +',  '+results[i].menu[j]._id.subItems[l].container+'-container<br>';
-                  }
-                  addToNonCustomizedTable += ' </td></tr>';
-                }
+                  addToNonCustomizedTable += '<td>'+ results[i].menu[j].attributes.name +'</td><td>'+ results[i].menu[j].singleQuantity +'</td></tr>';
+                //- else if (results[i].menu[j]._id.subItems.length > 0) {
+                //-   addToNonCustomizedTable += '<td>';
+                //-   for (var l = 0; l < results[i].menu[j]._id.subItems.length; l++) {
+                //-     addToNonCustomizedTable += ''+ results[i].menu[j]._id.subItems[l].quantity+'-'+results[i].menu[j]._id.subItems[l].name +',  '+results[i].menu[j]._id.subItems[l].container+'-container<br>';
+                //-   }
+                //-   addToNonCustomizedTable += ' </td></tr>';
+                //- }
                 else
-                  addToNonCustomizedTable += '</tr>';
+                  addToNonCustomizedTable += '<td><b>Quantity - '+ results[i].menu[j].singleQuantity +'</b></td></tr>';
               }
             }
           }

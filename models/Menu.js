@@ -5,12 +5,12 @@ var menuSchema = new mongoose.Schema({
   meal: { type: String, enum: ['Lunch', 'Dinner'], default: 'Lunch'},
   item: { type: mongoose.Schema.Types.ObjectId, ref: 'Item' },
   category: { type: String},
-  subItems: [{
-     "name": { type: String },
-     "quantity": {type: Number, default: '1'},
-     "cost": { type: Number, default: '' },
-     "container": { type: Number , default: '1'}
-  }],
+  subItems: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Item' }
+    //  "name": { type: String },
+    //  "quantity": {type: Number, default: '1'},
+    //  "cost": { type: Number, default: '' },
+    //  "container": { type: Number , default: '1'}
+  ],
   totalCost: Number
 });
 

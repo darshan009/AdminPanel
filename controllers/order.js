@@ -9,61 +9,54 @@ var SubItems = require('../models/SubItems');
 exports.getOrderList = function(req, res) {
   Order.find()
   .populate('menu._id')
-  .populate('menu.subItems._id')
-  .exec(function(err, orders) {
-    Item.populate(orders, 'menu._id.item', function(err, results){
-      //console.log(results)
-      var customizedResult = [];
-      var nonCustomizedResult = [];
-      var z = 0, y = 0;
-      for (var i=0; i<results.length; i++){
-        for (var j=0; j<results[i].menu.length; j++){
-          if (results[i].state == 'Published') {
-            console.log(results[i].menu[j]);
-            if (results[i].menu[j].subItems && results[i].menu[j].subItems._id != null) {
-              customizedResult[y] = {
-                  id : results[i]._id,
-                  title : results[i].menu[j]._id.item.title,
-                  date : results[i].menu[j]._id.date,
-                  user : results[i].user,
-                  quantity : results[i].menu[j].singleQuantity,
-                  details : []
-              }
-              for (var k=0; k<results[i].menu[j].subItems._id.subItemsArray.length; k++)
-                customizedResult[y].details.push(results[i].menu[j].subItems._id.subItemsArray[k]);
-              //console.log(customizedResult[z].details);
-              y++;
+  .exec(function(err, results) {
+    //console.log(results)
+    var customizedResult = [];
+    var nonCustomizedResult = [];
+    var z = 0, y = 0;
+    for (var i=0; i<results.length; i++){
+      for (var j=0; j<results[i].menu.length; j++){
+        if (results[i].state == 'Published') {
+          console.log(results[i].menu[j]);
+          if (results[i].menu[j].subItems && results[i].menu[j].subItems._id != null) {
+            customizedResult[y] = {
+                id : results[i]._id,
+                title : results[i].menu[j]._id.title,
+                date : results[i].date,
+                user : results[i].user,
+                quantity : results[i].menu[j].singleQuantity,
+                details : []
             }
-            else{
-              //console.log(results[i].menu[j].attributes);
-              nonCustomizedResult[z] = {
-                  id : orders[i]._id,
-                  title : results[i].menu[j]._id.item.title,
-                  date : results[i].menu[j]._id.date,
-                  user : results[i].user,
-                  quantity : results[i].menu[j].singleQuantity,
-                  details : []
-              }
-              if (results[i].menu[j].attributes.name) {
-                nonCustomizedResult[z].nameAtt = results[i].menu[j].attributes.name;
-                nonCustomizedResult[z].quantityAtt = results[i].menu[j].singleQuantity;
-              }
-              else{
-                for (var l=0; l<results[i].menu[j]._id.subItems.length; l++)
-                  nonCustomizedResult[z].details.push(results[i].menu[j]._id.subItems[l]);
-              }
-              z++;
+            for (var k=0; k<results[i].menu[j].subItems._id.subItemsArray.length; k++)
+              customizedResult[y].details.push(results[i].menu[j].subItems._id.subItemsArray[k]);
+            //console.log(customizedResult[z].details);
+            y++;
+          }
+          else{
+            //console.log(results[i].menu[j].attributes);
+            nonCustomizedResult[z] = {
+                id : results[i]._id,
+                title : results[i].menu[j]._id.title,
+                date : results[i].date.toDateString(),
+                user : results[i].user,
+                quantity : results[i].menu[j].singleQuantity,
+                details : []
             }
+            if (results[i].menu[j].attributes.name) {
+              nonCustomizedResult[z].nameAtt = results[i].menu[j].attributes.name;
+              nonCustomizedResult[z].quantityAtt = results[i].menu[j].singleQuantity;
+            }
+            z++;
           }
         }
       }
-      console.log("-------customizedResult-------");
-      console.log(nonCustomizedResult);
-      res.render('orderList', {
-        customizedResult : customizedResult,
-        nonCustomizedResult : nonCustomizedResult
-      });
-    })
+    }
+    console.log("-------customizedResult-------");
+    console.log(nonCustomizedResult);
+    res.render('orderList', {
+      customizedResult : customizedResult,
+      nonCustomizedResult : nonCustomizedResult
+    });
   });
 };
 
@@ -72,37 +65,35 @@ exports.getOrdersByDate = function(req, res) {
     var dateSelected = req.query.date;
   else
     var dateSelected = undefined;
-  Order.find()
-  .populate('menu._id', null, {date : dateSelected})
-  .populate('menu.subItems._id')
-  .exec(function(err, orders) {
-    Item.populate(orders, 'menu._id.item', function(err, results){
-      console.log("--------getOrdersByDate--------");
-      var k = 0, orderList = [];
-      var z = 0;
-      for (var i=0; i<results.length; i++){
-        var menuList = [];
-        if (results[i].state == 'Published') {
-          for (var j=0; j<results[i].menu.length; j++) {
-            if (results[i].menu[j]._id != null) {
-              menuList.push(results[i].menu[j]);
-              console.log(results[i].menu[j]);
-            }
-          }
-          if (menuList.length > 0) {
-            orderList[k] = {
-              id : results[i]._id,
-              user : results[i].user,
-              address : results[i].address,
-              menu : menuList
-            }
-            k++;
+  Order.find({date : dateSelected})
+  .populate('menu._id')
+  .exec(function(err, results) {
+    console.log("--------getOrdersByDate--------");
+    var k = 0, orderList = [];
+    var z = 0;
+    for (var i=0; i<results.length; i++){
+      var menuList = [];
+      if (results[i].state == 'Published') {
+        for (var j=0; j<results[i].menu.length; j++) {
+          if (results[i].menu[j]._id != null) {
+            menuList.push(results[i].menu[j]);
+            console.log(results[i].menu[j]);
           }
         }
+        if (menuList.length > 0) {
+          orderList[k] = {
+            id : results[i]._id,
+            date : results[i].date.toDateString(),
+            user : results[i].user,
+            address : results[i].address,
+            menu : menuList
+          }
+          k++;
+        }
       }
-      console.log(orderList);
-      res.send(orderList);
-    })
+    }
+    console.log(orderList);
+    res.send(orderList);
   });
 };
 
@@ -121,25 +112,21 @@ exports.getViewOrder = function(req, res){
   Order.findById(req.params.id)
   .populate('address._id')
   .populate('menu._id')
-  .populate('menu.subItems._id')
-  .exec(function(err, order) {
-    Item.populate(order, 'menu._id.item', function(err, result) {
-      if(!result) res.end("No order found")
-      if (!order) res.end("Order not found")
-      var fullResult = [];
-      for (var i=0; i<result.menu.length; i++){
-        fullResult[i] = {
-          id : result.menu[i]._id._id,
-          title : result.menu[i]._id.item.title,
-          attributes : result.menu[i].attributes
-        }
+  .exec(function(err, result) {
+    if(!result) res.end("No order found");
+    var fullResult = [];
+    for (var i=0; i<result.menu.length; i++) {
+      fullResult[i] = {
+        id : result.menu[i]._id,
+        title : result.menu[i]._id.title,
+        attributes : result.menu[i].attributes
       }
-      console.log(result);
-      res.render('viewOrder', {
-        result : result,
-        fullResult : fullResult //result.menu._id.
-      });
-    })
+    }
+    console.log(result);
+    res.render('viewOrder', {
+      result : result,
+      fullResult : fullResult //result.menu._id.
+    });
   });
 };
 
@@ -175,6 +162,7 @@ exports.getEditOrder = function(req, res){
 
 exports.postAddOrder = function(req, res){
   if(req.params.id){
+    console.log(req.body);
      Order.findById(req.params.id)
      .populate('menu._id')
      .populate('menu.subItems._id')
@@ -208,7 +196,7 @@ exports.postAddOrder = function(req, res){
            if (req.body.allPreMenus && req.body.allPreMenus.length != order.menu.length)
              for (var z=0; z<order.menu.length; z++) {
                for (var y=0; y<req.body.allPreMenus.length; y++)
-                 if (order.menu[z]._id._id == req.body.allPreMenus[y]) {
+                 if (order.menu[z]._id == req.body.allPreMenus[y]) {
                    found = true;
                    break;
                  }
@@ -234,27 +222,16 @@ exports.postAddOrder = function(req, res){
                  });
                  console.log("---------subItems check-----------");
                  for (var k=0; k<subItemsName[subItemsCounter].length; k++) {
-                   subItems.subItemsArray.push({
-                     name : subItemsName[subItemsCounter][k],
-                     quantity : Number(req.body.subItemsQuantity[subItemsCounter][k]),
-                     container : Number(req.body.subItemsContainer[subItemsCounter][k])
-                   })
                    subTotal += req.body.subItemsQuantity[subItemsCounter][k] * req.body.subItemsCost[subItemsCounter][k];
+                   order.menu.push({
+                     _id: req.body.subItemsId[subItemsCounter][k],
+                     subTotal : subTotal * req.body.subItemsQuantity[subItemsCounter][k],
+                     singleQuantity : req.body.singleQuantity[i],
+                     containerType: req.body.containerType[i]
+                   })
                  }
-                 order.menu.push({
-                   _id : allMenus[i],
-                   subItems : {
-                     _id : subItems._id
-                   },
-                   subTotal : subTotal,
-                   singleQuantity : req.body.singleQuantity[i],
-                   containerType: req.body.containerType[i]
-                 });
-                 subItems.save(function (err) {
-                   if (err) return err;
-                 });
                  subItemsCounter++;
-                 console.log(order.menu[i])
+                 totalCost += subTotal * req.body.singleQuantity[i];
                }// this part has attributes - half, full
                else if (req.body.getPosition[i] == 'hasAttributes') {
                  console.log("---------cost check-----------");
@@ -264,7 +241,7 @@ exports.postAddOrder = function(req, res){
                      var subTotal = sortedMenus[i].item.attributes[k].cost * req.body.singleQuantity[i];
                    }
                  order.menu.push({
-                   _id : allMenus[i],
+                   _id : sortedMenus[i].item._id,
                    attributes : {
                      name : req.body.attributesName[j],
                      quantity : req.body.singleQuantity[i]
@@ -273,16 +250,17 @@ exports.postAddOrder = function(req, res){
                    singleQuantity : req.body.singleQuantity[i],
                    containerType: req.body.containerType[i]
                  })
+                 totalCost += subTotal * req.body.singleQuantity[i];
                  j++;
                }//this is the non-customized part
                else {
                  order.menu.push({
-                   _id : allMenus[i],
+                   _id : sortedMenus[i].item._id,
                    subTotal : Number(sortedMenus[i].item.totalCost) * req.body.singleQuantity[i],
                    singleQuantity : req.body.singleQuantity[i],
                    containerType: req.body.containerType[i]
                  })
-                 totalCost += sortedMenus[i].item.totalCost;
+                 totalCost += sortedMenus[i].item.totalCost * req.body.singleQuantity[i];
                }
              }
            console.log("-----------cost check---------");
@@ -331,12 +309,14 @@ exports.postAddOrder = function(req, res){
    }
   else {
     console.log(req.body);
+    var subItemsId = req.body.subItemsId;
     var subItemsName = req.body.subItemsName;
     var subItemsQuantity = req.body.subItemsQuantity;
     var subItemsCost = req.body.subItemsCost;
     var subItemsContainer = req.body.subItemsContainer
     for (var i=0; i < req.body.getPosition.length; i++) {
       if (req.body.getPosition[i] == 'false') {
+        subItemsId.splice(i, 0, '');
         subItemsName.splice(i, 0, '');
         subItemsQuantity.splice(i, 0, '');
         subItemsCost.splice(i, 0, '');
@@ -414,51 +394,36 @@ exports.postAddOrder = function(req, res){
             meal: sortedMenus[positions[s][0]].meal
           })
           for (var t=0; t<positions[s].length; t++) {
-            var j = 0, subItemsCounter = 0, totalCost = 0, subItems = [], subTotal = 0;
+            var j = 0, totalCost = 0, subTotal = 0;
             //customized
             if (req.body.getPosition[positions[s][t]] == 'true') {
-              var subItems = new SubItems({
-                order : {
-                  _id : order._id
-                },
-                subItemsArray : []
-              });
-              console.log("---------subItems check-----------");
+              console.log("---------subItems as seperate items-----------");
               for (var k=0; k<subItemsName[positions[s][t]].length; k++) {
-                subItems.subItemsArray.push({
-                  name : subItemsName[positions[s][t]][k],
-                  quantity : Number(subItemsQuantity[positions[s][t]][k]),
-                  container : Number(subItemsContainer[positions[s][t]][k])
-                })
                 subTotal += subItemsQuantity[positions[s][t]][k] * subItemsCost[positions[s][t]][k];
+                order.menu.push({
+                  _id : subItemsId[positions[s][t]][k],
+                  singleQuantity : Number(subItemsQuantity[positions[s][t]][k]),
+                  //container : Number(subItemsContainer[positions[s][t]][k]),
+                  containerType: req.body.containerType[positions[s][t]],
+                  subTotal : subTotal * subItemsQuantity[positions[s][t]],
+                })
               }
-              console.log(subItems);
-              order.menu.push({
-                _id : allMenus[positions[s][t]],
-                subItems : {
-                  _id : subItems._id
-                },
-                subTotal : subTotal * req.body.singleQuantity[positions[s][t]],
-                singleQuantity : req.body.singleQuantity[positions[s][t]],
-                containerType: req.body.containerType[positions[s][t]]
-              });
               totalCost += subTotal * req.body.singleQuantity[positions[s][t]];
-              subItems.save(function (err) {
-                if (err) return err;
-              });
-              subItemsCounter++;
               console.log(order.menu[positions[s][t]])
             }// this part has attributes - half, full
             else if (req.body.getPosition[positions[s][t]] == 'hasAttributes') {
               console.log("---------cost check-----------");
               for (var k=0; k<sortedMenus[positions[s][t]].item.attributes.length; k++)
-                if (sortedMenus[positions[s][t]].item.attributes[k].name == req.body.attributesName[j])
+                if (sortedMenus[positions[s][t]].item.attributes[k].name == req.body.attributesName[j]) {
                   subTotal += sortedMenus[positions[s][t]].item.attributes[k].cost * req.body.singleQuantity[positions[s][t]];
+                  var container = sortedMenus[positions[s][t]].item.attributes[k].container;
+                }
               order.menu.push({
-                _id : allMenus[positions[s][t]],
+                _id : sortedMenus[positions[s][t]].item._id,
                 attributes : {
                   name : req.body.attributesName[j],
-                  //quantity : req.body.attributesQuantity[j]
+                  //quantity : req.body.attributesQuantity[j],
+                  container : container
                 },
                 subTotal : subTotal * req.body.singleQuantity[positions[s][t]],
                 singleQuantity : req.body.singleQuantity[positions[s][t]],
@@ -469,7 +434,7 @@ exports.postAddOrder = function(req, res){
             }//this is the non-customized part
             else {
               order.menu.push({
-                _id : allMenus[positions[s][t]],
+                _id : sortedMenus[positions[s][t]].item._id,
                 subTotal : Number(sortedMenus[positions[s][t]].item.totalCost) * req.body.singleQuantity[positions[s][t]],
                 singleQuantity : req.body.singleQuantity[positions[s][t]],
                 containerType: req.body.containerType[positions[s][t]]
@@ -589,6 +554,7 @@ exports.getCustomizedMenuToItem = function(req, res) {
   console.log(req.query.id);
   Menu.findById(req.query.id)
   .populate('item')
+  .populate('subItems')
   .exec(function(err, menu){
     console.log("--------getCustomizedMenuToItem----------")
     console.log(menu);
@@ -597,9 +563,10 @@ exports.getCustomizedMenuToItem = function(req, res) {
       console.log("subItems found");
       for (var i=0; i<menu.subItems.length; i++)
         subItemsAttributes[i] = {
-          name : menu.subItems[i].name,
+          id: menu.subItems[i]._id,
+          name : menu.subItems[i].title,
           quantity : menu.subItems[i].quantity,
-          cost : menu.subItems[i].cost,
+          cost : menu.subItems[i].totalCost,
           container :menu.subItems[i].container
         }
     }else if(menu.item.attributes.length != 0){

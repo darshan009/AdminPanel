@@ -8,8 +8,10 @@ var itemSchema = new mongoose.Schema({
   category: { type: mongoose.Schema.Types.ObjectId, ref: 'ItemCategory' },
   attributes : [{
     "name" : String,
-    "cost": Number
+    "cost": Number,
+    "container": Number
   }],
+  quantity: Number,
   image: String,
   chef: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   container: Number,

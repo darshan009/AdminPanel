@@ -63,35 +63,33 @@ exports.postAddMenu = function(req, res){
     });
   }
   else {
-    Item.findById(req.body.itemSelected).exec(function(err, item){
-      var menu = new Menu({
-        date: req.body.date,
-        meal: req.body.meal,
-        category: req.body.category,
-        item: item._id
-      })
-      menu.subItems = [];
-      var locals = req.body;
-      var totalCost = 0;
-      if (locals.name)
-        for(var i=0; i<locals.name.length; i++) {
-          if (locals.cost[i] != ''){
-            menu.subItems.push({
-              name : locals.name[i],
-              cost : locals.cost[i],
-              quantity : locals.quantity[i],
-              container : locals.container[i]
-            })
-            totalCost += Number(locals.cost[i]) * Number(locals.quantity[i]);
-          }
-        }
-      menu.totalCost = 0;
-      menu.totalCost += totalCost;
-      menu.save(function (err) {
-        if (err) return err;
-      })
-      res.redirect('/menuList');
+    var menu = new Menu({
+      date: req.body.date,
+      meal: req.body.meal,
+      category: req.body.category,
+      item: req.body.itemSelected
     })
+    menu.subItems = [];
+    var locals = req.body;
+    var totalCost = 0;
+    if (locals.name)
+      for(var i=0; i<locals.name.length; i++) {
+        if (locals.cost[i] != ''){
+          menu.subItems.push(locals.name[i]
+            // name : locals.name[i],
+            // cost : locals.cost[i],
+            // quantity : locals.quantity[i],
+            // container : locals.container[i]
+          )
+          totalCost += Number(locals.cost[i]) * Number(locals.quantity[i]);
+        }
+      }
+    menu.totalCost = 0;
+    menu.totalCost += totalCost;
+    menu.save(function (err) {
+      if (err) return err;
+    })
+    res.redirect('/menuList');
   }
 };
 

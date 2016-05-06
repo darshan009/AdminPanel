@@ -5,7 +5,8 @@ var subItemsSchema = new mongoose.Schema({
     _id : { type: mongoose.Schema.Types.ObjectId, ref: 'Order' }
   },
   subItemsArray: [{
-     name : String,
+     id: { type: mongoose.Schema.Types.ObjectId, ref: 'Item' },
+     //name : String,
      quantity : Number,
      container: Number
   }],

@@ -110,6 +110,8 @@ exports.deleteItemCategory = function(req,res){
            item.description= req.body.description;
            item.type= req.body.type;
            item.category= itemCategory._id;
+           item.quantity = req.body.quantity;
+           item.container = req.body.container;
            item.totalCost = 0;
            item.totalCost += totalCost;
            item.attributes = [];
@@ -118,7 +120,8 @@ exports.deleteItemCategory = function(req,res){
                if (locals.nameAtt[i] != '' && locals.costAtt[i] != '')
                  item.attributes.push({
                    name : locals.nameAtt[i],
-                   cost : locals.costAtt[i]
+                   cost : locals.costAtt[i],
+                   container: locals.containerAtt[i]
                  })
                  totalCost += Number(locals.costAtt[i]);
               }
@@ -142,6 +145,7 @@ exports.deleteItemCategory = function(req,res){
            chef: userChef._id,
            description: req.body.description,
            type: req.body.type,
+           quantity: req.body.quantity,
            category: itemCategory._id,
            container: req.body.container
          });
@@ -152,7 +156,8 @@ exports.deleteItemCategory = function(req,res){
              if (locals.nameAtt[i] != '' && locals.costAtt[i] != '') {
                item.attributes.push({
                  name : locals.nameAtt[i],
-                 cost : locals.costAtt[i]
+                 cost : locals.costAtt[i],
+                 container: locals.containerAtt[i]
                })
                totalCost += Number(locals.costAtt[i]);
              }

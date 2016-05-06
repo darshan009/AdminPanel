@@ -245,10 +245,10 @@ html
                                     td
                                       li
                                         input(type='hidden', name="allPreMenus[]", value= '#{menu._id._id}')
-                                        | #{menu._id.item.title}
+                                        | #{menu._id.title}
                                       td
                                         | #{menu.singleQuantity}
-                                if (menu.subItems._id)
+                                if (menu.subItems)
                                   table.table.table-bordered.table-hover
                                     tbody
                                       each subItemsArray in menu.subItems._id.subItemsArray
@@ -497,14 +497,14 @@ html
           if (check != 'normal')
             generatedMenu += '<div class="btn-tools"><div data-customizeDivTag="'+ count +'"></div><button class="btn btn-box-tool pull-left" data-removeBtn='+count+' type="button" onclick="customizeMenu('+count+','+check+')">Customize</button>';
           if (check == 'normal' || check == 'hasAttributes')
-            generatedMenu += '<input type="hidden" name="subItemsName['+count+']"><input type="hidden" name="subItemsQuantity['+count+']"><input type="hidden" name="subItemsCost['+count+']"><input type="hidden" name="subItemsContainer['+count+']">';
+            generatedMenu += '<input type="hidden" name="subItemsId['+count+']""><input type="hidden" name="subItemsName['+count+']"><input type="hidden" name="subItemsQuantity['+count+']"><input type="hidden" name="subItemsCost['+count+']"><input type="hidden" name="subItemsContainer['+count+']">';
           if (check == 'normal' || check == 'true')
             generatedMenu += '<input type="hidden" name="attributesName['+count+']">';
           generatedMenu += '<button class="btn btn-box-tool  pull-right" type="button" onclick="deleteSelectBox('+count+')"><i class="fa fa-times"></i></button></div></div>';
           newTextField.after().html(generatedMenu);
           newTextField.appendTo('#selectedMenu');
           console.log(check);
-          if (check === 'hasAttributes'){
+          if (check === 'hasAttributes' || check == 'false'){
             customizeMenu(count, check);
             var z = $('[data-removeBtn="'+count+'"]');
             z.remove();
@@ -534,11 +534,14 @@ html
           }, function(j){
             var newTextField = $(document.createElement('div'))
             //console.log(j[0].quantity);
-            var generatedTable = '<table class="table table-bordered table-hover"><tbody>';
+            if (check == 'false')
+              var generatedTable = '<table class="table table-bordered table-hover"><thead><th>Item</th><th>Quantity</th><th>Cost</th></thead><tbody>';
+            if (check == 'hasAttributes')
+              var generatedTable = '<table class="table table-bordered table-hover"><thead><th>Quantity</th><th>Cost</th></thead><tbody>';
             //var subItemsName = [];
             for (var i = 0; i < j.length; i++){
               if(j[i].quantity){
-                generatedTable += '<tr><td><input name = "subItemsName['+d+']" value='+ j[i].name +'></td><td><input type = "Number" name = "subItemsQuantity['+d+']" value = '+ j[i].quantity +'></td><td><input type = "hidden" name = "subItemsCost['+d+']" value = '+ j[i].cost +'>'+ j[i].cost +'</td><td><input type = "Number" name = "subItemsContainer['+d+']" value = '+ j[i].container +'></td></tr>';
+                generatedTable += '<tr><td><input type="hidden" name="subItemsId['+d+']" value="'+j[i].id+'">'+ j[i].name +'</td><td><input type = "Number" name = "subItemsQuantity['+d+']" value = '+ j[i].quantity +'></td><td><input type = "hidden" name = "subItemsCost['+d+']" value = '+ j[i].cost +'>'+ j[i].cost +'</td></tr>';
               }
               else{
                 generatedTable += '<tr><td><input type = "radio" checked name = "attributesName['+d+']" value='+ j[i].name +'>&nbsp&nbsp'+ j[i].name +'</td><td>'+ j[i].cost +'</td>';

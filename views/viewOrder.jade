@@ -197,10 +197,10 @@ html
                               tr
                                 td
                                   li
-                                    | #{menu._id.item.title}
+                                    | #{menu._id.title}
                                   td
                                     | #{menu.singleQuantity}
-                            if (menu.subItems._id)
+                            if (menu.subItems)
                               table.table.table-bordered.table-hover
                                 tbody
                                   each subItemsArray in menu.subItems._id.subItemsArray

@@ -243,6 +243,7 @@ html
                         tr
                           th Name
                           th Cost
+                          th Container 
                         tbody
                           if(item)
                             each items in item.attributes
@@ -251,7 +252,13 @@ html
                                   input(type='text' name='nameAtt[]' placeholder='Attribute name' value=(items?(items.name?items.name:''):''))
                                 td
                                   input(type='Number' name='costAtt[]' placeholder='Cost' value=(items?(items.cost?items.cost:''):''))
+                                td
+                                  input(type='Number' name='containerAtt[]' placeholder='Container Number' value=(items?(items.container?items.container:''):''))
                     button.btn.btn-info.pull-right(onclick='addTableRowPartTwo()', type='button') Add a row
+                .form-group
+                  label.col-sm-2.control-label Default quantity
+                  .col-sm-10
+                    input.form-control#quantity(type='Number' name='quantity' placeholder='Default quantity' value=(item?(item.quantity?item.quantity:''):''))
                 .form-group
                   label.col-sm-2.control-label Container Number
                   .col-sm-10
@@ -296,8 +303,20 @@ html
     script(src='../public/dist/js/app.min.js')
     // page script
     script.
+      $(function () {
+        $("#example1").DataTable();
+        $('#example2').DataTable({
+          "paging": true,
+          "lengthChange": false,
+          "searching": false,
+          "ordering": true,
+          "info": true,
+          "autoWidth": false
+        });
+      });
       function addTableRowPartTwo() {
-        document.getElementById("singleCost").setAttribute('disabled', true)
+        document.getElementById("singleCost").setAttribute('disabled', true);
+        document.getElementById("container").setAttribute('disabled', true)
         var table = document.getElementById("attributesTable");
         var row = table.insertRow(1);
         var cell1 = row.insertCell(0);
@@ -313,16 +332,11 @@ html
         cell2Data.name = "costAtt[]";
         cell2Data.placeholder = "Cost"
         cell2.appendChild(cell2Data);
+        
+        var cell3 = row.insertCell(2);
+        var cell3Data = document.createElement("input");
+        cell3Data.type = "Number";
+        cell3Data.name = "containerAtt[]";
+        cell3Data.placeholder = "Container Number"
+        cell3.appendChild(cell3Data);
       }
-    script.
-      $(function () {
-        $("#example1").DataTable();
-        $('#example2').DataTable({
-          "paging": true,
-          "lengthChange": false,
-          "searching": false,
-          "ordering": true,
-          "info": true,
-          "autoWidth": false
-        });
-      });
