@@ -168,75 +168,43 @@ exports.getSingleItems = function(req, res) {
     orderOptions.date = req.query.date;
   if(req.query.meal)
     orderOptions.meal = req.query.meal;
-    console.log(orderOptions);
-  Order.find()
-  .populate('menu._id', null, orderOptions)
-  .populate('menu.subItems._id')
-  .exec(function(err, results) {
-    Item.populate(results, 'menu._id.item', function(err, orders){
-      if (err) return err;
-      var singleItems = [], z = 0;
+  Order.find(orderOptions)
+  .populate('menu._id')
+  .exec(function(err, orders) {
+    console.log(orders.length);
+      if (err)
+        return err;
+      var singleItems = [], z = 0, steel, disposable;
       if (!orders)
         res.send("No orders found");
       for (var i=0; i<orders.length; i++) {
-        for (var j=0; j<orders[i].menu.length; j++) {
-          if (orders[i].menu[j].subItems._id && orders[i].menu[j]._id) {
-            for (var k=0; k<orders[i].menu[j].subItems._id.subItemsArray.length; k++) {
-              var steel = 0, disposable = 0;
-              if (orders[i].menu[j].containerType == 'Steel')
-                steel = orders[i].menu[j].subItems._id.subItemsArray[k].container;
-              else
-                disposable = orders[i].menu[j].subItems._id.subItemsArray[k].container;
-              singleItems[z] = {
-                title: orders[i].menu[j].subItems._id.subItemsArray[k].name,
-                quantity: orders[i].menu[j].singleQuantity * orders[i].menu[j].subItems._id.subItemsArray[k].quantity,
-                steel: steel,
-                disposable: disposable
-              }
-              z++;
-            }
-          }else if (orders[i].menu[j]._id && orders[i].menu[j]._id.subItems.length > 0) {
-            for (var k=0; k<orders[i].menu[j]._id.subItems.length; k++) {
-              var steel = 0, disposable = 0;
-              if (orders[i].menu[j].containerType == 'Steel')
-                steel = orders[i].menu[j]._id.subItems[k].container;
-              else
-                disposable = orders[i].menu[j]._id.subItems[k].container;
-              singleItems[z] = {
-                title: orders[i].menu[j]._id.subItems[k].name,
-                quantity: orders[i].menu[j].singleQuantity * orders[i].menu[j]._id.subItems[k].quantity,
-                steel: steel,
-                disposable: disposable
-              }
-              z++;
-            }
-          }
-          else {
+        if (orders[i].state != 'Archieved')
+          for (var j=0; j<orders[i].menu.length; j++) {
             if (orders[i].menu[j]._id) {
-              var steel = 0, disposable = 0;
+              steel = 0, disposable = 0;
+              //steel and disposable containers for each item
               if (orders[i].menu[j].containerType == 'Steel')
-                steel = orders[i].menu[j]._id.item.container;
-              else
-                disposable = orders[i].menu[j]._id.item.container;
+                steel = orders[i].menu[j]._id.container;
+              else if (orders[i].menu[j].containerType == 'Disposable')
+                disposable = orders[i].menu[j]._id.container;
               if (steel > 0 || disposable > 0)
                 singleItems[z] = {
-                  title: orders[i].menu[j]._id.item.title,
+                  title: orders[i].menu[j]._id.title,
                   quantity: orders[i].menu[j].singleQuantity,
                   steel: steel,
                   disposable: disposable
                 }
               else
                 singleItems[z] = {
-                  title: orders[i].menu[j]._id.item.title,
+                  title: orders[i].menu[j]._id.title,
                   quantity: orders[i].menu[j].singleQuantity
                 }
               z++
             }
           }
-        }
       }
-      //console.log(singleItems);
-      //sorting singleItems by name
+
+      // get the total number of each item
       var uniqueItems = [], uniqueTitles = [], count = 0;
       for (var i=0; i<singleItems.length; i++)
         if (uniqueTitles.indexOf(singleItems[i].title) < 0)
@@ -245,6 +213,7 @@ exports.getSingleItems = function(req, res) {
       for (var j=0; j<uniqueTitles.length; j++) {
         var quantityCount = 0, steel = 0, disposable = 0;
         for (var k=0; k<singleItems.length; k++) {
+          // calculating total steel and disposable containers for each item
           if (singleItems[k].title == uniqueTitles[j]) {
             quantityCount += singleItems[k].quantity;
             steel += singleItems[k].steel;
@@ -259,9 +228,8 @@ exports.getSingleItems = function(req, res) {
         }
         count++;
       }
-      console.log(uniqueItems);
+      //console.log(uniqueItems);
       res.send(uniqueItems)
-    });
   });
 };
 

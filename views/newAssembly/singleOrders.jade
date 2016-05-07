@@ -14,6 +14,8 @@ html
     link(rel='stylesheet', href='https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css')
     // DataTables
     link(rel='stylesheet', href='../public/plugins/datatables/dataTables.bootstrap.css')
+    //iCheck
+    link(rel='stylesheet', href='../public/plugins/iCheck/all.css')
     // datepicker
     link(rel='stylesheet', href='../public/bootstrap/css/datepicker.css')
     // Theme style
@@ -217,6 +219,12 @@ html
                       select.form-control(name = 'meal' id='mealSelected')
                         option Lunch
                         option Dinner
+                  //- .form-group
+                  //-   label.col-sm-2.control-label
+                  //-   .col-sm-6
+                  //-     label 
+                  //-       input(type="checkbox" class="minimal" value="Sandwich")
+                  //-       | Sandwich
                   .form-group
                     label.col-sm-2.control-label Veg Categories
                     .col-sm-6
@@ -267,12 +275,19 @@ html
     script(src='../public/bootstrap/js/bootstrap-datepicker.js')
     //barcode
     script(type='text/javascript', src='../public/plugins/jQuery/jquery-barcode.js')
+    //iCheck
+    script(src='../public/plugins/iCheck/icheck.min.js')
     // AdminLTE App
     script(src='../public/dist/js/app.min.js')
     // page script
     script.
       $(function () {
         $.fn.dataTable.ext.errMode = 'none';
+        //iCheck for checkbox and radio inputs
+        $('input[type="checkbox"].minimal, input[type="radio"].minimal').iCheck({
+          checkboxClass: 'icheckbox_minimal-blue',
+          radioClass: 'iradio_minimal-blue'
+        });
         //get todays date
         var today = new Date();
         var dd = today.getDate();

@@ -42,6 +42,7 @@ app.use(function(req, res, next){
 
 //controllers
 var userController = require('./controllers/user');
+var itemCategoryController = require('./controllers/itemCategory');
 var itemController = require('./controllers/item');
 var menuController = require('./controllers/menu');
 var orderController = require('./controllers/order');
@@ -60,12 +61,12 @@ app.get('/orderHistory', userController.isAdmin, userController.getUsersForHisto
 app.get('/orderHistory/:email', userController.isAdmin, userController.getUserHistory);
 app.get('/logout', userController.getLogout);
 //item category
-app.get('/categoryList', userController.isAdmin, itemController.getItemCategories);
-app.get('/addCategory', userController.isAdmin, itemController.getAddItemCategory);
-app.post('/addCategory', userController.isAdmin, itemController.postAddItemCategory);
-app.get('/editCategory/:id', userController.isAdmin, itemController.getAddItemCategory);
-app.post('/editCategory/:id', userController.isAdmin, itemController.postAddItemCategory);
-app.get('/addCategory/delete/:id', userController.isAdmin, itemController.deleteItemCategory);
+app.get('/categoryList', userController.isAdmin, itemCategoryController.getItemCategories);
+app.get('/addCategory', userController.isAdmin, itemCategoryController.getAddItemCategory);
+app.post('/addCategory', userController.isAdmin, itemCategoryController.postAddItemCategory);
+app.get('/editCategory/:id', userController.isAdmin, itemCategoryController.getAddItemCategory);
+app.post('/editCategory/:id', userController.isAdmin, itemCategoryController.postAddItemCategory);
+app.get('/addCategory/delete/:id', userController.isAdmin, itemCategoryController.deleteItemCategory);
 //items
 app.get('/itemList', userController.isAdmin, itemController.getItemList);
 app.get('/addItem', userController.isAdmin, itemController.getAddItem);
@@ -109,9 +110,9 @@ app.get('/getCustomizedOrderByCategory', assemblyController.getCustomizedOrderBy
 app.get('/singleItems', assemblyController.getSingleItemsPage);
 app.get('/singleItemsList', assemblyController.getSingleItems);
 //populate menu in add order
-app.get('/getMenusFromOptions', orderController.getMenusFromOptions);
-app.get('/getUserAddress', orderController.getUserAddress);
-app.get('/getCustomizedMenuToItem', orderController.getCustomizedMenuToItem);
+app.get('/getUserAddress', userController.getUserAddress);
+app.get('/getMenusFromOptions', menuController.getMenusFromOptions);
+app.get('/getCustomizedMenuToItem', menuController.getCustomizedMenuToItem);
 //listen
 var port = Number(process.env.PORT || 3000);
 app.listen(port, function(){

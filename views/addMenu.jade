@@ -212,16 +212,18 @@ html
                     label.col-sm-2.control-label Category
                     .col-sm-10
                       select.form-control(name = 'category' id = 'categorySelected')
-                        option(selected='selected')
-                          | #{menu?(menu.category?menu.category:''):''}
-                        each itemCategory in itemCategories
-                          option #{itemCategory.name}
+                        option(selected='selected' value=(menu?(menu.category?menu.category._id:''):''))
+                          | #{menu?(menu.category?menu.category.name:''):''}
+                        if (itemCategories)
+                          each itemCategory in itemCategories
+                            option(value='#{itemCategory._id}')
+                              | #{itemCategory.name}
                   .form-group
                     label.col-sm-2.control-label Select Item
                     .col-sm-10
                       select.form-control(name = 'itemSelected' id = 'itemList')
-                        option(selected='selected' value = (item?(item._id?item._id:''):''))
-                          | #{item?(item.title?item.title:''):''}
+                        option(selected='selected' value = (menu?(menu.item._id?menu.item._id:''):''))
+                          | #{menu?(menu.item.title?menu.item.title:''):''}
                   .form-group
                     label.col-sm-2.control-label Add Sub-Items
                     .col-sm-10
@@ -237,13 +239,18 @@ html
                             each menus in menu.subItems
                               tr
                                 td
-                                  input(type='text' name='name[]' placeholder='Sub-Item name' value=(menus?(menus.name?menus.name:''):''))
+                                  select.form-control(name = 'name[]' value='#{menus._id}')
+                                    option(selected value='#{menus._id}')
+                                      | #{menus.title}
+                                    each item in items
+                                      option(value='#{item._id}')
+                                        | #{item.title}
                                 td
-                                  input(type='Number' name='quantity[]' placeholder='Quantity' value=(menus?(menus.quantity?menus.quantity:''):''))
+                                  input(type='text' name='quantity[]' value='#{menus.quantity}')
                                 td
-                                  input(type='Number' name='container[]' placeholder='Container Number' value=(menus?(menus.container?menus.container:''):''))
+                                  input(type='text' name='container[]' value='#{menus.container}')
                                 td
-                                  input(type='Number' name='cost[]' placeholder='Cost for 1' value=(menus?(menus.cost?menus.cost:''):''))
+                                  input(type='text' name='cost[]' value='#{menus.totalCost}')
                       button.btn.btn-info.pull-right#addRow(type='button') Add a row
                   // /.form group
                 // /.box-body
@@ -321,13 +328,15 @@ html
             for (var i=0; i<j.length; i++) {
               addedRows += '<option data-id="'+j[i]._id+'" data-container="'+j[i].container+'" data-cost="'+j[i].totalCost+'" value="'+j[i]._id+'">'+j[i].title+'</option>';
             }
-            addedRows += '</select></td><td><input type="text" name = "quantity[]" placeholder="Quantity"></td><td><input type="text" name = "container[]" placeholder="Container"></td><td><input type="text" id="itemSelectedCost'+count+'" name = "cost[]" placeholder="Cost for 1"></td></tr>';
+            addedRows += '</select></td><td><input type="text" name = "quantity[]" placeholder="Quantity"></td><td><input type="text" name = "container[]" id="itemSelectedContainer'+count+'" placeholder="Container"></td><td><input type="text" id="itemSelectedCost'+count+'" name = "cost[]" placeholder="Cost for 1"></td></tr>';
             $("#menuSubItems tbody").append(addedRows);
             count++;
           })
         })
       })
       function getItemCost(count) {
-        var id = $('option:selected', '#itemSelected'+count+'').attr('data-cost');
+        var id = $('option:selected', '#itemSelected'+count+'').attr('data-cost'),
+            container = $('option:selected', '#itemSelected'+count+'').attr('data-container');
         $("#itemSelectedCost"+count+"").val(id);
+        $("#itemSelectedContainer"+count+"").val(container);
       }

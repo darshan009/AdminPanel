@@ -200,16 +200,7 @@ html
                                     | #{menu._id.title}
                                   td
                                     | #{menu.singleQuantity}
-                            if (menu.subItems)
-                              table.table.table-bordered.table-hover
-                                tbody
-                                  each subItemsArray in menu.subItems._id.subItemsArray
-                                    tr
-                                      td #{subItemsArray.name}
-                                      td #{subItemsArray.quantity}
-                                      td #{subItemsArray.cost}
-                                      td #{subItemsArray.container}
-                            else if (menu.attributes.name)
+                            if (menu.attributes.name)
                               table.table.table-bordered.table-hover
                                 tbody
                                   tr
@@ -226,15 +217,15 @@ html
                     .col-sm-10
                       p
                         | #{result?(result.address._id.tag?result.address._id.tag:''):''}
-                  if (fullResult)
+                  if (result)
                     .form-group
                       label.col-sm-2.control-label Full Address
                       .col-sm-10
-                        input.form-control(type='text', id='', name='tag[]' placeholder='Add a tag - Home, Office or custom' disabled value=(result?(result.address._id.tag?result.address._id.tag:''):''))
-                        input.form-control(type='text', id='', name='flatNo[]' placeholder='Building Name and Flat Number' disabled)
-                        input.form-control(type='text', id='', name='streetAddress[]' disabled placeholder='Enter your street Address...' value=(result?(result.address._id.streetAddress?result.address._id.streetAddress:''):''))
-                        input.form-control(type='text', id='', name='landmark[]' disabled placeholder='Landmark' value=(result?(result.address._id.landmark?result.address._id.landmark:''):''))
-                        input.form-control(type='Number', id='', name='pincode[]' disabled placeholder='Pincode' value=(result?(result.address._id.pincode?result.address._id.pincode:''):''))
+                        input.form-control(type='text', id='', name='tag[]' placeholder='Add a tag - Home, Office or custom' disabled value=(result.address._id.tag))
+                        input.form-control(type='text', id='', name='flatNo[]' placeholder='Building Name and Flat Number' disabled value=(result.address._id.flatNo))
+                        input.form-control(type='text', id='', name='streetAddress[]' disabled placeholder='Enter your street Address...' value=(result.address._id.streetAddress))
+                        input.form-control(type='text', id='', name='landmark[]' disabled placeholder='Landmark' value=(result.address._id.landmark))
+                        input.form-control(type='Number', id='', name='pincode[]' disabled placeholder='Pincode' value=(result.address._id.pincode))
                         //input.form-control(type='Number', id='', name='pincode[]' disabled placeholder='Contact Number' value=(result?(result.address._id.contactNo?result.address._id.contactNo:''):''))
                 // /.box-body
                 .box-footer

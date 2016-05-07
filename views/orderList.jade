@@ -195,35 +195,8 @@ html
                 button.btn.btn-info#datePicker(type = 'button') Submit
           .nav-tabs-custom
             ul.nav.nav-tabs
-              li.active
-                a(href='#activity', data-toggle='tab') Customized Order List
               li
                 a(href='#timeline', data-toggle='tab') Non-Customized Order List
-            .tab-content
-              #activity.active.tab-pane
-                .box-body
-                  table#example2.table.table-bordered.table-hover
-                    thead
-                      tr
-                        th Menu
-                        th Date
-                        th User
-                        th Details
-                    tbody
-                      if customizedResult
-                        each customizedResults in customizedResult
-                          tr
-                            td
-                              a(href='/viewOrder/#{customizedResults.id}' target='_blank')
-                                | #{customizedResults.title}
-                            td #{customizedResults.date}
-                            td #{customizedResults.user}
-                            td
-                              each details in customizedResults.details
-                                | #{details.quantity}-#{details.name}, #{details.container}-container
-                                br
-                              b
-                                | Total Quantity - #{customizedResults.quantity}
               #timeline.tab-pane
                 .box-body
                   table#example3.table.table-bordered.table-hover
@@ -234,29 +207,22 @@ html
                         th User
                         th Details
                     tbody
-                      if nonCustomizedResult
-                        each nonCustomizedResults in nonCustomizedResult
+                      if resultToDisplay
+                        each resultToDisplays in resultToDisplay
                           tr
                             td
-                              a(href='/viewOrder/#{nonCustomizedResults.id}' target='_blank')
-                                | #{nonCustomizedResults.title}
-                            td #{nonCustomizedResults.date}
-                            td #{nonCustomizedResults.user}
-                            if (nonCustomizedResults.details.length > 0)
+                              a(href='/viewOrder/#{resultToDisplays.id}' target='_blank')
+                                | #{resultToDisplays.title}
+                            td #{resultToDisplays.date}
+                            td #{resultToDisplays.user}
+                            if (resultToDisplays.nameAtt)
                               td
-                                each details in nonCustomizedResults.details
-                                  | #{details.quantity}-#{details.name}, #{details.container}-container
-                                  br
-                                b
-                                  | Total Quantity - #{nonCustomizedResults.quantity}
-                            else if (nonCustomizedResults.nameAtt)
-                              td
-                                | #{nonCustomizedResults.quantityAtt}-#{nonCustomizedResults.nameAtt}
+                                | #{resultToDisplays.quantityAtt}-#{resultToDisplays.nameAtt}
                                 br
                             else
                               td
                                 b
-                                  | Quantity - #{nonCustomizedResults.quantity}
+                                  | Quantity - #{resultToDisplays.quantity}
               // /.box-body
             // /.box
           // /.row

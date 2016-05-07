@@ -4,7 +4,11 @@ var Order = require('../models/Order');
 var Item = require('../models/Item');
 var Address = require('../models/Address');
 
-//check if user is admin
+/*
+ |-----------------------------------------------------------
+ | grant access on basis of user type
+ |-----------------------------------------------------------
+*/
 exports.isAdmin = function(req, res, next){
   if(req.user){
     if((req.user.type).toLowerCase() == "admin")
@@ -25,8 +29,14 @@ exports.isAdmin = function(req, res, next){
   else
     res.redirect('/');
 };
-//login logout signup
-exports.getLogin = function(req, res, next){
+
+
+/*
+ |-----------------------------------------------------------
+ | LOGIN LOGOUT
+ |-----------------------------------------------------------
+*/
+exports.getLogin = function(req, res){
   if(req.user){
     if((req.user.type).toLowerCase() == "admin")
       res.redirect('/userList');
@@ -34,6 +44,7 @@ exports.getLogin = function(req, res, next){
       res.end("Your are not authorized");
   }else res.render('adminLogin');
 };
+
 exports.postLogin = function(req, res, next){
     passport.authenticate('local', function(err, user, info){
       if (err)
@@ -48,53 +59,21 @@ exports.postLogin = function(req, res, next){
     })(req, res, next);
 };
 
-//get all users
+exports.getLogout = function(req, res){
+  req.logout();
+  res.redirect('/');
+};
+
+
+/*
+ |-----------------------------------------------------------
+ | User CRUD operations
+ |-----------------------------------------------------------
+*/
 exports.getUsers = function(req, res, next){
   User.find().exec(function(err, users){
     if(err) return next(err);
     res.render('userList', {users: users});
-  });
-};
-
-exports.getUsersForHistory = function(req, res, next){
-  User.find().exec(function(err, users){
-    if(err) return next(err);
-    res.render('userListHistory', {users: users});
-  });
-};
-exports.getUserHistory = function(req, res, next){
-  Order.find({user: req.params.email})
-  .populate('menu._id')
-  .populate('menu.subItems._id')
-  .exec(function(err, orders) {
-    Item.populate(orders, 'menu._id.item', function(err, results){
-      if(err) return next(err);
-      var fullResult = [], y = 0;
-      for (var i=0; i<results.length; i++) {
-        for (var j=0; j<results[i].menu.length; j++) {
-          fullResult[y] = {
-              title : results[i].menu[j]._id.item.title,
-              date : results[i].menu[j]._id.date,
-              user : results[i].user,
-              quantity : results[i].menu[j].singleQuantity,
-              mealType : results[i].menu[j]._id.meal,
-              details : []
-          }
-          if (results[i].menu[j].subItems && results[i].menu[j].subItems._id != null)
-            for (var k=0; k<results[i].menu[j].subItems._id.subItemsArray.length; k++)
-              fullResult[y].details.push(results[i].menu[j].subItems._id.subItemsArray[k]);
-          else if (results[i].menu[j].attributes.name) {
-            fullResult[y].nameAtt = results[i].menu[j].attributes.name;
-            fullResult[y].quantityAtt = results[i].menu[j].singleQuantity;
-          }
-          else
-            for (var l=0; l<results[i].menu[j]._id.subItems.length; l++)
-              fullResult[y].details.push(results[i].menu[j]._id.subItems[l]);
-          y++;
-        }
-      }
-      res.render('orderHistory', {fullResult: fullResult});
-    });
   });
 };
 
@@ -103,7 +82,8 @@ exports.getAddUser = function(req, res, next){
     User.findById(req.params.id)
     .populate('address._id')
     .exec(function(err, user){
-      if(err) return next(err);
+      if(err)
+        return next(err);
       var addressList = []
       addressList = (user.address);
       console.log(user.address);
@@ -117,81 +97,80 @@ exports.postAddUser = function(req, res, next){
     User.findById(req.params.id)
     .populate('address._id')
     .exec(function(err, user){
-      var addressFind = [];
-      for (var i=0; i<user.address.length; i++)
-         addressFind.push(user.address[i]._id);
-      Address.find({_id : {$in : addressFind}})
-      .exec(function(err, addresses){
-        console.log(addresses);
-        user.firstName = req.body.firstName;
-        user.lastName = req.body.lastName;
-        user.email = req.body.email;
-        user.type = req.body.userType;
-        user.image = req.body.image;
-        var newAmount = Number(user.amount) + Number(req.body.amount);
-        user.amount = newAmount;
-        var fullAddress = [];
-        console.log("-------preaddressId-------");
-        console.log(req.body.preaddressId);
-        // removing address ID from user.address if removed
-        var found = false;
-        if (req.body.preaddressId && req.body.preaddressId.length != user.address.length)
-          for (var i=0; i<user.address.length; i++) {
-            for (var j=0; j<req.body.preaddressId.length; j++)
-              if ( user.address[i]._id == req.body.preaddressId[j]) {
-                found = true;
-                break;
-              }
-            if (!found) {
-              var addressId = user.address[i]._id;
-              Address.remove({_id : addressId}, function(err){
-                if (err) return err;
-                console.log("address removed");
-              });
-              user.address.splice(i, 1);
+      if(err)
+        return next(err);
+      user.firstName = req.body.firstName;
+      user.lastName = req.body.lastName;
+      user.email = req.body.email;
+      user.type = req.body.userType;
+      user.image = req.body.image;
+      var newAmount = Number(user.amount) + Number(req.body.amount);
+      user.amount = newAmount;
+
+      console.log("-------preaddressId-------");
+      console.log(req.body.preaddressId);
+
+      // remove address from user.address if address is removed
+      var found = false;
+      if (req.body.preaddressId && req.body.preaddressId.length != user.address.length){
+        for (var i=0; i<user.address.length; i++) {
+          for (var j=0; j<req.body.preaddressId.length; j++)
+            if ( user.address[i]._id == req.body.preaddressId[j]) {
+              found = true;
+              break;
             }
-            found = false;
-          }
-        // for pre added addresses
-        if (req.body.preaddressId)
-          for (var i=0; i<req.body.preaddressId.length; i++) {
-            var preaddressId = req.body.preaddressId[i];
-            Address.update(
-              { _id: preaddressId },
-              {
-                tag : req.body.pretag[i],
-                flatNo : req.body.preflatNo[i],
-                streetAddress : req.body.prestreetAddress[i],
-                landmark : req.body.prelandmark[i],
-                pincode : req.body.prepincode[i]
-              },
-              { upsert : true }
-            ).exec(function(err, address){
-              console.log(address);
+          if (!found) {
+            var addressId = user.address[i]._id;
+            Address.remove({_id : addressId}, function(err){
+              if (err) return err;
+              console.log("address removed");
             });
+            user.address.splice(i, 1);
           }
-        // for newly added addresses
-        if (req.body.streetAddress)
-          for (var i=0; i<req.body.streetAddress.length; i++) {
-            var address = new Address({
-              user : user._id,
-              tag : req.body.tag[i],
-              flatNo : req.body.flatNo[i],
-              streetAddress : req.body.streetAddress[i],
-              landmark : req.body.landmark[i],
-              pincode : req.body.pincode[i]
-            });
-            user.address.push(address._id);
-            address.save(function (err) {
-                if (err) return err
-            });
-          }
-        //console.log(user.address);
-        user.save(function (err) {
-            if (err) return err
-        });
-        res.redirect('/userList');
-      })
+          found = false;
+        }
+      }
+
+      // update previously added addresses
+      if (req.body.preaddressId)
+        for (var i=0; i<req.body.preaddressId.length; i++) {
+          var preaddressId = req.body.preaddressId[i];
+          Address.update(
+            { _id: preaddressId },
+            {
+              tag : req.body.pretag[i],
+              flatNo : req.body.preflatNo[i],
+              streetAddress : req.body.prestreetAddress[i],
+              landmark : req.body.prelandmark[i],
+              pincode : req.body.prepincode[i]
+            },
+            { upsert : true }
+          ).exec(function(err, address){
+            console.log(address);
+          });
+        }
+
+      // for newly added addresses
+      if (req.body.streetAddress)
+        for (var i=0; i<req.body.streetAddress.length; i++) {
+          var address = new Address({
+            user : user._id,
+            tag : req.body.tag[i],
+            flatNo : req.body.flatNo[i],
+            streetAddress : req.body.streetAddress[i],
+            landmark : req.body.landmark[i],
+            pincode : req.body.pincode[i]
+          });
+          user.address.push(address._id);
+          address.save(function (err) {
+              if (err) return err
+          });
+        }
+      user.save(function (err) {
+          if (err)
+            return err;
+      });
+      res.redirect('/userList');
     });
   }else{
     var user = new User({
@@ -204,7 +183,6 @@ exports.postAddUser = function(req, res, next){
       contactNo : req.body.contactNo
     });
     user.address = [];
-    var fullAddress = [];
     if (req.body.streetAddress)
       for (var i=0; i<req.body.streetAddress.length; i++) {
         var address = new Address({
@@ -222,13 +200,87 @@ exports.postAddUser = function(req, res, next){
       }
     console.log(user.address);
     user.save(function (err) {
-        if (err) return err
+        if (err)
+          return err;
     });
     res.redirect('/userList');
   }
 };
 
-exports.getLogout = function(req, res, next){
-  req.logout();
-  res.redirect('/');
+
+/*
+ |-----------------------------------------------------------
+ | User history section --> orders && transactions
+ |-----------------------------------------------------------
+*/
+exports.getUsersForHistory = function(req, res, next){
+  User.find().exec(function(err, users){
+    if(err)
+      return next(err);
+    res.render('userListHistory', {users: users});
+  });
+};
+exports.getUserHistory = function(req, res, next){
+  Order.find({user: req.params.email})
+  .populate('menu._id')
+  .exec(function(err, orders) {
+    if(err)
+      return next(err);
+    var fullResult = [], y = 0;
+    for (var i=0; i<orders.length; i++) {
+      for (var j=0; j<orders[i].menu.length; j++) {
+        fullResult[y] = {
+            title : orders[i].menu[j]._id.title,
+            date : orders[i].date,
+            user : orders[i].user,
+            quantity : orders[i].menu[j].singleQuantity,
+            mealType : orders[i].meal,
+            details : []
+        }
+        if (orders[i].menu[j].attributes.name) {
+          fullResult[y].nameAtt = orders[i].menu[j].attributes.name;
+          fullResult[y].quantityAtt = orders[i].menu[j].singleQuantity;
+        }
+        y++;
+      }
+    }
+    res.render('orderHistory', {fullResult: fullResult});
+  });
+};
+
+/*
+ |-----------------------------------------------------------
+ | AJAX call to get users address in add Order
+ | GET /getUserAddress
+ |-----------------------------------------------------------
+*/
+exports.getUserAddress = function(req, res){
+  if(req.query.userEmail)
+    var userEmail = req.query.userEmail;
+  User.findOne({email: userEmail})
+  .populate('address._id')
+  .exec(function(err, user){
+    if (err) {
+      return err;
+    }
+    var userJson = [];
+    if (user.address)
+      for(var i=0; i<user.address.length; i++)
+        userJson[i] = {
+          address : user.address[i]._id.tag,
+          flatNo : user.address[i]._id.flatNo,
+          streetAddress : user.address[i]._id.streetAddress,
+          landmark : user.address[i]._id.landmark,
+          pincode : user.address[i]._id.pincode,
+          contactNo : user.contactNo
+        }
+    // still not sure why I used it;
+    // if (userJson.length == 0)
+    //   userJson[0] = {
+    //     amount: 0
+    //   }
+    // else
+    userJson[0].amount = user.amount;
+    res.send(userJson);
+  })
 };

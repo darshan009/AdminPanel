@@ -205,11 +205,12 @@ html
                 .form-group
                   label.col-sm-2.control-label Chef
                   .col-sm-10
-                    select.form-control(name='chefEmail')
-                      option(selected='selected')
-                        | #{paramsUserChef?(paramsUserChef.email?paramsUserChef.email:''):''}
+                    select.form-control(name='chef')
+                      option(selected='selected' value=(item?(item.chef?item.chef._id:''):''))
+                        | #{item?(item.chef?item.chef.email:''):''}
                       each userChefs in userChef
-                        option #{userChefs.email}
+                        option(value='#{userChefs._id}')
+                          | #{userChefs.email}
                 .form-group
                   label.col-sm-2.control-label(for='exampleInputFile') Image
                   .col-sm-10
@@ -230,11 +231,12 @@ html
                 .form-group
                   label.col-sm-2.control-label Category
                   .col-sm-10
-                    select.form-control(name='category' value=(item?(item.category?item.category:''):''))
+                    select.form-control(name='category' value=(item?(item.category?item.category._id:''):''))
                       option(selected='selected')
-                        | #{itemCategory?(itemCategory.name?itemCategory.name:''):''}
+                        | #{item?(item.category?item.category.name:''):''}
                       each itemCategory in itemCategories
-                        option #{itemCategory.name}
+                        option(value='#{itemCategory._id}')
+                          | #{itemCategory.name}
                 .form-group
                   label.col-sm-2.control-label Attributes
                   .col-sm-10

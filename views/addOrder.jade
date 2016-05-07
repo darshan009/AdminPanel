@@ -248,16 +248,7 @@ html
                                         | #{menu._id.title}
                                       td
                                         | #{menu.singleQuantity}
-                                if (menu.subItems)
-                                  table.table.table-bordered.table-hover
-                                    tbody
-                                      each subItemsArray in menu.subItems._id.subItemsArray
-                                        tr
-                                          td #{subItemsArray.name}
-                                          td #{subItemsArray.quantity}
-                                          td #{subItemsArray.cost}
-                                          td #{subItemsArray.container}
-                                else if (menu.attributes.name)
+                                if (menu.attributes.name)
                                   table.table.table-bordered.table-hover
                                     tbody
                                       tr
@@ -526,7 +517,7 @@ html
           var x = $('[data-customizeOrderId = "'+d+'"]').val();
           var z = $('[data-removeBtn="'+d+'"]');
           console.log(check);
-          if (check === false)
+          if (check == 'false')
             $('[data-getPosition = '+d+' ]').attr("value", "true");
           z.remove();
           $.getJSON("/getCustomizedMenuToItem", {
