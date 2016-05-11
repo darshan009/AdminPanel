@@ -190,14 +190,8 @@ exports.postAddOrder = function(req, res){
                //menu has subItems
                if (req.body.getPosition[i] == 'true') {
                  var subTotal = 0;
-                 var subItems = new SubItems({
-                   order : {
-                     _id : order._id
-                   },
-                   subItemsArray : []
-                 });
                  console.log("---------subItems check-----------");
-                 for (var k=0; k<subItemsId[subItemsCounter].length; k++) {
+                 for (var k=0; k<req.body.subItemsId[subItemsCounter].length; k++) {
                    subTotal += req.body.subItemsQuantity[subItemsCounter][k] * req.body.subItemsCost[subItemsCounter][k];
                    order.menu.push({
                      _id: req.body.subItemsId[subItemsCounter][k],
@@ -208,6 +202,7 @@ exports.postAddOrder = function(req, res){
                  }
                  subItemsCounter++;
                  totalCost += subTotal * req.body.singleQuantity[i];
+                 console.log(order.menu[i]);
                }
                else if (req.body.getPosition[i] == 'hasAttributes') { // this part has attributes - half, full
                  console.log("---------cost check-----------");
@@ -308,7 +303,7 @@ exports.postAddOrder = function(req, res){
       if(req.body.allMenus[i] != '')
         allMenus.push(req.body.allMenus[i]);
     }
-    console.log(allMenus);
+    // console.log(allMenus);
 
     Menu.find({_id : {$in : allMenus}})
     .populate('item')
@@ -360,8 +355,8 @@ exports.postAddOrder = function(req, res){
           }
           outerArrayCount++;
         }
-        console.log(uniquePositions);
-        console.log(positions);
+        // console.log(uniquePositions);
+        // console.log(positions);
 
         /*
          |-----------------------------------------------------------
@@ -387,9 +382,9 @@ exports.postAddOrder = function(req, res){
                 subTotal += subItemsQuantity[positions[s][t]][k] * subItemsCost[positions[s][t]][k];
                 order.menu.push({
                   _id : subItemsId[positions[s][t]][k],
-                  singleQuantity : Number(subItemsQuantity[positions[s][t]][k]),
+                  singleQuantity : Number(subItemsQuantity[positions[s][t]][k]) * req.body.singleQuantity[positions[s][t]],
                   containerType: req.body.containerType[positions[s][t]],
-                  subTotal : subTotal * subItemsQuantity[positions[s][t]],
+                  subTotal: subTotal * subItemsQuantity[positions[s][t]][k]
                 })
               }
               totalCost += subTotal * req.body.singleQuantity[positions[s][t]];

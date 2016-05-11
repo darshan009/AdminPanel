@@ -30,7 +30,7 @@ exports.getMixedAssemblyList = function(req, res, next) {
   });
 };
 
-exports.getMultipleAssemblyList = function(req, res, next) {
+exports.getMultipleAssemblyList = function(req, res) {
   res.render('multipleAssembly');
 };
 exports.getOrderByCategory = function(req, res) {
@@ -156,8 +156,11 @@ exports.getCustomizedOrderByCategory = function(req, res){
   });
 };
 
-
-// ---- Single items list --------
+/*
+ |-----------------------------------------------------------
+ | Total of individual items for Item list page
+ |-----------------------------------------------------------
+ */
 exports.getSingleItemsPage = function(req, res) {
   res.render('singleItems');
 };
@@ -234,69 +237,61 @@ exports.getSingleItems = function(req, res) {
 };
 
 
-/* ------------------------------
-------- new assembly seciton ----
----------------------------- */
+/*
+ |------------------------------
+ | New assembly seciton
+ |------------------------------
+*/
 exports.getnAssemblyList = function(req, res) {
   ItemCategory.find().exec(function(err, itemCategories) {
-    Item.find()
-    .populate('category')
-    .exec(function(err, items) {
-      if (err) return next(err);
-      res.render('./newAssembly/singleOrders', {
-        itemCategories : itemCategories
-      });
-    })
+    if (err) {
+      return err;
+    }
+    res.render('./newAssembly/singleOrders', {
+      itemCategories : itemCategories
+    });
   });
 };
 
 exports.getSingleOrders = function(req, res) {
-  var category = req.query.category;
-  if (category.indexOf("-") > -1) {
-    var newCategory = category.replace("-", " ");
-    category = newCategory;
-  }
-  var orderOptions = {
-    category : category,
+  var category = req.query.category, mealType = req.query.mealType;
+
+  Order.find({
     meal : req.query.meal,
     date : req.query.date
-  };
-  var mealType = req.query.mealType;
-  Order.find()
-  .populate('menu._id', null, orderOptions)
+  })
+  .populate('menu._id', null, {category : {$in: category}})
   .populate('address._id')
-  .populate('menu.subItems._id')
   .exec(function(err, orders) {
-    Item.populate(orders, 'menu._id.item', function(err, results) {
-      //User.populate(resultsuser, 'address._id.user', function(err, results) {
-      console.log(results);
-        if (results && results.state != 'Archieved') {
-          var listOfOrdersByAddress = [], k = 0, testArray = [];
-          for (var i=0; i<results.length; i++) {
+    //User.populate(resultsuser, 'address._id.user', function(err, results) {
+      if (orders) {
+        var listOfOrdersByAddress = [], k = 0, testArray = [], orderList;
+        for (var i=0; i<orders.length; i++) {
+          if (orders[i].state != 'Archieved' && orders[i].status != 'out') {
               //single orders by users
-            if (results[i].menu.length == 1) {
-              var orderList = [];
-              for (var j = 0; j < results[i].menu.length; j++) {
-                if (results[i].menu[j]._id != null) {
-                  console.log(results[i].menu[j]);
-                  orderList.push(results[i].menu[j]);
+            if (orders[i].menu.length == 1) {
+              orderList = [];
+              for (var j = 0; j < orders[i].menu.length; j++) {
+                if (orders[i].menu[j]._id != null) {
+                  orderList.push(orders[i].menu[j]);
                 }
               }
-              if (orderList.length > 0 && orderList[0]._id.item.type == mealType) {
+              if (orderList.length > 0 && orderList[0]._id.type == mealType) {
                 listOfOrdersByAddress[k] = {
-                  user: results[i].user,
-                  orderList: results[i].menu,
-                  address : results[i].address
+                  _id: orders[i]._id,
+                  user: orders[i].user,
+                  orderList: orders[i].menu,
+                  address : orders[i].address
                 }
                 k++;
               }
             }
           }
-          console.log(listOfOrdersByAddress);
-          res.send(listOfOrdersByAddress);
         }
-      //});
-    });
+        console.log(listOfOrdersByAddress);
+        res.send(listOfOrdersByAddress);
+      }
+    //});
   });
 };
 
@@ -312,42 +307,45 @@ exports.getSingleOrdersWithExtrasPage = function(req, res) {
     })
   });
 };
+
 exports.getSingleOrdersWithExtras = function(req, res) {
-  var orderOptions = {
+  Order.find({
     meal : req.query.meal,
     date : req.query.date
-  };
-  Order.find()
-  .populate('menu._id', null, orderOptions)
+  })
+  .populate('menu._id')
   .populate('address._id')
-  .populate('menu.subItems._id')
   .exec(function(err, orders) {
-    Item.populate(orders, 'menu._id.item', function(err, resultsForCategory) {
-      ItemCategory.populate(resultsForCategory, 'menu._id.item.category', function(err, results) {
-        if (results && results.state != 'Archieved') {
-          var listOfOrdersByAddresses = [], listOfOrdersByAddress = [], k = 0, testArray = [];
-          for (var i=0; i<results.length; i++) {
+    ItemCategory.populate(orders, 'menu._id.category', function(err, orders) {
+      if (err) {
+        return err;
+      }
+      if (orders) {
+        var listOfOrdersByAddresses = [], listOfOrdersByAddress = [], k = 0, testArray = [];
+        for (var i=0; i<orders.length; i++) {
+          if(orders[i].state != 'Archieved') {
             //single orders by users
-            if (results[i].menu.length > 1) {
+            if (orders[i].menu.length > 1) {
               var extrasCount = 1;
-              for (var j = 0; j < results[i].menu.length; j++) {
-                //check for extra values
-                if (results[i].menu[j]._id != null && results[i].menu[j]._id.item.category.name == 'Extras') {
+              for (var j = 0; j < orders[i].menu.length; j++) {
+                //check for single orders with extra
+                if (orders[i].menu[j]._id != null && orders[i].menu[j]._id.category.name == 'Extras') {
                   extrasCount++;
-                  if (extrasCount == results[i].menu.length)
+                  if (extrasCount == orders[i].menu.length)
                     var extrasFound = true;
                 }
               }
               if (extrasFound) {
                 var orderList = [];
-                for (var j = 0; j < results[i].menu.length; j++) {
-                  if (results[i].menu[j]._id != null) {
-                    orderList.push(results[i].menu[j]);
+                for (var j = 0; j < orders[i].menu.length; j++) {
+                  if (orders[i].menu[j]._id != null) {
+                    orderList.push(orders[i].menu[j]);
                   }
                 }
                 listOfOrdersByAddresses[k] = {
-                  user: results[i].user,
-                  address : results[i].address,
+                  _id: orders[i]._id,
+                  user: orders[i].user,
+                  address : orders[i].address,
                   orderList: orderList
                 }
                 k++;
@@ -355,10 +353,10 @@ exports.getSingleOrdersWithExtras = function(req, res) {
               }
             }
           }
-          console.log(listOfOrdersByAddresses);
-          res.send(listOfOrdersByAddresses);
         }
-      });
+        console.log(listOfOrdersByAddresses);
+        res.send(listOfOrdersByAddresses);
+      }
     });
   });
 };
@@ -368,50 +366,50 @@ exports.getMultipleCategoryOrdersPage = function(req, res) {
     Item.find()
     .populate('category')
     .exec(function(err, items) {
-      if (err) return next(err);
+      if (err) return (err);
       res.render('./newAssembly/multipleOrders', {
         itemCategories : itemCategories
       });
     })
   });
 };
+
 exports.getMultipleCategoryOrders = function(req, res) {
-  var orderOptions = {
+  Order.find({
     meal : req.query.meal,
     date : req.query.date
-  };
-  Order.find()
-  .populate('menu._id', null, orderOptions)
+  })
+  .populate('menu._id')
   .populate('address._id')
-  .populate('menu.subItems._id')
-  .exec(function(err, orders) {
-    Item.populate(orders, 'menu._id.item', function(err, resultsForCategory) {
-      ItemCategory.populate(resultsForCategory, 'menu._id.item.category', function(err, results) {
-        if (results && results.state != 'Archieved') {
-          var listOfOrdersByAddresses = [], listOfOrdersByAddress = [], k = 0, testArray = [];
-          for (var i=0; i<results.length; i++) {
-            //single orders by users
-            if (results[i].menu.length > 1) {
-              var extrasCount = 1, extrasFound = false;
-              for (var j = 0; j < results[i].menu.length; j++) {
-                //check for extra values
-                if (results[i].menu[j]._id != null && results[i].menu[j]._id.item.category.name == 'Extras') {
+  .exec(function(err, results) {
+    ItemCategory.populate(results, 'menu._id.category', function(err, orders) {
+      if (orders) {
+        var listOfOrdersByAddresses = [], listOfOrdersByAddress = [], k = 0, testArray = [], extrasCount, extrasFound, orderList;
+        for (var i=0; i<orders.length; i++) {
+          if (orders[i].state != 'Archieved' && orders[i].status != 'out') {
+            //multiple orders only
+            if (orders[i].menu.length > 1) {
+              extrasCount = 1, extrasFound = false;
+              for (var j = 0; j < orders[i].menu.length; j++) {
+                //check for single orders with extra
+                if (orders[i].menu[j]._id != null && orders[i].menu[j]._id.category.name == 'Extras') {
                   extrasCount++;
-                  if (extrasCount == results[i].menu.length)
-                    var extrasFound = true;
+                  if (extrasCount == orders[i].menu.length)
+                    extrasFound = true;
                 }
               }
               if (!extrasFound) {
-                var orderList = [];
-                for (var j = 0; j < results[i].menu.length; j++) {
-                  if (results[i].menu[j]._id != null) {
-                    orderList.push(results[i].menu[j]);
+                orderList = [];
+                for (var j = 0; j < orders[i].menu.length; j++) {
+                  if (orders[i].menu[j]._id != null) {
+                    orderList.push(orders[i].menu[j]);
                   }
                 }
                 if (orderList.length > 1) {
                   listOfOrdersByAddresses[k] = {
-                    user: results[i].user,
-                    address : results[i].address,
+                    _id: orders[i]._id,
+                    user: orders[i].user,
+                    address : orders[i].address,
                     orderList: orderList
                   }
                   k++;
@@ -420,11 +418,40 @@ exports.getMultipleCategoryOrders = function(req, res) {
               }
             }
           }
-          console.log("--------multipleCategoryOrders--------");
-          console.log(listOfOrdersByAddresses);
-          res.send(listOfOrdersByAddresses);
         }
-      });
+        console.log("--------multipleCategoryOrders--------");
+        console.log(listOfOrdersByAddresses);
+        res.send(listOfOrdersByAddresses);
+      }
     });
+  });
+};
+
+
+/*
+ |----------------------------------
+ | AJAX call to chagne order status
+ |----------------------------------
+*/
+exports.changeOrderStatus = function(req, res){
+  console.log(req.query.orders);
+  var queryOrders = req.query.orders;
+
+  Order.find( { _id: {$in: queryOrders} } )
+  .exec(function(err, orders){
+    if (err) {
+      return err;
+    }
+    if(!orders)
+      res.end("No orders found");
+    for(var i=0; i<orders.length; i++) {
+      orders[i].status = 'out';
+      orders[i].save(function(err){
+        if(err)
+          return err;
+      });
+    }
+    console.log(orders);
+    res.send(orders);
   });
 };

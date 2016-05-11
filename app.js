@@ -100,6 +100,8 @@ app.get('/singleOrdersWithExtras', assemblyController.getSingleOrdersWithExtrasP
 app.get('/getSingleOrdersWithExtras', assemblyController.getSingleOrdersWithExtras);
 app.get('/multipleCategoryOrders', assemblyController.getMultipleCategoryOrdersPage);
 app.get('/getMultipleCategoryOrders', assemblyController.getMultipleCategoryOrders);
+//change order status
+app.get('/changeOrderStatus', assemblyController.changeOrderStatus);
 //assembly
 app.get('/assembly', assemblyController.getAssemblyList);
 app.get('/mixedAssembly', assemblyController.getMixedAssemblyList);
