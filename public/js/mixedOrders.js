@@ -34,11 +34,11 @@ $(function () {
   $('button#displaySelected').click(function(){
 
     //get all selected checkbox values and type
-    var categories = $('.minimal:checked').map(function() {
+    var items = $('.minimal:checked').map(function() {
       return this.value;
     }).get();
     var type = $(this).attr('data-type');
-    console.log(type);
+
     $date = $('#dateSelected').val();
     $meal = $('#mealSelected').val();
     if ( !$('#mealSelected').val() )
@@ -58,7 +58,7 @@ $(function () {
       for (var m=0; m<listOfOrdersByAddresses.length; m++)
         for (l=0; l<listOfOrdersByAddresses[m].orderList.length; l++)
           if (listOfOrdersByAddresses[m].orderList[l]._id.category.name != 'Extras')
-            if (categories.indexOf(listOfOrdersByAddresses[m].orderList[l]._id.category._id) > -1 && listOfOrdersByAddresses[m].orderList[l]._id.type == type)
+            if (items.indexOf(listOfOrdersByAddresses[m].orderList[l]._id._id) > -1 && listOfOrdersByAddresses[m].orderList[l]._id.type == type)
               listOfOrdersByAddress.push(listOfOrdersByAddresses[m]);
       console.log(listOfOrdersByAddress);
 
@@ -236,6 +236,7 @@ $(function () {
         }
 
         //display barcodes based on the number of containers
+        var addressArray = [];
         for (var k=0;k<displayBarcodeCount; k++ ) {
           addressArray.push(nonSimilarDivData[i].address._id);
           newDivData += '<h3><div class="invoice-info"><div class="invoice-col"><strong>'+nonSimilarDivData[i].orderList[j]._id.title+'<br/><br/>'+nonSimilarDivData[i].user+'</br><p align="center">';

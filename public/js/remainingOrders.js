@@ -45,7 +45,7 @@ $(function () {
           }
           addToTable += '<td><a href=/viewOrder/'+results[i].id+' target="_blank">'+results[i].menu[j]._id.title+'</a></td>';
           if (results[i].menu[j].attributes != null)
-            addToTable += '<td>'+ results[i].menu[j].attributes.name +'</td><td>'+ results[i].menu[j].singleQuantity +'</td></tr>';
+            addToTable += '<td><b>Quantity - '+ results[i].menu[j].singleQuantity +' , '+ results[i].menu[j].attributes.name +'<b></td>';
           else
             addToTable += '<td><b>Quantity - '+ results[i].menu[j].singleQuantity +'</b></td>';
           addToTable += '<td><b>'+results[i].menu[j].containerType+'</b><br>';

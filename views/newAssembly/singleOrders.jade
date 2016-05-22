@@ -226,12 +226,12 @@ html
                   .form-group
                     label.col-sm-2.control-label Categories
                     .col-sm-6
-                      each itemCategory in itemCategories
-                        if (itemCategory.name != 'Classic Indian' && itemCategory.name != 'Indian')
+                      each item in items
+                        if (item.title != 'Classic Indian' && item.title != 'Indian')
                           .col-sm-3
                             label
-                              input(type="checkbox" class="minimal" value="#{itemCategory._id}")
-                              | #{itemCategory.name}
+                              input(type="checkbox" class="minimal" value="#{item._id}")
+                              | #{item.title}
                   .form-group
                     label.col-sm-2.control-label
                     .col-sm-2

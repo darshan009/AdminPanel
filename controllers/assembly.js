@@ -243,24 +243,25 @@ exports.getSingleItems = function(req, res) {
  |------------------------------
 */
 exports.getnAssemblyList = function(req, res) {
-  ItemCategory.find().exec(function(err, itemCategories) {
+  Item.find().exec(function(err, items) {
     if (err) {
       return err;
     }
     res.render('./newAssembly/singleOrders', {
-      itemCategories : itemCategories
+      items : items
     });
   });
 };
 
 exports.getSingleOrders = function(req, res) {
-  var category = req.query.category, mealType = req.query.mealType;
+  var items = req.query.items,
+      mealType = req.query.mealType;
 
   Order.find({
     meal : req.query.meal,
     date : req.query.date
   })
-  .populate('menu._id', null, {category : {$in: category}})
+  .populate('menu._id', null, {_id : {$in: items}})
   .populate('address._id')
   .exec(function(err, orders) {
     //User.populate(resultsuser, 'address._id.user', function(err, results) {
@@ -296,16 +297,13 @@ exports.getSingleOrders = function(req, res) {
 };
 
 exports.getSingleOrdersWithExtrasPage = function(req, res) {
-  ItemCategory.find().exec(function(err, itemCategories) {
-    Item.find()
-    .populate('category')
-    .exec(function(err, items) {
-      if (err) return next(err);
-      res.render('./newAssembly/mixedOrders', {
-        itemCategories : itemCategories
-      });
-    })
-  });
+  Item.find().exec(function(err, items) {
+    if (err)
+      return next(err);
+    res.render('./newAssembly/mixedOrders', {
+      items : items
+    });
+  })
 };
 
 exports.getSingleOrdersWithExtras = function(req, res) {
@@ -323,7 +321,7 @@ exports.getSingleOrdersWithExtras = function(req, res) {
       if (orders) {
         var listOfOrdersByAddresses = [], listOfOrdersByAddress = [], k = 0, testArray = [];
         for (var i=0; i<orders.length; i++) {
-          if(orders[i].state != 'Archieved') {
+          if(orders[i].state != 'Archieved' && orders[i].status != 'out') {
             //single orders by users
             if (orders[i].menu.length > 1) {
               var extrasCount = 1;

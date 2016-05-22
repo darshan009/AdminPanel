@@ -35,7 +35,7 @@ $(function () {
   $('button#displaySelected').click(function(){
 
     //get all selected checkbox values and type
-    var categories = $('.minimal:checked').map(function() {
+    var items = $('.minimal:checked').map(function() {
       return this.value;
     }).get();
     var type = $(this).attr('data-type');
@@ -49,131 +49,12 @@ $(function () {
 
     //call
     $.getJSON("/getSingleOrders", {
-      category : categories,
+      items : items,
       meal : $meal,
       date: $date,
       mealType: type,
       ajax : true
     },function(listOfOrdersByAddress){
-
-      // //sort listOfOrdersByAddress by similar orders
-      // var positions = [], uniquePositions = [], sortedSimilarOrders = [];
-      // for (var a=0; a<listOfOrdersByAddress.length; a++) {
-      //   for (var b=a+1; b<listOfOrdersByAddress.length; b++) {
-      //     if (listOfOrdersByAddress[a].orderList[0]._id.subItems.length > 0 && listOfOrdersByAddress[a].orderList[0]._id.subItems.length ==  listOfOrdersByAddress[b].orderList[0]._id.subItems.length) {
-      //       var checkCount = 0;
-      //       for (var i=0; i<listOfOrdersByAddress[a].orderList[0]._id.subItems.length; i++) {
-      //         if (listOfOrdersByAddress[a].orderList[0]._id.subItems[i].name == listOfOrdersByAddress[b].orderList[0]._id.subItems[i].name && listOfOrdersByAddress[a].orderList[0]._id.subItems[i].quantity == listOfOrdersByAddress[b].orderList[0]._id.subItems[i].quantity) {
-      //           checkCount++;
-      //         }
-      //       }
-      //       if (checkCount == listOfOrdersByAddress[a].orderList[0]._id.subItems.length) {
-      //         positions.push(a);
-      //         positions.push(b);
-      //       }
-      //     }
-      //   }
-      // }
-      // console.log(positions);
-      // //get unique positions
-      // for (var a=0; a<positions.length; a++) {
-      //   if (uniquePositions.indexOf(positions[a]) < 0)
-      //     uniquePositions.push(positions[a]);
-      // }
-      // console.log(uniquePositions);
-      //
-      // //now get sorted arrays of similar orders
-      // for (var b=0; b<uniquePositions.length; b++) {
-      //   sortedSimilarOrders.push(listOfOrdersByAddress[uniquePositions[b]]);
-      // }
-      // console.log(sortedSimilarOrders);
-      //
-      // /*
-      //  |------------------------------
-      //  | display similar order section
-      //  |------------------------------
-      // */
-      // $('#displaySimilar').html('');
-      // $('#displaySimilarBarcode').html('');
-      // //displaying similar orders first
-      // var similarDivId = 0;
-      // for (var m=0; m<sortedSimilarOrders.length; m++) {
-      //
-      //     var similarCount = 0;
-      //     for (var z=m; z<sortedSimilarOrders.length; z++) {
-      //       //console.log(sortedSimilarOrders[m]);
-      //       var checkCount = 0;
-      //       for (var i=0; i<sortedSimilarOrders[m].orderList[0]._id.subItems.length; i++) {
-      //         if (sortedSimilarOrders[m].orderList[0]._id.subItems[i].name == sortedSimilarOrders[z].orderList[0]._id.subItems[i].name && sortedSimilarOrders[m].orderList[0]._id.subItems[i].quantity == sortedSimilarOrders[z].orderList[0]._id.subItems[i].quantity) {
-      //           checkCount++;
-      //         }
-      //       }
-      //       if (checkCount == sortedSimilarOrders[z].orderList[0]._id.subItems.length) {
-      //         similarCount++;
-      //       }else
-      //         break;
-      //     }
-      //     console.log(similarCount);
-      //     if (similarCount > 0) {
-      //       var displayDivOnce = true, similarDivData = [], addressArraySimilar = [];
-      //       for (var y=0; y<similarCount; y++) {
-      //         addressArraySimilar.push(sortedSimilarOrders[m+y].address._id._id);
-      //         if (displayDivOnce) {
-      //           var addToTable = '<div id="'+similarDivId+'" class="box box-success"><div class="box-header"><h3 class="box-title">Similar Order List - <b>'+categories+' -- '+type+'</b></h3></div><!-- /.box-header--><div id="" class="box-body"><table id="example3" class="table table-bordered table-hover"><thead><tr><th>User</th><th>Address</th><th>Meal</th><th>Details</th><th>Container</th></tr></thead><tbody>';
-      //           displayDivOnce = false;
-      //         }
-      //         addToTable += '<tr><td>'+ sortedSimilarOrders[m+y].user +'</td>';
-      //         addToTable += '<td>'+ sortedSimilarOrders[m+y].address._id.tag +',</br>'+sortedSimilarOrders[m+y].address._id.flatNo+',</br>'+sortedSimilarOrders[m+y].address._id.streetAddress+',</br>'+sortedSimilarOrders[m+y].address._id.landmark+',</br>'+sortedSimilarOrders[m+y].address._id.pincode+'</td>';
-      //         addToTable += '<td>'+ sortedSimilarOrders[m+y].orderList[0]._id.item.title +'</td>';
-      //         addToTable += '<td>';
-      //         if (sortedSimilarOrders[m+y].orderList[0].subItems) {
-      //           for (var p=0; p<sortedSimilarOrders[m+y].orderList[0].subItems._id.subItemsArray.length; p++)
-      //             addToTable += ''+sortedSimilarOrders[m+y].orderList[0].subItems._id.subItemsArray[p].quantity+'-'+sortedSimilarOrders[m+y].orderList[0].subItems._id.subItemsArray[p].name+',</br>';
-      //         }else if (sortedSimilarOrders[m+y].orderList[0]._id.subItems.length > 0) {
-      //           for (var p=0; p<sortedSimilarOrders[m+y].orderList[0]._id.subItems.length; p++)
-      //             addToTable += ''+sortedSimilarOrders[m+y].orderList[0]._id.subItems[p].quantity+'-'+sortedSimilarOrders[m+y].orderList[0]._id.subItems[p].name+',</br>';
-      //         }
-      //         addToTable += '<b>Total Quantity - '+sortedSimilarOrders[m+y].orderList[0].singleQuantity+'</td>';
-      //         addToTable += '<td><b>'+sortedSimilarOrders[m+y].orderList[0].containerType+'</b><br>';
-      //         if (sortedSimilarOrders[m+y].orderList[0].specialinstruction)
-      //           addToTable += '<br /><b> Speacial Instruction - '+sortedSimilarOrders[m+y].orderList[0].specialinstruction+'</td></tr>';
-      //         else
-      //           addToTable += '</td></tr>';
-      //         addToTable += '</td></tr>';
-      //         var displayLastDiv = true;
-      //         similarDivData.push(sortedSimilarOrders[m+y]);
-      //       }
-      //       console.log(y);
-      //       m += similarCount - 1;
-      //       if (y > 1 && displayLastDiv) {
-      //         console.log("y is greater than 1");
-      //         addToTable += '</tbody></table><br /><button type="button" id="getBarcodeSimilar'+similarDivId+'" class="btn btn-info pull-right" data-address="'+addressArraySimilar+'" onclick="printBarcodeSimilar('+similarDivId+')">Get Address Barcodes</button></div></div>';
-      //         $('#displaySimilar').attr('data-CustomizedButton', $buttonDisablerId);
-      //         $('#displaySimilar').append(addToTable);
-      //         $('#example3').DataTable({
-      //         "paging": false,
-      //         "lengthChange": true,
-      //         "searching": true,
-      //         "ordering": false,
-      //         "info": true,
-      //         "autoWidth": true
-      //         });
-      //         displayLastDiv = false;
-      //       }
-      //       //barcode Section
-      //       var newDivData = '<div id="displaySimilarBarcode'+similarDivId+'" class = "box box-info"><div class = "box-header">Choose categroy</div><div class = "box-body">';
-      //       for (var i=0; i < similarDivData.length; i++) {
-      //         newDivData += '<h3><div class="invoice-info"><div class="invoice-col"><strong>'+similarDivData[i].orderList[0]._id.item.title+'<br/><br/>'+similarDivData[i].user+'</br><p align="center">';
-      //         newDivData += '<address>'+similarDivData[i].address._id.user+'</p><br>'+similarDivData[i].address._id.tag +',</br>'+similarDivData[i].address._id.flatNo+',</br>'+similarDivData[i].address._id.streetAddress+',</br>'+similarDivData[i].address._id.landmark+',</br>'+similarDivData[i].address._id.pincode+'</address>';
-      //         newDivData += '<div id="bcTarget'+i+'"></div></div></strong></div><br></h3><hr>';
-      //       }
-      //       newDivData += '<br /><button id="" type="button" class="btn btn-info pull-left" onclick = "printSimilarDiv('+similarDivId+')">Print Address Barcodes list</button><button class="btn btn-info pull-right" data-orderids="" onclick="changeOrderStatus()">Done</button>';
-      //       newDivData += '</div></div>';
-      //       $('#displaySimilarBarcode').append(newDivData);
-      //       $('#displaySimilarBarcode'+similarDivId+'').hide();
-      //     }
-      //     similarDivId++;
-      // }
 
       /*
        |------------------------------------
