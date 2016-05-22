@@ -222,10 +222,34 @@ html
                     .col-sm-6
                       table
                         tr
-                          each itemCategory in itemCategories
-                            td
-                              button.btn.btn-app#selectedCategory(type='button' data-getButton='n-#{itemCategory._id}' data-mealType = 'Veg' value = '#{itemCategory.name}')
-                                | #{itemCategory.name}
+                          //- each itemCategory in itemCategories
+                          //-   td
+                          //-     button.btn.btn-app#selectedCategory(type='button' data-getButton='n-#{itemCategory._id}' data-mealType = 'Veg' value = '#{itemCategory.name}')
+                          //-       | #{itemCategory.name}
+                          td
+                            button.btn.btn-app#selectedCategory(type='button' data-getButton='Sandwich' data-mealType = 'Veg' value = 'Sandwich')
+                              | Sandwich
+                          td
+                            button.btn.btn-app#selectedCategory(type='button' data-getButton='Salad' data-mealType = 'Veg' value = 'Salad')
+                              | Salad
+                          td
+                            button.btn.btn-app#selectedCategory(type='button' data-getButton='Pasta' data-mealType = 'Veg' value = 'Pasta')
+                              | Pasta
+                          td
+                            button.btn.btn-app#selectedCategory(type='button' data-getButton='Classic-Indian' data-mealType = 'Veg' value = 'Classic Indian')
+                              | Classic Indian
+                          td
+                            button.btn.btn-app#selectedCategory(type='button' data-getButton='Indian' data-mealType = 'Veg' value = 'Indian')
+                              | Indian
+                          td
+                            button.btn.btn-app#selectedCategory(type='button' data-getButton='Roasted' data-mealType = 'Veg' value = 'Roasted')
+                              | Roasted
+                          td
+                            button.btn.btn-app#selectedCategory(type='button' data-getButton='Burgers' data-mealType = 'Veg' value = 'Burgers')
+                              | Burgers
+                          td
+                            button.btn.btn-app#selectedCategory(type='button' data-getButton='Extras' data-mealType = 'Veg' value = 'Extras')
+                              | Extras
                           td
                             button.btn.btn-app#selectedCategory(type='button' data-getButton='int' data-mealType = 'Veg' value = 'International')
                               | International
@@ -234,10 +258,34 @@ html
                     .col-sm-6
                       table
                         tr
-                          each itemCategory in itemCategories
-                            td
-                              button.btn.btn-app#selectedCategory(type='button' data-getButton='n-#{itemCategory._id}' data-mealType = 'Non Veg' value = '#{itemCategory.name}')
-                                | #{itemCategory.name}
+                          //- each itemCategory in itemCategories
+                          //-   td
+                          //-     button.btn.btn-app#selectedCategory(type='button' data-getButton='n-#{itemCategory._id}' data-mealType = 'Non Veg' value = '#{itemCategory.name}')
+                          //-       | #{itemCategory.name}
+                          td
+                            button.btn.btn-app#selectedCategory(type='button' data-getButton='Sandwich' data-mealType = 'Non Veg' value = 'Sandwich')
+                              | Sandwich
+                          td
+                            button.btn.btn-app#selectedCategory(type='button' data-getButton='Salad' data-mealType = 'Non Veg' value = 'Salad')
+                              | Salad
+                          td
+                            button.btn.btn-app#selectedCategory(type='button' data-getButton='Pasta' data-mealType = 'Non Veg' value = 'Pasta')
+                              | Pasta
+                          td
+                            button.btn.btn-app#selectedCategory(type='button' data-getButton='Classic-Indian' data-mealType = 'Non Veg' value = 'Classic Indian')
+                              | Classic Indian
+                          td
+                            button.btn.btn-app#selectedCategory(type='button' data-getButton='Indian' data-mealType = 'Non Veg' value = 'Indian')
+                              | Indian
+                          td
+                            button.btn.btn-app#selectedCategory(type='button' data-getButton='Roasted' data-mealType = 'Non Veg' value = 'Roasted')
+                              | Roasted
+                          td
+                            button.btn.btn-app#selectedCategory(type='button' data-getButton='Burgers' data-mealType = 'Non Veg' value = 'Burgers')
+                              | Burgers
+                          td
+                            button.btn.btn-app#selectedCategory(type='button' data-getButton='Extras' data-mealType = 'Non Veg' value = 'Extras')
+                              | Extras
                           td
                             button.btn.btn-app#selectedCategory(type='button' data-getButton='int' data-mealType = 'Non Veg' value = 'International')
                               | International

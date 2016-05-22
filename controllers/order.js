@@ -379,13 +379,15 @@ exports.postAddOrder = function(req, res){
             if (req.body.getPosition[positions[s][t]] == 'true') {
               console.log("---------subItems as seperate items-----------");
               for (var k=0; k<subItemsId[positions[s][t]].length; k++) {
-                subTotal += subItemsQuantity[positions[s][t]][k] * subItemsCost[positions[s][t]][k];
-                order.menu.push({
-                  _id : subItemsId[positions[s][t]][k],
-                  singleQuantity : Number(subItemsQuantity[positions[s][t]][k]) * req.body.singleQuantity[positions[s][t]],
-                  containerType: req.body.containerType[positions[s][t]],
-                  subTotal: subTotal * subItemsQuantity[positions[s][t]][k]
-                })
+                if (subItemsQuantity[positions[s][t]][k] > 0) {
+                  subTotal += subItemsQuantity[positions[s][t]][k] * subItemsCost[positions[s][t]][k];
+                  order.menu.push({
+                    _id : subItemsId[positions[s][t]][k],
+                    singleQuantity : Number(subItemsQuantity[positions[s][t]][k]) * req.body.singleQuantity[positions[s][t]],
+                    containerType: req.body.containerType[positions[s][t]],
+                    subTotal: subTotal * subItemsQuantity[positions[s][t]][k]
+                  })
+                }
               }
               totalCost += subTotal * req.body.singleQuantity[positions[s][t]];
               console.log(order.menu[positions[s][t]])

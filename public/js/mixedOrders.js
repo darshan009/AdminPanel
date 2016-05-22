@@ -37,8 +37,8 @@ $(function () {
     var categories = $('.minimal:checked').map(function() {
       return this.value;
     }).get();
-    var type = $('.minimal:checked').attr('data-type');
-
+    var type = $(this).attr('data-type');
+    console.log(type);
     $date = $('#dateSelected').val();
     $meal = $('#mealSelected').val();
     if ( !$('#mealSelected').val() )
@@ -177,15 +177,13 @@ $(function () {
        | display non-similar mixed order section
        |-----------------------------------------
       */
-      var nonSimilarDivData = [], addressArray = [], addressCount = 0, addToTable;
+      var nonSimilarDivData = [], addToTable;
       $('#displaySection').html('');
       $('#displaySectionBarcode').html('');
       addToTable = '<div class="box box-success"><div class="box-header"><h3 class="box-title">Mixed Order List - <b></b></h3></div><!-- /.box-header--><div id="displaySection" class="box-body"><table id="example3" class="table table-bordered table-hover"><thead><tr><th>User</th><th>Address</th><th>Meal</th><th>Details</th><th>Container</th></tr></thead><tbody>';
       for (var m=0; m<listOfOrdersByAddress.length; m++) {
         for (var i = 0; i < listOfOrdersByAddress[m].orderList.length; i++) {
           if (uniquePositions.indexOf(m) < 0) {
-            addressArray[addressCount] = listOfOrdersByAddress[m].address._id._id;
-            addressCount++;
             if (i == 0) {
               addToTable += '<tr><td rowspan='+listOfOrdersByAddress[m].orderList.length+'>'+ listOfOrdersByAddress[m].user +'</td>';
               addToTable += '<td rowspan='+listOfOrdersByAddress[m].orderList.length+'>'+ listOfOrdersByAddress[m].address._id.tag +',</br>'+listOfOrdersByAddress[m].address._id.flatNo+',</br>'+listOfOrdersByAddress[m].address._id.streetAddress+',</br>'+listOfOrdersByAddress[m].address._id.landmark+',</br>'+listOfOrdersByAddress[m].address._id.pincode+'</td>';
@@ -203,7 +201,7 @@ $(function () {
           }
         }
       }
-      addToTable += '</tbody></table><br /><button id="getBarcode" type="button" class="btn btn-info pull-right" data-address='+[addressArray]+' onclick="printBarcode()">Get Address Barcode</button></div></div>';
+      addToTable += '</tbody></table><br /><button id="getBarcode" type="button" class="btn btn-info pull-right" onclick="printBarcode()">Get Address Barcode</button></div></div>';
       //console.log(addToTable)
       $('#displaySection').append(addToTable);
       $('#example3').DataTable({
@@ -216,16 +214,37 @@ $(function () {
       });
 
       //barcode Section
-      var containerCount = 0, orderIds = [], newDivData = '<div class = "box box-info"><div class = "box-header">Choose categroy</div><div class = "box-body">';
+      var containerCount = 0, displayBarcodeCount, orderIds = [], newDivData = '<div class = "box box-info"><div class = "box-header">Choose categroy</div><div class = "box-body">';
       for (var i=0; i < nonSimilarDivData.length; i++) {
         orderIds.push(nonSimilarDivData[i]._id);
+        containerCount = 0, displayBarcodeCount = 0;
         for (var j=0; j<nonSimilarDivData[i].orderList.length; j++) {
+
+          //check for the number of containers, if > 6 containers for one order then print a new barcode for the order
+          if (nonSimilarDivData[i].orderList[j].attributes)
+            containerCount += nonSimilarDivData[i].orderList[j].attributes.container;
+          else
+            containerCount += nonSimilarDivData[i].orderList[j]._id.container;
+          if (containerCount > 6) {
+            displayBarcodeCount++;
+            containerCount = 0;
+            if (nonSimilarDivData[i].orderList[j].attributes)
+              containerCount += nonSimilarDivData[i].orderList[j].attributes.container;
+            else
+              containerCount += nonSimilarDivData[i].orderList[j]._id.container;
+          }
+        }
+
+        //display barcodes based on the number of containers
+        for (var k=0;k<displayBarcodeCount; k++ ) {
+          addressArray.push(nonSimilarDivData[i].address._id);
           newDivData += '<h3><div class="invoice-info"><div class="invoice-col"><strong>'+nonSimilarDivData[i].orderList[j]._id.title+'<br/><br/>'+nonSimilarDivData[i].user+'</br><p align="center">';
           newDivData += '<address>'+nonSimilarDivData[i].address._id.user+'</p><br>'+nonSimilarDivData[i].address._id.tag +',</br>'+nonSimilarDivData[i].address._id.flatNo+',</br>'+nonSimilarDivData[i].address._id.streetAddress+',</br>'+nonSimilarDivData[i].address._id.landmark+',</br>'+nonSimilarDivData[i].address._id.pincode+'</address>';
           newDivData += '<div id="bcTarget'+i+'"></div></div></strong></div><br></h3><hr>';
         }
       }
-      newDivData += '<br /><button id="" type="button" class="btn btn-info pull-left" onclick = "printDiv()">Print order list</button><button id="nonSimilarDoneButton" class="btn btn-info pull-right" data-orderids='+[orderIds]+' onclick="changeOrderStatus()">Done</button>';
+
+      newDivData += '<br /><button id="" type="button" class="btn btn-info pull-left" onclick = "printDiv()">Print order list</button><button id="nonSimilarDoneButton" class="btn btn-info pull-right" data-address='+[addressArray]+' data-orderids='+[orderIds]+' onclick="changeOrderStatus()">Done</button>';
       newDivData += '</div></div>';
       $('#displaySectionBarcode').append(newDivData);
       $('#displaySectionBarcode').hide();

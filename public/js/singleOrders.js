@@ -38,7 +38,7 @@ $(function () {
     var categories = $('.minimal:checked').map(function() {
       return this.value;
     }).get();
-    var type = $('.minimal:checked').attr('data-type');
+    var type = $(this).attr('data-type');
 
     $date = $('#dateSelected').val();
     $meal = $('#mealSelected').val();

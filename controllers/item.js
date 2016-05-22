@@ -100,11 +100,11 @@ var User = require('../models/User.js');
      var item = new Item({
        title: req.body.title,
        state : req.body.state,
-       chef: userChef._id,
+       chef: req.body.chef,
        description: req.body.description,
        type: req.body.type,
        quantity: req.body.quantity,
-       category: itemCategory._id,
+       category: req.body.category,
        container: req.body.container
      });
      var totalCost = 0;
@@ -138,8 +138,10 @@ var User = require('../models/User.js');
 
  exports.deleteItem = function(req, res){
    Item.findById(req.params.id).exec(function(err, item){
+     console.log("hi");
      if(err)
       return err;
+     console.log("hi");
      item.remove();
      res.redirect('/itemList');
    });

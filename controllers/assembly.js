@@ -455,3 +455,49 @@ exports.changeOrderStatus = function(req, res){
     res.send(orders);
   });
 };
+
+/*
+ |-----------------------------------------------------------
+ | AJAX call to get orders by date for remainingOrders
+ |-----------------------------------------------------------
+*/
+exports.getRemainingOrdersPage = function(req, res) {
+  res.render('./newAssembly/remainingOrders');
+};
+
+exports.getRemainingOrdersByDate = function(req, res) {
+  Order.find({
+    date : req.query.date,
+    meal: req.query.meal
+  })
+  .populate('menu._id')
+  .populate('address._id')
+  .exec(function(err, orders) {
+    if (err) {
+      return err;
+    }
+    var k = 0, orderList = [], menuList = [];
+    for (var i=0; i<orders.length; i++){
+      menuList = [];
+      if (orders[i].state == 'Published' && orders[i].status != 'out') {
+        for (var j=0; j<orders[i].menu.length; j++) {
+          if (orders[i].menu[j]._id != null) {
+            menuList.push(orders[i].menu[j]);
+          }
+        }
+        if (menuList.length > 0) {
+          orderList[k] = {
+            id : orders[i]._id,
+            date : orders[i].date.toDateString(),
+            user : orders[i].user,
+            address : orders[i].address,
+            menu : menuList
+          }
+          k++;
+        }
+      }
+    }
+    console.log(orderList);
+    res.send(orderList);
+  });
+};

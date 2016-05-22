@@ -73,6 +73,7 @@ app.get('/addItem', userController.isAdmin, itemController.getAddItem);
 app.get('/editItem/:id', userController.isAdmin, itemController.getAddItem);
 app.post('/addItem', userController.isAdmin, itemController.postAddItem);
 app.post('/editItem/:id', userController.isAdmin, itemController.postAddItem);
+app.get('/addItem/delete/:id', userController.isAdmin, itemController.deleteItem);
 //menu
 app.get('/menuList', userController.isAdmin, menuController.getMenuList);
 app.get('/addMenu', userController.isAdmin, menuController.getAddMenu);
@@ -100,6 +101,8 @@ app.get('/singleOrdersWithExtras', assemblyController.getSingleOrdersWithExtrasP
 app.get('/getSingleOrdersWithExtras', assemblyController.getSingleOrdersWithExtras);
 app.get('/multipleCategoryOrders', assemblyController.getMultipleCategoryOrdersPage);
 app.get('/getMultipleCategoryOrders', assemblyController.getMultipleCategoryOrders);
+app.get('/remainingOrders', assemblyController.getRemainingOrdersPage);
+app.get('/getRemainingOrdersByDate', assemblyController.getRemainingOrdersByDate);
 //change order status
 app.get('/changeOrderStatus', assemblyController.changeOrderStatus);
 //assembly

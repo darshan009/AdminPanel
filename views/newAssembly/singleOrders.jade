@@ -175,6 +175,10 @@ html
                     a(href='/multipleCategoryOrders')
                       i.fa.fa-circle-o
                       |  Multiple Category Orders
+                  li
+                    a(href='/remainingOrders')
+                      i.fa.fa-circle-o
+                      |  Remaining Orders
             li
               a(href='/assembly')
                 i.fa.fa-pie-chart
@@ -220,25 +224,20 @@ html
                         option Lunch
                         option Dinner
                   .form-group
-                    label.col-sm-2.control-label Veg Categories
+                    label.col-sm-2.control-label Categories
                     .col-sm-6
                       each itemCategory in itemCategories
-                        .col-sm-3
-                          label
-                            input(type="checkbox" class="minimal" data-type="Veg" value="#{itemCategory._id}")
-                            | #{itemCategory.name}
-                  .form-group
-                    label.col-sm-2.control-label Non-Veg Categories
-                    .col-sm-6
-                      each itemCategory in itemCategories
-                        .col-sm-3
-                          label
-                            input(type="checkbox" class="minimal" data-type="Non-Veg" value="#{itemCategory._id}")
-                            | #{itemCategory.name}
+                        if (itemCategory.name != 'Classic Indian' && itemCategory.name != 'Indian')
+                          .col-sm-3
+                            label
+                              input(type="checkbox" class="minimal" value="#{itemCategory._id}")
+                              | #{itemCategory.name}
                   .form-group
                     label.col-sm-2.control-label
-                    .col-sm-6
-                      button.btn.btn-info(type= 'button' id='displaySelected') Display
+                    .col-sm-2
+                      button.btn.btn-info(type= 'button' data-type='Veg' id='displaySelected') Veg
+                    .col-sm-2
+                      button.btn.btn-info(type= 'button' data-type='Non-Veg' id='displaySelected') Non-Veg
           .row#displaySection
           .row#displaySectionBarcode
               // /.box-body
