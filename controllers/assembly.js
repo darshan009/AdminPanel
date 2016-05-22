@@ -499,3 +499,34 @@ exports.getRemainingOrdersByDate = function(req, res) {
     res.send(orderList);
   });
 };
+
+/*
+ |--------------------------------------------
+ | AJAX call to get all the items for the day
+ |--------------------------------------------
+*/
+exports.getItemsForTheDay = function(req, res) {
+  Order.find({
+    meal : req.query.meal,
+    date : req.query.date
+  })
+  .populate('menu._id')
+  .populate('address._id')
+  .exec(function(err, orders) {
+
+    //find all unique items
+    var uniqueItems = [], findUniqueItems = [];
+    for (var i=0; i<orders.length; i++) {
+      if (orders[i].state != 'Archieved' && orders[i].status != 'out') {
+        for (var j=0; j<orders[i].menu.length; j++) {
+          if (findUniqueItems.indexOf(orders[i].menu[j]._id._id) < 0) {
+            findUniqueItems.push(orders[i].menu[j]._id._id);
+            uniqueItems.push(orders[i].menu[j]._id);
+          }
+        }
+      }
+    }
+    console.log(uniqueItems);
+    res.send(uniqueItems);
+  });
+};

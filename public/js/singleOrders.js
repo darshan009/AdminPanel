@@ -1,10 +1,6 @@
 $(function () {
   $.fn.dataTable.ext.errMode = 'none';
-  //iCheck plugin for checkbox and radio inputs
-  $('input[type="checkbox"].minimal, input[type="radio"].minimal').iCheck({
-    checkboxClass: 'icheckbox_minimal-blue',
-    radioClass: 'iradio_minimal-blue'
-  });
+
   //datepcker plugin
   $('.datepicker').datepicker();
 
@@ -26,6 +22,40 @@ $(function () {
   var today = mm+'/'+dd+'/'+yyyy;
   console.log(today);
   $('#dateSelected').val(today);
+
+  /*
+   |---------------------------------------------
+   | AJAX call for retrieving items for the day
+   |---------------------------------------------
+  */
+  $('button#getItemsForTheDay').click(function(){
+
+    $date = $('#dateSelected').val();
+    $meal = $('#mealSelected').val();
+
+    //call
+    $.getJSON("/getItemsForTheDay", {
+      meal : $meal,
+      date: $date,
+      ajax : true
+    },function(itemsForTheDay){
+
+      var addToCategories = '';
+      for (var i=0; i<itemsForTheDay.length; i++) {
+        addToCategories += '<div class="col-sm-6"><label><input type="checkbox" value="'+itemsForTheDay[i]._id+'" class="minimal"/>'+itemsForTheDay[i].title+'</label></div>';
+      }
+      $('#displayCategories').html('');
+      $('#displayCategories').append(addToCategories);
+
+      //iCheck plugin for checkbox and radio inputs
+      $('input[type="checkbox"].minimal, input[type="radio"].minimal').iCheck({
+        checkboxClass: 'icheckbox_minimal-blue',
+        radioClass: 'iradio_minimal-blue'
+      });
+
+    });
+  });
+
 
   /*
    |------------------------------

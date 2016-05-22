@@ -97,6 +97,7 @@ app.get('/getOrdersByDate', orderController.getOrdersByDate);
 //new assembly
 app.get('/nassembly', assemblyController.getnAssemblyList);
 app.get('/getSingleOrders', assemblyController.getSingleOrders);
+app.get('/getItemsForTheDay', assemblyController.getItemsForTheDay);
 app.get('/singleOrdersWithExtras', assemblyController.getSingleOrdersWithExtrasPage);
 app.get('/getSingleOrdersWithExtras', assemblyController.getSingleOrdersWithExtras);
 app.get('/multipleCategoryOrders', assemblyController.getMultipleCategoryOrdersPage);

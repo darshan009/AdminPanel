@@ -223,15 +223,12 @@ html
                       select.form-control(name = 'meal' id='mealSelected')
                         option Lunch
                         option Dinner
+                    .col-sm-2
+                      button.btn.btn-info#getItemsForTheDay(type= 'button') Get Items for the day
                   .form-group
                     label.col-sm-2.control-label Categories
                     .col-sm-6
-                      each item in items
-                        if (item.title != 'Classic Indian' && item.title != 'Indian')
-                          .col-sm-3
-                            label
-                              input(type="checkbox" class="minimal" value="#{item._id}")
-                              | #{item.title}
+                      #displayCategories
                   .form-group
                     label.col-sm-2.control-label
                     .col-sm-2
