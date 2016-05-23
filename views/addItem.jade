@@ -231,8 +231,8 @@ html
                 .form-group
                   label.col-sm-2.control-label Category
                   .col-sm-10
-                    select.form-control(name='category' value=(item?(item.category?item.category._id:''):''))
-                      option(selected='selected')
+                    select.form-control(name='category')
+                      option(selected='selected' value=(item?(item.category?item.category._id:''):''))
                         | #{item?(item.category?item.category.name:''):''}
                       each itemCategory in itemCategories
                         option(value='#{itemCategory._id}')
@@ -273,7 +273,7 @@ html
                 .box-footer
                   if(item)
                     a(href='/addItem/delete/#{item._id}')
-                      button.btn.btn-info.pull-left(type='submit') Delete
+                      button.btn.btn-info.pull-left(type='button') Delete
                     button.btn.btn-info.pull-right(type='submit') Edit
                   else
                     button.btn.btn-info.pull-right(type='submit') Save

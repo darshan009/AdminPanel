@@ -208,16 +208,17 @@ exports.postAddOrder = function(req, res){
                  console.log("---------cost check-----------");
                  for (var k=0; k<sortedMenus[i].item.attributes.length; k++)
                    if (sortedMenus[i].item.attributes[k].name == req.body.attributesName[j]) {
-                     totalCost += sortedMenus[i].item.attributes[k].cost * req.body.singleQuantity[i];
-                     var subTotal = sortedMenus[i].item.attributes[k].cost * req.body.singleQuantity[i];
+                     subTotal += sortedMenus[i].item.attributes[k].cost * req.body.singleQuantity[i];
+                     var container = sortedMenus[positions[s][t]].item.attributes[k].container;
                    }
                  order.menu.push({
                    _id : sortedMenus[i].item._id,
                    attributes : {
                      name : req.body.attributesName[j],
-                     quantity : req.body.singleQuantity[i]
+                     //quantity : req.body.singleQuantity[i],
+                     container: container
                    },
-                   subTotal : subTotal,
+                   subTotal : subTotal * req.body.singleQuantity[positions[s][t]],
                    singleQuantity : req.body.singleQuantity[i],
                    containerType: req.body.containerType[i]
                  })

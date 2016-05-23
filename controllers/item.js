@@ -65,21 +65,20 @@ var User = require('../models/User.js');
        if (err)
         return err;
        var locals = req.body;
+       console.log(req.body);
        var totalCost = 0;
-       item.title= req.body.title;
-       item.state = req.body.state;
-       item.chef= req.body.chef;
-       item.description= req.body.description;
-       item.type= req.body.type;
-       item.category= req.body.category;
-       item.quantity = req.body.quantity;
-       item.container = req.body.container;
-       item.totalCost = 0;
-       item.totalCost += totalCost;
-       item.attributes = [];
+       item.title = locals.title;
+       item.state = locals.state;
+       item.chef = locals.chef;
+       item.description = locals.description;
+       item.type = locals.type;
+       item.category= locals.category;
+       item.quantity = locals.quantity;
+       item.container = locals.container;
 
        //if item has attributes
-       if (locals.nameAtt)
+       if (locals.nameAtt) {
+         item.attributes = [];
          for(var i=0; i<locals.nameAtt.length; i++){
            if (locals.nameAtt[i] != '' && locals.costAtt[i] != '')
              item.attributes.push({
@@ -87,25 +86,33 @@ var User = require('../models/User.js');
                cost : locals.costAtt[i],
                container: locals.containerAtt[i]
              })
-             totalCost += Number(locals.costAtt[i]);
           }
+       }
+
+       //if item does not have attributes then it has only one cost
+       if (locals.singleCost) {
+          totalCost += locals.singleCost * locals.quantity;
+          item.totalCost = 0;
+          item.totalCost += totalCost;
+       }
+       console.log(item);
        item.save(function (err) {
-           if (err)
-            return err;
+         if (err)
+          return err;
        });
       res.redirect('/itemList');
      });
    }else{
      var locals = req.body;
      var item = new Item({
-       title: req.body.title,
-       state : req.body.state,
-       chef: req.body.chef,
-       description: req.body.description,
-       type: req.body.type,
-       quantity: req.body.quantity,
-       category: req.body.category,
-       container: req.body.container
+       title: locals.title,
+       state : locals.state,
+       chef: locals.chef,
+       description: locals.description,
+       type: locals.type,
+       quantity: locals.quantity,
+       category: locals.category,
+       container: locals.container
      });
      var totalCost = 0;
 
@@ -125,7 +132,7 @@ var User = require('../models/User.js');
 
      //if item does not have attributes then it has only one cost
      if (locals.singleCost)
-        totalCost += locals.singleCost;
+        totalCost += locals.singleCost * locals.quantity;
      item.totalCost = 0;
      item.totalCost += totalCost;
      item.save(function (err) {

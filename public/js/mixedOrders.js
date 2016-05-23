@@ -140,7 +140,7 @@ $(function () {
       */
       $('#displaySimilar').html('');
       $('#displaySimilarBarcode').html('');
-      var similarDivId = 0;
+      var similarDivId = 0, similarBarcodeDivData = [], displayAddressArrayCounter = 0;
       for (var m=0; m<sortedMixedOrders.length; m++) {
         //console.log(sortedMixedOrders[m].mixed);
         var similarCount = 0;
@@ -150,23 +150,28 @@ $(function () {
             similarCount++;
         }
         if (similarCount > 0) {
-          var drawOnce = true, similarDivData = [], addressArraySimilar = [];
+          var drawOnce = true;
           for (var y=0; y<similarCount; y++) {
             for (var i = 0; i < sortedMixedOrders[m+y].orderList.length; i++) {
-              addressArraySimilar.push(sortedMixedOrders[m+y].address._id._id);
               if (drawOnce) {
                 var addToTable = '<div id="'+similarDivId+'" class="box box-success"><div class="box-header"><h3 class="box-title">Similar Order List - <b> -- '+type+'</b></h3></div><!-- /.box-header--><div id="" class="box-body"><table id="example3" class="table table-bordered table-hover"><thead><tr><th>User</th><th>Address</th><th>Meal</th><th>Details</th><th>Container</th></tr></thead><tbody>';
                 drawOnce = false;
               }
               if (i == 0) {
-                similarDivData.push(sortedMixedOrders[m+y]);
+                similarBarcodeDivData.push(sortedMixedOrders[m+y]);
                 addToTable += '<tr><td rowspan='+sortedMixedOrders[m+y].orderList.length+'>'+ sortedMixedOrders[m+y].user +'</td>';
                 addToTable += '<td rowspan='+sortedMixedOrders[m+y].orderList.length+'>'+ sortedMixedOrders[m+y].address._id.tag +',</br>'+sortedMixedOrders[m+y].address._id.flatNo+',</br>'+sortedMixedOrders[m+y].address._id.streetAddress+',</br>'+sortedMixedOrders[m+y].address._id.landmark+',</br>'+sortedMixedOrders[m+y].address._id.pincode+'</td>';
               }
               addToTable += '<td>'+ sortedMixedOrders[m+y].orderList[i]._id.title +'</td>';
               addToTable += '<td>';
-              addToTable += '<b>Total Quantity - '+sortedMixedOrders[m+y].orderList[i].singleQuantity+'</td>';
-              addToTable += '<td><b>'+sortedMixedOrders[m+y].orderList[i].containerType+'</b><br>';
+              if (sortedMixedOrders[m+y].orderList[i].attributes) {
+                addToTable += '<b>Total Quantity - '+sortedMixedOrders[m+y].orderList[i].singleQuantity+', '+sortedMixedOrders[m+y].orderList[i].attributes.name+'</td>';
+                addToTable += '<td><b>'+sortedMixedOrders[m+y].orderList[i].attributes.container+' - '+sortedMixedOrders[m+y].orderList[i].containerType+'</b><br>';
+              }
+              else {
+                addToTable += '<b>Total Quantity - '+sortedMixedOrders[m+y].orderList[i].singleQuantity+'</td>';
+                addToTable += '<td><b>'+sortedMixedOrders[m+y].orderList[i]._id.container+' - '+sortedMixedOrders[m+y].orderList[i].containerType+'</b><br>';
+              }
               if (sortedMixedOrders[m+y].orderList[i].specialinstruction)
                 addToTable += '<br /><b> Speacial Instruction - '+sortedMixedOrders[m+y].orderList[i].specialinstruction+'</td></tr>';
               else
@@ -176,30 +181,57 @@ $(function () {
             }
           }
           m += similarCount - 1;
+
+          //get barcode Section ready
+          var containerCount = 0, addressArraySimilar = [], displayBarcodeCount, orderIds = [],
+              newDivData = '<div id="displaySimilarBarcode'+similarDivId+'" class = "box box-info"><div class = "box-header">Choose categroy</div><div class = "box-body">';
+          for (var i=0; i < similarBarcodeDivData.length; i++) {
+            orderIds.push(similarBarcodeDivData[i]._id);
+            containerCount = 0, displayBarcodeCount = 1;
+            for (var j=0; j<similarBarcodeDivData[i].orderList.length; j++) {
+
+              //check for the number of containers, if > 6 containers for one order then print a new barcode for the order
+              if (similarBarcodeDivData[i].orderList[j].attributes)
+                containerCount += similarBarcodeDivData[i].orderList[j].attributes.container * similarBarcodeDivData[i].orderList[j].singleQuantity;
+              else
+                containerCount += similarBarcodeDivData[i].orderList[j]._id.container;
+              if (containerCount > 6) {
+                displayBarcodeCount++;
+                containerCount = 0;
+                if (similarBarcodeDivData[i].orderList[j].attributes)
+                  containerCount += similarBarcodeDivData[i].orderList[j].attributes.container;
+                else
+                  containerCount += similarBarcodeDivData[i].orderList[j]._id.container;
+              }
+            }
+
+            //display barcodes based on the number of containers
+            for (var k=0; k<displayBarcodeCount; k++) {
+              addressArraySimilar.push(similarBarcodeDivData[i].address._id._id);
+              newDivData += '<h3><div class="invoice-info"><div class="invoice-col"><strong>'+similarBarcodeDivData[i].user+'</br><p align="center">';
+              newDivData += '<address>'+similarBarcodeDivData[i].address._id.user+'</p><br>'+similarBarcodeDivData[i].address._id.tag +',</br>'+similarBarcodeDivData[i].address._id.flatNo+',</br>'+similarBarcodeDivData[i].address._id.streetAddress+',</br>'+similarBarcodeDivData[i].address._id.landmark+',</br>'+similarBarcodeDivData[i].address._id.pincode+'</address>';
+              newDivData += '<div id="bcTargetSimilar'+displayAddressArrayCounter+'"></div></div></strong></div><br></h3><hr>';
+              displayAddressArrayCounter++;
+            }
+          }
+
+
+          //now display similar order section since getBarcode button needs address Array from barcode section
           if (y > 1 && displayLastDiv) {
             addToTable += '</tbody></table><br /><button type="button" id="getBarcodeSimilar'+similarDivId+'" class="btn btn-info pull-right" data-address="'+addressArraySimilar+'" onclick="printBarcodeSimilar('+similarDivId+')">Get Address Barcodes</button></div></div>';
             $('#displaySimilar').append(addToTable);
             $('#example2').DataTable({
-            "paging": false,
-            "lengthChange": true,
-            "searching": false,
-            "ordering": false,
-            "info": true,
-            "autoWidth": true
+              "paging": false,
+              "lengthChange": true,
+              "searching": false,
+              "ordering": false,
+              "info": true,
+              "autoWidth": true
             });
             displayLastDiv = false;
           }
 
-          //barcode Section
-          var orderIds = [], newDivData = '<div id="displaySimilarBarcode'+similarDivId+'" class = "box box-info"><div class = "box-header">Choose categroy</div><div class = "box-body">';
-          for (var i=0; i < similarDivData.length; i++) {
-            orderIds.push(similarDivData[i]._id);
-            for (var j=0; j<similarDivData[i].orderList.length; j++) {
-              newDivData += '<h3><div class="invoice-info"><div class="invoice-col"><strong>'+similarDivData[i].orderList[j]._id.title+'<br/><br/>'+similarDivData[i].user+'</br><p align="center">';
-              newDivData += '<address>'+similarDivData[i].address._id.user+'</p><br>'+similarDivData[i].address._id.tag +',</br>'+similarDivData[i].address._id.flatNo+',</br>'+similarDivData[i].address._id.streetAddress+',</br>'+similarDivData[i].address._id.landmark+',</br>'+similarDivData[i].address._id.pincode+'</address>';
-              newDivData += '<div id="bcTarget'+i+'"></div></div></strong></div><br></h3><hr>';
-            }
-          }
+          //time to display the barcode section and hide it
           newDivData += '<br /><button id="" type="button" class="btn btn-info pull-left" onclick = "printSimilarDiv('+similarDivId+')">Print Address Barcodes list</button><button id="similarDoneButton'+similarDivId+'" class="btn btn-info pull-right" data-orderids="'+[orderIds]+'" onclick="changeOrderStatusForSimilar('+similarDivId+')">Done</button>';
           newDivData += '</div></div>';
           $('#displaySimilarBarcode').append(newDivData);
@@ -228,8 +260,14 @@ $(function () {
             }
             addToTable += '<td>'+ listOfOrdersByAddress[m].orderList[i]._id.title +'</td>';
             addToTable += '<td>';
-            addToTable += '<b>Total Quantity - '+listOfOrdersByAddress[m].orderList[i].singleQuantity+'</td>';
-            addToTable += '<td><b>'+listOfOrdersByAddress[m].orderList[i]._id.container+' - '+listOfOrdersByAddress[m].orderList[i].containerType+'</b><br>';
+            if (listOfOrdersByAddress[m].orderList[i].attributes) {
+              addToTable += '<b>Quantity - '+listOfOrdersByAddress[m].orderList[i].singleQuantity+', '+listOfOrdersByAddress[m].orderList[i].attributes.name+'</td>';
+              addToTable += '<td><b>'+listOfOrdersByAddress[m].orderList[i].attributes.container+' - '+listOfOrdersByAddress[m].orderList[i].containerType+'</b><br>';
+            }
+            else {
+              addToTable += '<b>Quantity - '+listOfOrdersByAddress[m].orderList[i].singleQuantity+'</td>';
+              addToTable += '<td><b>'+listOfOrdersByAddress[m].orderList[i]._id.container+' - '+listOfOrdersByAddress[m].orderList[i].containerType+'</b><br>';
+            }
             if (listOfOrdersByAddress[m].orderList[i].specialinstruction)
               addToTable += '<br /><b> Speacial Instruction - '+listOfOrdersByAddress[m].orderList[i].specialinstruction+'</td></tr>';
             else
@@ -238,28 +276,18 @@ $(function () {
           }
         }
       }
-      addToTable += '</tbody></table><br /><button id="getBarcode" type="button" class="btn btn-info pull-right" onclick="printBarcode()">Get Address Barcode</button></div></div>';
-      //console.log(addToTable)
-      $('#displaySection').append(addToTable);
-      $('#example3').DataTable({
-        "paging": false,
-        "lengthChange": true,
-        "searching": false,
-        "ordering": false,
-        "info": true,
-        "autoWidth": true
-      });
 
-      //barcode Section
-      var containerCount = 0, displayBarcodeCount, orderIds = [], newDivData = '<div class = "box box-info"><div class = "box-header">Choose categroy</div><div class = "box-body">';
+      //get barcode Section ready
+      var containerCount = 0, addressArray = [], displayBarcodeCount, orderIds = [], displayAddressArrayCounter = 0;
+          newDivData = '<div class = "box box-info"><div class = "box-header">Choose categroy</div><div class = "box-body">';
       for (var i=0; i < nonSimilarDivData.length; i++) {
         orderIds.push(nonSimilarDivData[i]._id);
-        containerCount = 0, displayBarcodeCount = 0;
+        containerCount = 0, displayBarcodeCount = 1;
         for (var j=0; j<nonSimilarDivData[i].orderList.length; j++) {
 
           //check for the number of containers, if > 6 containers for one order then print a new barcode for the order
           if (nonSimilarDivData[i].orderList[j].attributes)
-            containerCount += nonSimilarDivData[i].orderList[j].attributes.container;
+            containerCount += nonSimilarDivData[i].orderList[j].attributes.container * nonSimilarDivData[i].orderList[j].singleQuantity;
           else
             containerCount += nonSimilarDivData[i].orderList[j]._id.container;
           if (containerCount > 6) {
@@ -273,29 +301,36 @@ $(function () {
         }
 
         //display barcodes based on the number of containers
-        var addressArray = [];
-        for (var k=0;k<displayBarcodeCount; k++ ) {
-          addressArray.push(nonSimilarDivData[i].address._id);
-          newDivData += '<h3><div class="invoice-info"><div class="invoice-col"><strong>'+nonSimilarDivData[i].orderList[j]._id.title+'<br/><br/>'+nonSimilarDivData[i].user+'</br><p align="center">';
+        for (var k=0; k<displayBarcodeCount; k++) {
+          addressArray.push(nonSimilarDivData[i].address._id._id);
+          newDivData += '<h3><div class="invoice-info"><div class="invoice-col"><strong>'+nonSimilarDivData[i].user+'</br><p align="center">';
           newDivData += '<address>'+nonSimilarDivData[i].address._id.user+'</p><br>'+nonSimilarDivData[i].address._id.tag +',</br>'+nonSimilarDivData[i].address._id.flatNo+',</br>'+nonSimilarDivData[i].address._id.streetAddress+',</br>'+nonSimilarDivData[i].address._id.landmark+',</br>'+nonSimilarDivData[i].address._id.pincode+'</address>';
-          newDivData += '<div id="bcTarget'+i+'"></div></div></strong></div><br></h3><hr>';
+          newDivData += '<div id="bcTarget'+displayAddressArrayCounter+'"></div></div></strong></div><br></h3><hr>';
+          displayAddressArrayCounter++;
         }
       }
 
-      newDivData += '<br /><button id="" type="button" class="btn btn-info pull-left" onclick = "printDiv()">Print order list</button><button id="nonSimilarDoneButton" class="btn btn-info pull-right" data-address='+[addressArray]+' data-orderids='+[orderIds]+' onclick="changeOrderStatus()">Done</button>';
+      //now display non-similar order section since getBarcode button needs address Array from barcode section
+      addToTable += '</tbody></table><br /><button id="getBarcode" type="button" class="btn btn-info pull-right" data-address='+[addressArray]+' onclick="printBarcode()">Get Address Barcode</button></div></div>';
+      $('#displaySection').append(addToTable);
+      $('#example3').DataTable({
+        "paging": false,
+        "lengthChange": true,
+        "searching": false,
+        "ordering": false,
+        "info": true,
+        "autoWidth": true
+      });
+
+
+      //time to display the barcode section and hide it
+      newDivData += '<br /><button id="" type="button" class="btn btn-info pull-left" onclick = "printDiv()">Print order list</button><button id="nonSimilarDoneButton" class="btn btn-info pull-right" data-orderids='+[orderIds]+' onclick="changeOrderStatus()">Done</button>';
       newDivData += '</div></div>';
       $('#displaySectionBarcode').append(newDivData);
       $('#displaySectionBarcode').hide();
-    });
-  });
 
 
-  $('button#disabler').click(function(){
-    var dataTagetButton = $('#example2').attr('data-targetButton');
-    var CustomizedButton = $('#example2').attr('data-CustomizedButton');
-    $('#example2 tbody').html('');
-    $(':button[data-getButton = '+dataTagetButton+']').attr('disabled', true);
-    $(':button[data-getButton = '+CustomizedButton+']').attr('disabled', true);
+    });//end of ajax call
   });
 });
 
@@ -327,7 +362,7 @@ function printBarcodeSimilar(position) {
   var addressArray = $('#getBarcodeSimilar'+position+'').data('address').split(',');
   console.log(addressArray);
   for (var i=0; i<addressArray.length; i++) {
-    $("#bcTarget"+i+"").barcode(addressArray[i], "code128", {barWidth:3, barHeight:60});
+    $("#bcTargetSimilar"+i+"").barcode(addressArray[i], "code128", {barWidth:3, barHeight:60});
   }
   $('#'+position).hide();
   $('#displaySimilarBarcode'+position+'').show();

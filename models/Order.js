@@ -14,7 +14,7 @@ var orderSchema = new mongoose.Schema({
       "container" : Number,
       "cost" : Number
     },
-    containerType: String,
+    containerType: {type: String, enum: ['Disposable', 'Steel'], default: 'Steel'},
     subTotal: Number,
     singleQuantity: { type: Number, default : '1' }
   }],

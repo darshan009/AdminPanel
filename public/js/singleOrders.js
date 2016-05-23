@@ -105,8 +105,14 @@ $(function () {
           }
           addToTable += '<td>'+ listOfOrdersByAddress[m].orderList[0]._id.title +'</td>';
           addToTable += '<td>';
-          addToTable += '<b>Total Quantity - '+listOfOrdersByAddress[m].orderList[0].singleQuantity+'</td>';
-          addToTable += '<td><b>'+listOfOrdersByAddress[m].orderList[0].containerType+'</b><br>';
+          if (listOfOrdersByAddress[m].orderList[0].attributes) {
+            addToTable += '<b>Quantity - '+listOfOrdersByAddress[m].orderList[0].singleQuantity+', '+listOfOrdersByAddress[m].orderList[0].attributes.name+'</td>';
+            addToTable += '<td><b>'+listOfOrdersByAddress[m].orderList[0].attributes.container+' - '+listOfOrdersByAddress[m].orderList[0].containerType+'</b><br>';
+          }
+          else {
+            addToTable += '<b>Quantity - '+listOfOrdersByAddress[m].orderList[0].singleQuantity+'</td>';
+            addToTable += '<td><b>'+listOfOrdersByAddress[m].orderList[0]._id.container+' - '+listOfOrdersByAddress[m].orderList[0].containerType+'</b><br>';
+          }
           if (listOfOrdersByAddress[m].orderList[i].specialinstruction)
             addToTable += '<br /><b> Speacial Instruction - '+listOfOrdersByAddress[m].orderList[i].specialinstruction+'</td></tr>';
           else
